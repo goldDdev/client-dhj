@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "module": "ESNext",
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@utils/*": ["src/utils/*", "src/utils/*.js", "src/utils/index"],
+      "@urls/*": [
+        "src/utils/url/*",
+        "src/utils/url/*.js",
+        "src/utils/url/index"
+      ],
+      "@components/*": [
+        "src/components/*",
+        "src/components/*.jsx",
+        "src/components/*.js",
+        "src/components/index"
+      ],
+      "@contexts/*": [
+        "src/contexts/*",
+        "src/contexts/*.jsx",
+        "src/contexts/index"
+      ],
+      "@hooks/*": ["src/hooks/*", "src/hooks/*.js", "src/hooks/index"],
+      "@services/*": [
+        "src/services/*",
+        "src/services/*.js",
+        "src/services/index"
+      ],
+      "@travel/*": ["src/travel/*", "src/travel/*.js", "src/travel/index"]
+    }
+  },
+  "include": ["src", "vite.config.js"]
+}
