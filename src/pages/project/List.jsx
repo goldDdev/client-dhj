@@ -1,16 +1,16 @@
 import React from "react";
-import { Chip, Paper } from "@mui/material";
-import { IconButton, Button } from "@components/base";
+import { Button, Chip, Paper } from "@mui/material";
+import { IconButton } from "@components/base";
 import { useSnackbar } from "notistack";
-import SettingTemplate from "@components/templates/SettingTemplate";
-import PersonAdd from "@mui/icons-material/PersonAdd";
+
+import Add from "@mui/icons-material/Add";
 import Edit from "@mui/icons-material/Edit";
 import * as utils from "@utils/";
 import * as Filter from "./filter";
-import * as FORM from "./form";
 import * as Dummy from "../../constants/dummy";
 import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
+import MainTemplate from "@components/templates/MainTemplate";
 
 const columns = (table, t, utils, onUpdate) => [
   {
@@ -27,64 +27,8 @@ const columns = (table, t, utils, onUpdate) => [
     size: "small",
   },
   {
-    label: "ID",
-    value: (value, idx) => {
-      return value.cardID;
-    },
-    head: {
-      align: "center",
-      padding: "checkbox",
-    },
-    align: "center",
-    padding: "checkbox",
-    size: "small",
-  },
-  {
     label: t("name"),
     value: (value) => value.name,
-  },
-  {
-    label: t("status"),
-    value: (value) => (
-      <Chip
-        label={t(value.status)}
-        color={!value.invoiceAt ? "success" : "default"}
-        size="small"
-        variant="outlined"
-      />
-    ),
-    align: "center",
-    head: {
-      align: "center",
-      sx: {
-        width: "10%",
-      },
-    },
-  },
-  {
-    label: t("phoneNumber"),
-    value: (value) => utils.ccFormat(value.phoneNumber) || "-",
-    align: "center",
-    head: {
-      align: "center",
-      sx: {
-        width: "10%",
-      },
-    },
-    sx: {
-      whiteSpace: "nowrap",
-    },
-  },
-  {
-    label: t("role"),
-    value: (value) => t(value.role) || "-",
-    align: "center",
-    head: {
-      align: "center",
-      sx: {
-        width: "10%",
-      },
-    },
   },
   {
     label: "",
@@ -95,6 +39,7 @@ const columns = (table, t, utils, onUpdate) => [
     ),
     align: "center",
     head: {
+      noWrap: true,
       align: "center",
       padding: "checkbox",
     },
@@ -142,37 +87,31 @@ export default () => {
   };
 
   return (
-    <SettingTemplate
-      title={t("employee")}
-      subtitle={t("employeeSubtitlePage")}
+    <MainTemplate
+      title={t("project")}
       headRight={{
         children: (
-          <Button startIcon={<PersonAdd />} onClick={onOpen}>
-            {t(["add", "employee"])}
+          <Button
+            disableElevation
+            startIcon={<Add />}
+            onClick={onOpen}
+          >
+            {t(["add", "project"])}
           </Button>
         ),
       }}
     >
-      <Filter.TableFilter t={t} table={table} />
+
+      <Filter.ButtonFilter />
 
       <Paper elevation={0} variant="outlined">
         <DataTable
-          data={table.data}
-          loading={table.loading}
+          data={[]}
+          loading={false}
           column={columns(table, t, utils, onUpdate)}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
-
-      <FORM.Create
-        open={trigger.form}
-        t={t}
-        r={r}
-        mutation={mutation}
-        snackbar={enqueueSnackbar}
-        table={table}
-        onOpen={onOpen}
-      />
-    </SettingTemplate>
+    </MainTemplate>
   );
 };

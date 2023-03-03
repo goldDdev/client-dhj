@@ -1,21 +1,7 @@
-import { Box, BoxProps, Stack, Typography } from "@mui/material";
+import { Box, Divider, Stack, Typography } from "@mui/material";
 import { Breadcrumb } from "@components/";
 
-interface MainTemplateProps {
-  title: string;
-  subTitle?: string;
-  breadcrumb: boolean;
-  headRight?: BoxProps;
-  children: any;
-}
-
-const MainTemplate = ({
-  title,
-  subTitle,
-  breadcrumb,
-  children,
-  headRight,
-}: MainTemplateProps): JSX.Element => {
+const MainTemplate = ({ title, subtitle, breadcrumb, children, headRight }) => {
   document.title = title;
   return (
     <>
@@ -25,7 +11,7 @@ const MainTemplate = ({
             {title}
           </Typography>
           {!breadcrumb && (
-            <Typography variant="subtitle1">{subTitle}</Typography>
+            <Typography variant="subtitle1">{subtitle}</Typography>
           )}
           {breadcrumb && <Breadcrumb />}
         </Box>
@@ -42,6 +28,6 @@ export default MainTemplate;
 
 MainTemplate.defaultProps = {
   title: "",
-  subTitle: "",
+  subtitle: "",
   breadcrumb: false,
 };

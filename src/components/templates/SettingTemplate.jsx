@@ -55,7 +55,7 @@ const SettingTemplate = ({
         {headRight ? <Box {...headRight} /> : null}
       </Stack>
 
-      <Stack direction="row" sx={{ mt: { xs: 2 } }} spacing={1} alignItems="center">
+      {/* <Stack direction="row" sx={{ mt: { xs: 2 } }} spacing={1} alignItems="center">
         <Typography fontWeight={700}>{t("page")}:</Typography>
         {path(t).map((v, i) => (
           <div key={"settings-" + i}>
@@ -68,7 +68,7 @@ const SettingTemplate = ({
             </Button>
           </div>
         ))}
-      </Stack>
+      </Stack> */}
 
       <Box sx={{ mt: "24px" }}>{children}</Box>
     </Stack>

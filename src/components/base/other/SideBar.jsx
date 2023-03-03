@@ -1,3 +1,4 @@
+import React from "react";
 import Drawer from "./Drawer";
 import {
   Divider,
@@ -11,9 +12,13 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  Collapse,
 } from "@mui/material";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useNavigate } from "react-router-dom";
 import * as icon from "@mui/icons-material";
+import logo from "@assets/png/logo-dhj.png";
 
 const menu = [
   {
@@ -25,8 +30,12 @@ const menu = [
   {
     canAccess: [],
     text: "Proyek",
-    link: "",
+    link: "/projects",
     icon: icon.Add,
+    children: [
+      { canAccess: [], text: "Board", link: "/projects/board" },
+      { canAccess: [], text: "Daftar", link: "/projects/list" },
+    ],
   },
   {
     canAccess: [],
@@ -51,14 +60,29 @@ const menu = [
     text: "Pengaturan",
     link: "/settings",
     icon: icon.Settings,
+    children: [
+      { canAccess: [], text: "Pengguna", link: "/projects/list" },
+      { canAccess: [], text: "Karyawan", link: "/settings" },
+      { canAccess: [], text: "BOC", link: "/settings" },
+      { canAccess: [], text: "Umum", link: "/settings" },
+    ],
   },
 ];
 
 const SideBar = (props) => {
   const { window } = props;
+  const [openParent, setOpenParent] = React.useState(-1);
   const navigate = useNavigate();
   const container =
     window !== undefined ? () => window().document.body : undefined;
+
+  const onClick = (value, index) => () => {
+    if (value.children && value.children.length > 0) {
+      setOpenParent((state) => (state === index ? -1 : index));
+    } else {
+      navigate(value.link);
+    }
+  };
 
   return (
     <>
@@ -100,7 +124,7 @@ const SideBar = (props) => {
 
         <Divider />
         <List>
-          <div>
+          <li>
             {menu.length > 0 &&
               menu.map((val, index) => (
                 <ListItemButton key={index} onClick={() => console.log("hai")}>
@@ -117,7 +141,7 @@ const SideBar = (props) => {
                   />
                 </ListItemButton>
               ))}
-          </div>
+          </li>
         </List>
       </MobileDrawer>
 
@@ -142,9 +166,7 @@ const SideBar = (props) => {
             px: [1],
           }}
         >
-          <Typography sx={{ flexGrow: 1 }} align="center" fontWeight={500}>
-            {import.meta.env.REACT_APP_NAME || "React App"}
-          </Typography>
+          <img src={logo} alt="PT. Duta Hita Jaya" height={50} />
           <IconButton onClick={props.onToggleDrawer}>
             <icon.ChevronLeft />
           </IconButton>
@@ -152,10 +174,10 @@ const SideBar = (props) => {
 
         <Divider />
         <List>
-          <div>
-            {menu.length > 0 &&
-              menu.map((val, index) => (
-                <ListItemButton key={index} onClick={() => navigate(val.link)}>
+          {menu.length > 0 &&
+            menu.map((val, index) => (
+              <li key={index}>
+                <ListItemButton onClick={onClick(val, index)}>
                   <ListItemIcon>
                     <Tooltip title={val.text}>
                       <SvgIcon component={val.icon} />
@@ -167,9 +189,47 @@ const SideBar = (props) => {
                       fontWeight: 500,
                     }}
                   />
+                  {val.children ? (
+                    openParent === index ? (
+                      <ExpandLess />
+                    ) : (
+                      <ExpandMore />
+                    )
+                  ) : null}
                 </ListItemButton>
-              ))}
-          </div>
+                {val.children
+                  ? val.children.map((_val, j) => (
+                      <Collapse
+                        in={openParent === index}
+                        key={`${index}${j}`}
+                        timeout="auto"
+                        unmountOnExit
+                      >
+                        <List component="div" disablePadding>
+                          <ListItemButton
+                            sx={{ pl: 6 }}
+                            onClick={onClick(_val, j)}
+                          >
+                            {_val.icon ? (
+                              <ListItemIcon>
+                                <Tooltip title={_val.text}>
+                                  <SvgIcon component={_val.icon} />
+                                </Tooltip>
+                              </ListItemIcon>
+                            ) : null}
+                            <ListItemText
+                              primary={_val.text}
+                              primaryTypographyProps={{
+                                fontWeight: 500,
+                              }}
+                            />
+                          </ListItemButton>
+                        </List>
+                      </Collapse>
+                    ))
+                  : null}
+              </li>
+            ))}
         </List>
       </Drawer>
     </>

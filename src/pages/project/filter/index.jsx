@@ -10,6 +10,14 @@ import {
 import Search from "@mui/icons-material/Search";
 import * as utils from "@utils/";
 import _ from "lodash";
+import { Button } from "@components/base";
+import {
+  Check,
+  ExpandLess,
+  ExpandMore,
+  FilterAlt,
+  Work,
+} from "@mui/icons-material";
 
 export const TableFilter = ({ t, table }) => {
   return (
@@ -38,22 +46,6 @@ export const TableFilter = ({ t, table }) => {
             <MenuItem value="INACTIVE">{t("INACTIVE")}</MenuItem>
           </TextField>
         </Paper>
-        <Paper elevation={0} sx={{ width: { xs: "100%", sm: "12%" } }}>
-          <TextField
-            value={table.query("role", "")}
-            onChange={(e) => table.setQuery({ role: e.target.value })}
-            select
-          >
-            <MenuItem value="" selected>
-              {t("choose")}
-            </MenuItem>
-            {utils.types.map((v) => (
-              <MenuItem key={v} value={v}>
-                {t(v)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Paper>
       </Stack>
 
       {Object.keys(table.queryParams).length === 0 ? null : (
@@ -75,6 +67,55 @@ export const TableFilter = ({ t, table }) => {
           </Box>
         </Stack>
       )}
+    </Stack>
+  );
+};
+
+export const ButtonFilter = ({ t, table }) => {
+  return (
+    <Stack
+      mb={2}
+      direction="row"
+      spacing={1}
+      justifyContent="space-between"
+      alignItems="center"
+    >
+      <Stack direction="row" spacing={1}>
+      <Paper elevation={0}>
+        <Button variant="outlined" color="inherit">
+          Semua 100
+        </Button>
+        </Paper>
+        <Button variant="outlined" color="inherit">
+          Draft 100
+        </Button>
+        <Button variant="outlined" color="inherit" startIcon={<Work />}>
+          Progress 100
+        </Button>
+        <Button variant="outlined" color="inherit" startIcon={<Check />}>
+          Selesai 100
+        </Button>
+      </Stack>
+
+      <Stack direction="row" flexGrow={1} spacing={1} alignItems="center">
+        <TextField
+          placeholder="Cari Kat sini"
+          InputProps={{
+            endAdornment: <Search />,
+          }}
+        />
+        <Paper elevation={0}>
+          <Button
+            startIcon={<FilterAlt />}
+            variant="outlined"
+            color="primary"
+            disableElevation
+            sx={{ height: 40 }}
+          >
+            <ExpandMore />
+          </Button>
+        </Paper>
+      </Stack>
     </Stack>
   );
 };

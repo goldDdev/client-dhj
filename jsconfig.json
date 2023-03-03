@@ -27,7 +27,13 @@
         "src/contexts/*.jsx",
         "src/contexts/index"
       ],
-      "@hooks/*": ["src/hooks/*", "src/hooks/*.js", "src/hooks/index"],
+      "@constants/*": [
+        "src/constants/*",
+        "src/constants/*.jsx",
+        "src/constants/index"
+      ],
+      "@hooks/*": ["src/hooks/*", "src/hooks/*.js"],
+      "@assets/*": ["src/assets/*"],
       "@services/*": [
         "src/services/*",
         "src/services/*.js",

@@ -31,10 +31,18 @@
     "searchResult": "Hasil Pencarian",
     "titleEmployeeDialog": "Form Karyawan",
     "save": "Simpan",
-    "cancel": "Batal"
+    "cancel": "Batal",
+    "DRAFT": "Draft",
+    "PROGRESS": "Progres",
+    "DONE": "Selesai",
+    "PENDING": "Tunda",
+    "CANCEL": "Batal",
+    "project": "Proyek",
+    "projectBoard": "Papan Proyek"
   },
   "message": {
     "employeeSubtitlePage": "Daftar Semua Karyawan",
+    "projectSubtitlePage": "Daftar Semua Proyek",
     "employeeSuccessCreate": "Karyawan berhasil ditambahkan",
     "employeeSuccessUpdate": "Karyawan berhasil ditambahkan",
     "employeeSuccessActivate": "Karyawan berhasil ditambahkan"

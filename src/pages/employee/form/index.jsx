@@ -1,8 +1,7 @@
-import * as MUI from "@mui/material";
+import { Stack, TextField, Button } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
-import * as icon from "@mui/icons-material";
-import { LoadingButton } from "@mui/lab";
 import _ from "lodash";
 
 export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
@@ -13,8 +12,8 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
       title={t("titleEmployeeDialog")}
       content={{
         children: (
-          <MUI.Stack spacing={2}>
-            <MUI.TextField
+          <Stack spacing={2}>
+            <TextField
               id="empName"
               disabled={mutation.loading}
               label={t("name")}
@@ -25,12 +24,12 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               helperText={mutation.message("name")}
               InputProps={{
                 endAdornment: mutation.loading ? (
-                  <MUI.CircularProgress size={20} />
+                  <CircularProgress size={20} />
                 ) : null,
               }}
             />
 
-            <MUI.TextField
+            <TextField
               id="empCard"
               disabled={mutation.loading}
               label={t("cardID")}
@@ -41,12 +40,12 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               helperText={mutation.message("cardID")}
               InputProps={{
                 endAdornment: mutation.loading ? (
-                  <MUI.CircularProgress size={20} />
+                  <CircularProgress size={20} />
                 ) : null,
               }}
             />
 
-            <MUI.TextField
+            <TextField
               id="empPN"
               disabled={mutation.loading}
               label={t("phoneNumber")}
@@ -59,7 +58,7 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               helperText={mutation.message("phoneNumber")}
               InputProps={{
                 endAdornment: mutation.loading ? (
-                  <MUI.CircularProgress size={20} />
+                  <CircularProgress size={20} />
                 ) : null,
               }}
               inputProps={{
@@ -77,15 +76,15 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               error={mutation.error("role")}
               helperText={mutation.message("role")}
             />
-          </MUI.Stack>
+          </Stack>
         ),
       }}
       actions={{
         children: (
           <>
-            <MUI.Button variant="outlined" onClick={onOpen}>
+            <Button variant="outlined" onClick={onOpen}>
               {t("cancel")}
-            </MUI.Button>
+            </Button>
             <LoadingButton
               loading={mutation.processing}
               disabled={mutation.processing}
