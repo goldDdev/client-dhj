@@ -46,7 +46,7 @@ const menu = [
   {
     canAccess: [],
     text: "Pelacakan",
-    link: "",
+    link: "/tracking",
     icon: icon.Map,
   },
   {

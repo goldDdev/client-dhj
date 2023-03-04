@@ -14,6 +14,7 @@ const router = createBrowserRouter([
       { path: "/settings", element: <Page.EmployeeList /> },
       { path: "/projects/board", element: <Page.ProjectBoard /> },
       { path: "/projects/list", element: <Page.ProjectList /> },
+      { path: "/tracking", element: <Page.MapTracking /> },
     ],
   },
 ]);
