@@ -61,9 +61,9 @@ const menu = [
     link: "/settings",
     icon: icon.Settings,
     children: [
-      { canAccess: [], text: "Pengguna", link: "/projects/list" },
-      { canAccess: [], text: "Karyawan", link: "/settings" },
-      { canAccess: [], text: "BOC", link: "/settings" },
+      { canAccess: [], text: "Pengguna", link: "/settings/user" },
+      { canAccess: [], text: "Karyawan", link: "/settings/employee" },
+      { canAccess: [], text: "BOQ", link: "/settings/boq" },
       { canAccess: [], text: "Umum", link: "/settings" },
     ],
   },

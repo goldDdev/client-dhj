@@ -13,17 +13,17 @@ const path = (t) => {
     },
     {
       label: t("user"),
-      link: "/settings/employee",
+      link: "/settings/user",
       startIcon: <icon.People />,
     },
     {
-      label: t("boc"),
-      link: "/settings/employee",
+      label: t("boq"),
+      link: "/settings/boq",
       startIcon: <icon.ListAlt />,
     },
     {
       label: t("general"),
-      link: "/settings/employee",
+      link: "/settings/general",
       startIcon: <icon.Settings />,
     },
   ];

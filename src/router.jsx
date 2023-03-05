@@ -11,10 +11,12 @@ const router = createBrowserRouter([
     path: "/",
     element: <AppLayouts />,
     children: [
-      { path: "/settings", element: <Page.EmployeeList /> },
       { path: "/projects/board", element: <Page.ProjectBoard /> },
       { path: "/projects/list", element: <Page.ProjectList /> },
       { path: "/tracking", element: <Page.MapTracking /> },
+      { path: "/settings", element: <Page.SettingGeneral /> },
+      { path: "/settings/employee", element: <Page.EmployeeList /> },
+      { path: "/settings/boq", element: <Page.BoqList /> },
     ],
   },
 ]);

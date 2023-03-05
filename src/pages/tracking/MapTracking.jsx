@@ -23,8 +23,9 @@ const MapTracking = () => {
     <MainTemplate
       title={t("project")}
     >
-      <Typography>Project Info : Project A (Dumai)</Typography>
+      {/* TODO : Filter by on-going project here */}
       {/* <Filter.ButtonFilter /> */}
+      <Typography>Project Info : Project A (Dumai)</Typography>
 
       <Paper elevation={0} variant="outlined">
         <Box sx={{ height: '500px', width: '100%' }}>
@@ -51,6 +52,7 @@ const MapTracking = () => {
           </MapContainer>
         </Box>
 
+        {/* TODO : show list employee with project assign in prgress for now */}
         {/* <DataTable
           data={[]}
           loading={false}
