@@ -11,6 +11,7 @@ import * as Dummy from "../../constants/dummy";
 import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
 import MainTemplate from "@components/templates/MainTemplate";
+import * as FORM from "./form";
 
 const columns = (table, t, utils, onUpdate) => [
   {
@@ -112,6 +113,16 @@ export default () => {
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
+
+      <FORM.Create
+        open={trigger.form}
+        t={t}
+        r={r}
+        mutation={mutation}
+        snackbar={enqueueSnackbar}
+        table={table}
+        onOpen={onOpen}
+      />
     </MainTemplate>
   );
 };
