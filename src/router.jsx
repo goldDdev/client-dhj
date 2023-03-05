@@ -17,6 +17,7 @@ const router = createBrowserRouter([
       { path: "/settings", element: <Page.SettingGeneral /> },
       { path: "/settings/employee", element: <Page.EmployeeList /> },
       { path: "/settings/boq", element: <Page.BoqList /> },
+      { path: "/settings/user", element: <Page.UserList /> },
     ],
   },
 ]);

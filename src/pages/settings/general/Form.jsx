@@ -50,7 +50,7 @@ export default () => {
 
   return (
     <SettingTemplate
-      title={t("setting")}
+      title={t(["setting", "general"])}
     >
 
       <Paper elevation={0} variant="outlined" sx={{ p: 2 }}>
