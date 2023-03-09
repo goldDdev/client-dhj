@@ -7,3 +7,20 @@ export const employee = {
   hourlyWages: 0,
   role: "WORKER",
 };
+
+export const project = {
+  id: 0,
+  name: "",
+  noSpk: "",
+  companyName: "",
+  contact: "",
+  startAt: null,
+  finishAt: null,
+  duration: 0,
+  price: 0,
+  location: "",
+  latitude: 0,
+  longitude: 0,
+  status: "DRAFT",
+  note: "",
+};

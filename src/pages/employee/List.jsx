@@ -122,6 +122,9 @@ export default () => {
         cardID: y.string().required(),
         phoneNumber: y.string().required().min(10).max(12),
       }),
+      format: {
+        phoneNumber: (value) => String(value) 
+      }
   });
 
   const onOpen = () => {

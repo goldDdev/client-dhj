@@ -6,7 +6,6 @@ import * as BASE from "@components/";
 import FRHooks from "frhooks";
 import moment from "moment";
 import useDropdown from "@hooks/useDropdown";
-import FilterBoard from "./FilterBoard";
 
 const data0 = [...Array(5)].map(() => ({
   companyName: "PT DUTA HITA JAYA",

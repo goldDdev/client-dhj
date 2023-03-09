@@ -6,3 +6,4 @@ export * from "./input";
 export * from "./board";
 export * from "./button";
 export * from "./dropdown";
+export * from "./progress";

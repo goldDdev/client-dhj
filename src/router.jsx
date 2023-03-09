@@ -13,6 +13,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/projects/board", element: <Page.ProjectBoard /> },
       { path: "/projects/list", element: <Page.ProjectList /> },
+      { path: "/project/:id/detail", element: <Page.ProjectDetail /> },
       { path: "/tracking", element: <Page.MapTracking /> },
       { path: "/settings", element: <Page.SettingGeneral /> },
       { path: "/settings/employee", element: <Page.EmployeeList /> },

@@ -176,3 +176,12 @@ export const types = [
   "STAFF",
   "WORKER",
 ];
+
+export const projectStatus = {
+  DRAFT: "Draft",
+  PROGRESS: "Progress",
+  CANCELLED: "Batal",
+  PENDING: "Tunda",
+  DONE: "Selesi",
+  REVIEW: "Pratinjau",
+};
