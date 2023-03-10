@@ -4,7 +4,7 @@ import * as BASE from "@components/base";
 import * as utils from "@utils/";
 import _ from "lodash";
 
-export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
+export const UserForm = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
   return (
     <BASE.DialogForm
       open={open}

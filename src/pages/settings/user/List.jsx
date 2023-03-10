@@ -8,7 +8,7 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import Edit from "@mui/icons-material/Edit";
 import * as utils from "@utils/";
 // import * as Filter from "./filter";
-import * as FORM from "./form";
+import * as FORM from "./Form";
 import * as Dummy from "../../../constants/dummy";
 import DataTable from "../../../components/base/table/DataTable";
 
@@ -28,19 +28,19 @@ const columns = (table, t, utils, onUpdate) => [
   },
   {
     label: t("name"),
-    value: (value) => value.name,
+    value: (value) => value.email,
   },
   {
     label: 'Email',
-    value: (value) => value.name,
+    value: (value) => value.email,
   },
   {
     label: 'Telp',
-    value: (value) => value.name,
+    value: (value) => '',
   },
   {
     label: 'Hak Akses',
-    value: (value) => value.name,
+    value: (value) => '',
   },
   {
     label: "",
@@ -64,19 +64,17 @@ export default () => {
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().employee("index").link(), {
+  const table = FRHooks.useTable(FRHooks.apiRoute().user("index").link(), {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
 
   const mutation = FRHooks.useMutation({
-    defaultValue: Dummy.employee,
+    defaultValue: Dummy.user,
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
-        name: y.string().required().min(3),
-        cardID: y.string().required(),
-        phoneNumber: y.string().required().min(10).max(12),
+        email: y.string().required().min(3),
       }),
   });
 
@@ -87,7 +85,7 @@ export default () => {
   };
 
   const onUpdate = (id) => async () => {
-    mutation.get(FRHooks.apiRoute().employee("detail", { id }).link(), {
+    mutation.get(FRHooks.apiRoute().user("detail", { id }).link(), {
       onBeforeSend: () => {
         onOpen();
       },
@@ -113,14 +111,14 @@ export default () => {
 
       <Paper elevation={0} variant="outlined">
         <DataTable
-          data={[]}
-          loading={false}
+          data={table.data}
+          loading={table.loading}
           column={columns(table, t, utils, onUpdate)}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
 
-      <FORM.Create
+      <FORM.UserForm
         open={trigger.form}
         t={t}
         r={r}

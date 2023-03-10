@@ -8,7 +8,7 @@ export const BoqForm = ({ open, t, r, mutation, snackbar, table, onOpen, onSubmi
     <BASE.DialogForm
       open={open}
       onClose={onOpen}
-      title={t(["form","boq"])}
+      title="Form Bill of Quantity"
       content={{
         children: (
           <Stack spacing={2}>

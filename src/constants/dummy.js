@@ -1,3 +1,9 @@
+export const user = {
+  id: 0,
+  email: "",
+  employee_id: 0,
+}
+
 export const boq = {
   id: 0,
   name: "",

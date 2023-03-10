@@ -7,6 +7,10 @@ const apiRoute = {
     index: "/boq",
     detail: "/boq/:id",
   },
+  user: {
+    index: "/user",
+    detail: "/user/:id",
+  },
   project: {
     index: "/project",
     detail: "/project/:id/detail",
