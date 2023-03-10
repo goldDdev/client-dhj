@@ -44,6 +44,10 @@
     "projectBoard": "Papan Proyek"
   },
   "message": {
+    "commonSuccessCreate": "Data berhasil ditambahkan",
+    "commonSuccessUpdate": "Data berhasil diubah",
+    "commonSuccessActivate": "Data berhasil diaktifkan",
+    "commonSuccessDelete": "Data berhasil dihapus",
     "employeeSubtitlePage": "Daftar Semua Karyawan",
     "projectSubtitlePage": "Daftar Semua Proyek",
     "employeeSuccessCreate": "Karyawan berhasil ditambahkan",

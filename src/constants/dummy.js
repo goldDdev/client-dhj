@@ -1,3 +1,9 @@
+export const boq = {
+  id: 0,
+  name: "",
+  typeUnit: "",
+}
+
 export const employee = {
   id: 0,
   name: "",

@@ -1,10 +1,9 @@
-import { Stack, TextField, Button } from "@mui/material";
+import { Stack, TextField, Button, CircularProgress } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
-import * as utils from "@utils/";
 import _ from "lodash";
 
-export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
+export const BoqForm = ({ open, t, r, mutation, snackbar, table, onOpen, onSubmit }) => {
   return (
     <BASE.DialogForm
       open={open}
@@ -32,11 +31,11 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               id="empUnit"
               disabled={mutation.loading}
               label={t("unit")}
-              value={mutation.data.unit || ""}
-              onChange={(e) => mutation.setData({ unit: e.target.value })}
-              onBlur={async () => mutation.validate("unit")}
-              error={mutation.error("unit")}
-              helperText={mutation.message("unit")}
+              value={mutation.data.typeUnit || ""}
+              onChange={(e) => mutation.setData({ typeUnit: e.target.value })}
+              onBlur={async () => mutation.validate("typeUnit")}
+              error={mutation.error("typeUnit")}
+              helperText={mutation.message("typeUnit")}
               InputProps={{
                 endAdornment: mutation.loading ? (
                   <CircularProgress size={20} />
@@ -54,23 +53,11 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               {t("cancel")}
             </Button>
             <LoadingButton
-              loading={mutation.processing}
-              disabled={mutation.processing}
               variant="contained"
               color="primary"
-              onClick={() => {
-                mutation.post("/employee", {
-                  method: mutation.isNewRecord ? "post" : "put",
-                  except: mutation.isNewRecord ? ["id"] : [],
-                  validation: true,
-                  onSuccess: (resp) => {
-                    snackbar(t("employeeSuccessCreate"));
-                    table.data.unshift(resp.data);
-                    mutation.clearData();
-                    mutation.clearError();
-                  },
-                });
-              }}
+              loading={mutation.processing}
+              disabled={mutation.processing}
+              onClick={onSubmit}
             >
               {t("save")}
             </LoadingButton>
