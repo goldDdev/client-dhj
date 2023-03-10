@@ -1,6 +1,24 @@
-import { Stack, TextField, Button, Box, CircularProgress } from "@mui/material";
+import {
+  Stack,
+  TextField,
+  Button,
+  Box,
+  CircularProgress,
+  Typography,
+  IconButton,
+  Paper,
+  Divider,
+} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { DialogForm, FieldSet, Select } from "@components/base";
+import {
+  Add,
+  Close,
+  MoreVert,
+  PersonAddAlt,
+  Search,
+} from "@mui/icons-material";
+import { SimpleList } from "@components/base/list";
 import * as utils from "@utils/";
 import moment from "moment";
 import _ from "lodash";
@@ -222,5 +240,105 @@ export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
         ),
       }}
     />
+  );
+};
+
+export const ListWorker = ({
+  onAdd,
+  onRemove,
+  onOpen,
+  workers,
+  selectedWorkers,
+  loading,
+  searchLoading,
+  addWorkerLoading,
+  open,
+  searchWorker,
+}) => {
+  return (
+    <Paper elevation={0} variant="outlined">
+      <Stack
+        p={1.5}
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        <Typography variant="subtitle1" fontWeight={500} gutterBottom>
+          Daftar Pekerja
+        </Typography>
+
+        <Button
+          variant="outlined"
+          startIcon={open ? <Close /> : <PersonAddAlt />}
+          disableElevation
+          onClick={onOpen}
+        >
+          {open ? "Tutup" : "Tambah Pekerja"}
+        </Button>
+      </Stack>
+
+      <Divider />
+
+      <Stack direction="row">
+        {open ? (
+          <Stack direction="column" flex={1} p={1}>
+            <TextField
+              placeholder="Cari Pekerja"
+              InputProps={{
+                startAdornment: <Search />,
+              }}
+              onChange={searchWorker}
+            />
+
+            <SimpleList
+              dense
+              loading={searchLoading}
+              data={workers.map((v, i) => ({
+                primary: v.name,
+                primaryTypographyProps: { variant: "subtitle2" },
+                secondary: utils.typesLabel(v.role),
+                secondaryTypographyProps: { variant: "body2" },
+                itemProps: {
+                  divider: workers.length - 1 !== i,
+                  dense: true,
+                  secondaryAction: addWorkerLoading.some(
+                    (_v) => _v === v.id
+                  ) ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <IconButton size="small" onClick={onAdd(v)}>
+                      <Add fontSize="small" />
+                    </IconButton>
+                  ),
+                },
+              }))}
+            />
+          </Stack>
+        ) : null}
+
+        {open ? <Divider flexItem orientation="vertical" /> : null}
+
+        <SimpleList
+          dense
+          sx={{ flex: 1 }}
+          loading={loading}
+          data={selectedWorkers.map((v, i) => ({
+            primary: v.name,
+            primaryTypographyProps: { variant: "subtitle2" },
+            secondary: utils.typesLabel(v.role),
+            secondaryTypographyProps: { variant: "body2" },
+            itemProps: {
+              divider: selectedWorkers.length - 1 !== i,
+              dense: true,
+              secondaryAction: (
+                <IconButton size="small" onClick={onRemove(v)}>
+                  <MoreVert fontSize="small" />
+                </IconButton>
+              ),
+            },
+          }))}
+        />
+      </Stack>
+    </Paper>
   );
 };

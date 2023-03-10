@@ -177,6 +177,23 @@ export const types = [
   "WORKER",
 ];
 
+export const typesLabel = (type) => {
+  const role = {
+    PM: "Project Manager",
+    PCC: "Project Control Coordinator",
+    PC: "Project Control",
+    QS: "Quantity Surveyor ",
+    QCC: "Quality Control Coordinator",
+    QC: "Quality Control",
+    SUP: "Superintendent Coordinator",
+    SPV: "Supervisor",
+    MANDOR: "Mandor",
+    STAFF: "Staff",
+    WORKER: "Pekerja",
+  };
+  return role[type] || role["WORKER"];
+};
+
 export const projectStatus = {
   DRAFT: "Draft",
   PROGRESS: "Progress",
