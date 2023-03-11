@@ -1,15 +1,15 @@
-import { Stack, TextField, Button } from "@mui/material";
+import { Stack, TextField, Button, CircularProgress } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
 import _ from "lodash";
 
-export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
+export const UserForm = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
   return (
     <BASE.DialogForm
       open={open}
       onClose={onOpen}
-      title={t(["form","boq"])}
+      title={t(["form","user"])}
       content={{
         children: (
           <Stack spacing={2}>
@@ -29,21 +29,27 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               }}
             />
             <TextField
-              id="empUnit"
+              id="email"
               disabled={mutation.loading}
-              label={t("unit")}
-              value={mutation.data.unit || ""}
-              onChange={(e) => mutation.setData({ unit: e.target.value })}
-              onBlur={async () => mutation.validate("unit")}
-              error={mutation.error("unit")}
-              helperText={mutation.message("unit")}
-              InputProps={{
-                endAdornment: mutation.loading ? (
-                  <CircularProgress size={20} />
-                ) : null,
-              }}
+              label="Email"
             />
-
+            <TextField
+              id="phone"
+              disabled={mutation.loading}
+              label={t("phoneNumber")}
+            />
+            <TextField
+              type="password"
+              id="password"
+              label="Password"
+              disabled={mutation.loading}
+            />
+            <TextField
+              type="password"
+              id="password"
+              label="Konfirmasi Password"
+              disabled={mutation.loading}
+            />
           </Stack>
         ),
       }}

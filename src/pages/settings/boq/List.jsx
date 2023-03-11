@@ -1,18 +1,19 @@
 import React from "react";
 import FRHooks from "frhooks";
-import { Chip, Paper } from "@mui/material";
+import { Paper } from "@mui/material";
 import { IconButton, Button } from "@components/base";
 import { useSnackbar } from "notistack";
 import SettingTemplate from "@components/templates/SettingTemplate";
-import PersonAdd from "@mui/icons-material/PersonAdd";
+import Add from "@mui/icons-material/Add";
 import Edit from "@mui/icons-material/Edit";
+import Delete from "@mui/icons-material/Delete";
 import * as utils from "@utils/";
 // import * as Filter from "./filter";
-import * as FORM from "./form";
+import * as FORM from "./Form";
 import * as Dummy from "../../../constants/dummy";
 import DataTable from "../../../components/base/table/DataTable";
 
-const columns = (table, t, utils, onUpdate) => [
+const columns = (table, t, onUpdate, onDelete) => [
   {
     label: "No",
     value: (_, idx) => {
@@ -32,12 +33,12 @@ const columns = (table, t, utils, onUpdate) => [
   },
   {
     label: t("unit"),
-    value: (value) => utils.ccFormat(value.unit) || "-",
+    value: (value) => value.type_unit || "-",
     align: "center",
     head: {
       align: "center",
       sx: {
-        width: "10%",
+        width: "15%",
       },
     },
     sx: {
@@ -45,16 +46,23 @@ const columns = (table, t, utils, onUpdate) => [
     },
   },
   {
-    label: "",
+    label: "Aksi",
     value: (value) => (
-      <IconButton title={t("edit")} size="small" onClick={onUpdate(value.id)}>
-        <Edit fontSize="small" />
-      </IconButton>
+      <>
+        <IconButton title={t("edit")} size="small" onClick={onUpdate(value.id)}>
+          <Edit fontSize="small" />
+        </IconButton>
+        <IconButton title={t("delete")} size="small" onClick={onDelete(value.id)}>
+          <Delete fontSize="small" />
+        </IconButton>
+      </>
     ),
     align: "center",
     head: {
       align: "center",
-      padding: "checkbox",
+      sx: {
+        width: "10%",
+      },
     },
   },
 ];
@@ -66,19 +74,18 @@ export default () => {
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().employee("index").link(), {
+  const table = FRHooks.useTable(FRHooks.apiRoute().boq("index").link(), {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
 
   const mutation = FRHooks.useMutation({
-    defaultValue: Dummy.employee,
+    defaultValue: Dummy.boq,
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
         name: y.string().required().min(3),
-        cardID: y.string().required(),
-        phoneNumber: y.string().required().min(10).max(12),
+        typeUnit: y.string().required().min(3),
       }),
   });
 
@@ -89,15 +96,49 @@ export default () => {
   };
 
   const onUpdate = (id) => async () => {
-    mutation.get(FRHooks.apiRoute().employee("detail", { id }).link(), {
+    mutation.get(FRHooks.apiRoute().boq("detail", { id }).link(), {
       onBeforeSend: () => {
         onOpen();
       },
       onSuccess: (resp) => {
-        mutation.setData(resp.data);
+        mutation.setData({ ...resp.data, typeUnit: resp.data.type_unit });
       },
     });
   };
+
+  const onDelete = (id) => async () => {
+    // TODO: confirm delete
+    mutation.destroy(FRHooks.apiRoute().boq("detail", { id }).link(), {
+      onSuccess: () => {
+        enqueueSnackbar(t("commonSuccessDelete"));
+        const idx = table.data.findIndex(d => d.id === id)
+        table.data.splice(idx, 1);
+      },
+    });
+  }
+
+  const onSubmit = async () => {
+    const isNew = mutation.isNewRecord;
+    const editId = mutation.data.id;
+    const route = isNew ? FRHooks.apiRoute().boq("index") : FRHooks.apiRoute().boq("detail", { id: editId })
+    mutation.post(route.link(), {
+      method: isNew ? "post" : "put",
+      except: isNew ? ["id"] : [],
+      validation: true,
+      onSuccess: (resp) => {
+        enqueueSnackbar(t("commonSuccessCreate"));
+        if (isNew) {
+          table.data.unshift(resp.data);
+        } else {
+          const idx = table.data.findIndex(d => d.id === editId)
+          table.data[idx] = resp.data;
+        }
+        mutation.clearData();
+        mutation.clearError();
+        onOpen();
+      },
+    });
+  }
 
   return (
     <SettingTemplate
@@ -105,7 +146,7 @@ export default () => {
       subtitle="Daftar semua master data Bill of Quantity"
       headRight={{
         children: (
-          <Button startIcon={<PersonAdd />} onClick={onOpen}>
+          <Button startIcon={<Add />} onClick={onOpen}>
             {t(["add", "boq"])}
           </Button>
         ),
@@ -115,14 +156,14 @@ export default () => {
 
       <Paper elevation={0} variant="outlined">
         <DataTable
-          data={[]}
-          loading={false}
-          column={columns(table, t, utils, onUpdate)}
+          data={table.data}
+          loading={table.loading}
+          column={columns(table, t, onUpdate, onDelete)}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
 
-      <FORM.Create
+      <FORM.BoqForm
         open={trigger.form}
         t={t}
         r={r}
@@ -130,6 +171,7 @@ export default () => {
         snackbar={enqueueSnackbar}
         table={table}
         onOpen={onOpen}
+        onSubmit={onSubmit}
       />
     </SettingTemplate>
   );
