@@ -1,4 +1,5 @@
 import React from "react";
+import FRHooks from "frhooks";
 import { Chip, Paper } from "@mui/material";
 import { IconButton, Button } from "@components/base";
 import { useSnackbar } from "notistack";
@@ -9,7 +10,6 @@ import * as utils from "@utils/";
 import * as Filter from "./filter";
 import * as FORM from "./form";
 import * as Dummy from "../../constants/dummy";
-import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
 
 const columns = (table, t, utils, onUpdate) => [

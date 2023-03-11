@@ -174,9 +174,6 @@ export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
               <TextField
                 disabled={mutation.loading || mutation.processing}
                 label="Tanggal Mulai"
-                InputLabelProps={{
-                  shrink: true,
-                }}
                 type="date"
                 value={mutation.data.startAt}
                 onChange={(e) => mutation.setData({ startAt: e.target.value })}
