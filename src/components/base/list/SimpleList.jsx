@@ -1,7 +1,9 @@
 import {
+  Box,
   List,
   ListItem,
   ListItemAvatar,
+  ListItemIcon,
   ListItemText,
   Skeleton,
 } from "@mui/material";
@@ -16,11 +18,15 @@ export default ({ loading, data, ...props }) => {
       ) : null}
 
       {!loading && data.length > 0
-        ? data.map(({ itemAvatar, itemProps, ...other }, i) => (
-            <ListItem key={i} {...itemProps}>
-              {itemAvatar ? <ListItemAvatar {...itemAvatar} /> : null}
-              <ListItemText {...other} />
-            </ListItem>
+        ? data.map(({ itemAvatar, itemProps, iconProps, group, ...other }, i) => (
+            <Box component="li" key={i}>
+              <ListItem component="div" {...itemProps}>
+                {itemAvatar ? <ListItemAvatar {...itemAvatar} /> : null}
+                {iconProps ? <ListItemIcon {...iconProps} /> : null}
+                <ListItemText {...other} />
+              </ListItem>
+              {group || null}
+            </Box>
           ))
         : null}
 

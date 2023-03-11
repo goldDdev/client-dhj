@@ -5,7 +5,7 @@ import {
   ThemeProvider,
   Toolbar,
 } from "@mui/material";
-import { Header, SideBar, Copyright } from "@components/";
+import { Header, SideBar, Copyright, Alert } from "@components/";
 import { Outlet } from "react-router-dom";
 import webTheme from "./webTheme";
 
@@ -70,7 +70,7 @@ const App = () => {
             })}
           >
             <Outlet />
-            {/* <Alert /> */}
+            <Alert />
           </Container>
           <Copyright sx={{ py: 1 }} />
         </Box>

@@ -9,15 +9,16 @@ import {
   Paper,
   Divider,
 } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
-import { DialogForm, FieldSet, Select } from "@components/base";
 import {
   Add,
   Close,
+  ExpandMore,
   MoreVert,
   PersonAddAlt,
   Search,
 } from "@mui/icons-material";
+import { LoadingButton } from "@mui/lab";
+import { BasicDropdown, DialogForm, FieldSet, Select } from "@components/base";
 import { SimpleList } from "@components/base/list";
 import * as utils from "@utils/";
 import moment from "moment";
@@ -268,7 +269,7 @@ export const ListWorker = ({
         </Typography>
 
         <Button
-          variant="outlined"
+          variant="text"
           startIcon={open ? <Close /> : <PersonAddAlt />}
           disableElevation
           onClick={onOpen}
@@ -320,20 +321,50 @@ export const ListWorker = ({
 
         <SimpleList
           dense
-          sx={{ flex: 1 }}
+          sx={{ flex: 1, maxHeight: 720, overflow: "scroll" }}
           loading={loading}
           data={selectedWorkers.map((v, i) => ({
             primary: v.name,
             primaryTypographyProps: { variant: "subtitle2" },
             secondary: utils.typesLabel(v.role),
             secondaryTypographyProps: { variant: "body2" },
+            sx: { m: 0 },
+            iconProps:
+              v.role === "MANDOR"
+                ? {
+                    sx: {
+                      justifyContent: "center",
+                    },
+                    children: (
+                      <IconButton size="small">
+                        <ExpandMore />
+                      </IconButton>
+                    ),
+                  }
+                : undefined,
             itemProps: {
+              disableGutters: v.role === "MANDOR",
               divider: selectedWorkers.length - 1 !== i,
               dense: true,
-              secondaryAction: (
-                <IconButton size="small" onClick={onRemove(v)}>
-                  <MoreVert fontSize="small" />
-                </IconButton>
+              sx: { m: 0, "& .MuiListItemSecondaryAction-root ": { right: 0 } },
+              secondaryAction: addWorkerLoading.some((_v) => _v === v.id) ? (
+                <CircularProgress size={20} />
+              ) : (
+                <BasicDropdown
+                  type="icon"
+                  menu={[
+                    {
+                      text: "Hapus",
+                      onClick: onRemove(v),
+                      disabled:
+                        v.role === "MANDOR" &&
+                        selectedWorkers.filter((_w) => _w.parentId === v.id)
+                          .length > 0,
+                    },
+                  ]}
+                  label={<MoreVert fontSize="small" />}
+                  size="small"
+                />
               ),
             },
           }))}

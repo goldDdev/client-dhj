@@ -7,6 +7,7 @@ const apiRoute = {
     index: "/project",
     detail: "/project/:id/detail",
     worker: "/project/worker",
+    listWorkers: "/project/:id/worker",
     deleteWorker: "/project/:id/worker",
   },
 };
