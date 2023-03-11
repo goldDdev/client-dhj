@@ -3,6 +3,7 @@ import SignInSide from "./auth/SignInSide";
 import ProjectBoard from "./project/Board";
 import ProjectList from "./project/List";
 import ProjectDetail from "./project/Detail";
+import ProjectAbsent from "./project/Absent";
 
 import EmployeeList from "./employee/List";
 
@@ -16,6 +17,7 @@ export {
   ProjectBoard,
   ProjectList,
   ProjectDetail,
+  ProjectAbsent,
   EmployeeList,
   BoqList,
   UserList,

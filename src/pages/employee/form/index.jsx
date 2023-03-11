@@ -66,6 +66,23 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               }}
             />
 
+            <TextField
+              id="empEmail"
+              disabled={mutation.loading}
+              label={"Alamat Email"}
+              value={mutation.data.email || ""}
+              onChange={(e) => mutation.setData({ email: e.target.value })}
+              onBlur={async () => mutation.validate("email")}
+              error={mutation.error("email")}
+              helperText={mutation.message("email")}
+              InputProps={{
+                endAdornment: mutation.loading ? (
+                  <CircularProgress size={20} />
+                ) : null,
+              }}
+              type="email"
+            />
+
             <BASE.Select
               id="empRole"
               label={t("role")}

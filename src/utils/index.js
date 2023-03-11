@@ -50,11 +50,17 @@ export const getMonth = (month) => {
   ][month];
 };
 
+export const getDayName = (number) => {
+  return ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][
+    number
+  ];
+};
+
 export const getDaysInMonthUTC = (month, year) => {
-  const date = new Date(Date.UTC(year, month, 1));
+  const date = new Date(Date.UTC(year, month - 1, 1));
   const days = [];
 
-  while (date.getUTCMonth() === month) {
+  while (date.getUTCMonth() === month - 1) {
     days.push(new Date(date));
     date.setUTCDate(date.getUTCDate() + 1);
   }

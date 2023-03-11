@@ -6,16 +6,24 @@ import {
   ListItemText,
   Paper,
   List,
+  Stack,
+  Typography,
+  Card,
+  CardHeader,
+  Divider,
+  Avatar,
 } from "@mui/material";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import Edit from "@mui/icons-material/Edit";
 import FRHooks from "frhooks";
 import * as FORM from "./form";
 import * as Dummy from "../../constants/dummy";
+import * as utils from "@utils";
 import { useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { useAlert } from "@contexts/AlertContext";
 import _ from "lodash";
+import moment from "moment";
 let controller = new AbortController();
 
 export default () => {
@@ -206,6 +214,8 @@ export default () => {
     });
   }, [id]);
 
+  console.log(utils.getDaysInMonthUTC(3, 2023));
+
   return (
     <ProjectTemplate
       container={"container"}
@@ -218,86 +228,26 @@ export default () => {
         ),
       }}
     >
-      <Grid container spacing={2} justifyContent="space-between">
-        <Grid item xs={trigger.openWorker ? 4 : 8}>
-          <Paper elevation={0} variant="outlined">
-            <List dense>
-              <ListItem divider>
-                <ListItemText
-                  primary="Nama Proyek"
-                  secondary={mutation.data.name}
-                  primaryTypographyProps={{
-                    variant: "subtitle1",
-                    fontWeight: 500,
-                  }}
-                  secondaryTypographyProps={{ variant: "body1" }}
+      <Grid container>
+        <Grid container item xs={14} columns={14} spacing={1}>
+          {utils.getDaysInMonthUTC(3, 2023).map((v, i) => (
+            <Grid item key={i} xs={2}>
+              <Card raised>
+                <CardHeader
+                  avatar={
+                    <Avatar variant="square">{moment(v).format("DD")}</Avatar>
+                  }
+                  title={utils.getDayName(moment(v).format("d"))}
+                  subheader={moment(v).format("MM/YYYY")}
+                  titleTypographyProps={{ variant: "subtitle1" }}
+                  subheaderTypographyProps={{ sx: { whiteSpace: "nowrap" } }}
+                  sx={{ p: 0.5 }}
                 />
-              </ListItem>
-
-              {/* Perusahaan */}
-              <ListItem divider>
-                <ListItemText
-                  primary="Informasi Pemberi Proyek"
-                  primaryTypographyProps={{
-                    variant: "subtitle1",
-                    fontWeight: 500,
-                  }}
-                />
-              </ListItem>
-
-              <ListItem dense>
-                <ListItemText
-                  primary="Perusahaan"
-                  secondary={mutation.data.companyName}
-                  primaryTypographyProps={{
-                    variant: "subtitle1",
-                    fontWeight: 500,
-                  }}
-                  secondaryTypographyProps={{ variant: "body1" }}
-                />
-              </ListItem>
-
-              <ListItem dense>
-                <ListItemText
-                  primary="Kontak"
-                  secondary={mutation.data.contact || "-"}
-                  primaryTypographyProps={{
-                    variant: "subtitle1",
-                    fontWeight: 500,
-                  }}
-                  secondaryTypographyProps={{
-                    variant: "body1",
-                    whiteSpace: "pre-line",
-                  }}
-                />
-              </ListItem>
-            </List>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={trigger.openWorker ? 8 : 4}>
-          <FORM.ListWorker
-            open={trigger.openWorker}
-            loading={mutation.loading}
-            searchLoading={trigger.workerSearchLoading}
-            addWorkerLoading={trigger.addWorkerLoading}
-            workers={resources.worker}
-            selectedWorkers={resources.selectedWorker}
-            onAdd={onAdd}
-            onRemove={onRemove}
-            onOpen={onOpenAddWorker}
-            searchWorker={searchWorker}
-          />
+              </Card>
+            </Grid>
+          ))}
         </Grid>
       </Grid>
-
-      <FORM.Create
-        open={trigger.form}
-        mutation={mutation}
-        route={FRHooks.apiRoute}
-        snackbar={enqueueSnackbar}
-        onOpen={onOpen}
-      />
     </ProjectTemplate>
   );
 };

@@ -121,10 +121,17 @@ export default () => {
         name: y.string().required().min(3),
         cardID: y.string().required(),
         phoneNumber: y.string().required().min(10).max(12),
+        email: y.string().when("role", {
+          is: (role) => {
+            return role !== "WORKER";
+          },
+          then: y.string().required(),
+        }),
+        role: y.string().required(),
       }),
-      format: {
-        phoneNumber: (value) => String(value) 
-      }
+    format: {
+      phoneNumber: (value) => String(value),
+    },
   });
 
   const onOpen = () => {

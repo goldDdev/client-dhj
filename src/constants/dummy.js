@@ -18,6 +18,7 @@ export const employee = {
   salary: 0,
   hourlyWages: 0,
   role: "WORKER",
+  email: "",
 };
 
 export const project = {
