@@ -3,6 +3,7 @@ import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
 import _ from "lodash";
+import FRHooks from "frhooks";
 
 export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
   return (
@@ -47,11 +48,12 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
 
             <TextField
               id="empPN"
+              type="number"
               disabled={mutation.loading}
               label={t("phoneNumber")}
               value={mutation.data.phoneNumber || ""}
               onChange={(e) =>
-                mutation.setData({ phoneNumber: +e.target.value })
+                mutation.setData({ phoneNumber: e.target.value })
               }
               onBlur={async () => mutation.validate("phoneNumber")}
               error={mutation.error("phoneNumber")}
@@ -91,15 +93,24 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               variant="contained"
               color="primary"
               onClick={() => {
-                mutation.post("/employee", {
-                  method: mutation.isNewRecord ? "post" : "put",
-                  except: mutation.isNewRecord ? ["id"] : [],
+                const isNew = mutation.isNewRecord;
+                const editId = mutation.data.id;
+                const route = isNew ? FRHooks.apiRoute().employee("index") : FRHooks.apiRoute().employee("detail", { id: editId })
+                mutation.post(route, {
+                  method: isNew ? "post" : "put",
+                  except: isNew ? ["id"] : [],
                   validation: true,
                   onSuccess: (resp) => {
-                    snackbar(t("employeeSuccessCreate"));
-                    table.data.unshift(resp.data);
+                    snackbar(t("commonSuccessCreate"));
+                    if (isNew) {
+                      table.data.unshift(resp.data);
+                    } else {
+                      const idx = table.data.findIndex(d => d.id === editId)
+                      table.data[idx] = resp.data;
+                    }
                     mutation.clearData();
                     mutation.clearError();
+                    onOpen();
                   },
                 });
               }}
