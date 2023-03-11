@@ -1,10 +1,9 @@
-import { Button, IconButton, Menu, MenuList, styled } from "@mui/material";
-import { memo } from "react";
+import { Button, IconButton, Menu, styled } from "@mui/material";
+import { memo, useId } from "react";
 import DropdownItem from "./DropdownItem";
 
 const StyledMenu = styled((props) => (
   <Menu
-    elevation={0}
     anchorOrigin={{
       vertical: "bottom",
       horizontal: "right",
@@ -20,9 +19,8 @@ const StyledMenu = styled((props) => (
     paddingTop: 0,
     paddingBottom: 0,
   },
-  "& .MuiPaper-root": {
-    boxShadow: "0px 11px 12px rgba(184, 184, 184, 0.12)",
-  },
+  // "& .MuiPaper-root": {
+  // },
   "& .MuiDivider-root": {
     marginBottom: 0,
     marginTop: 0,
@@ -40,6 +38,7 @@ const Dropdown = ({
   ButtonProps,
   IconButtonProps,
 }) => {
+  const id = useId
   return (
     <div>
       {type === "Button" && (
@@ -60,7 +59,7 @@ const Dropdown = ({
       )}
 
       <StyledMenu
-        id="menu-appbar"
+        id={id}
         anchorEl={anchorEl}
         keepMounted
         open={Boolean(anchorEl)}

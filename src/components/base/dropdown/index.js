@@ -1,3 +1,4 @@
 import Dropdown from "./Dropdown";
+import BasicDropdown from "./Basic";
 
-export { Dropdown };
+export { Dropdown, BasicDropdown };
