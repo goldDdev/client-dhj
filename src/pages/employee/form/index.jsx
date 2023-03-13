@@ -113,7 +113,8 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
                 const isNew = mutation.isNewRecord;
                 const editId = mutation.data.id;
                 const route = isNew ? FRHooks.apiRoute().employee("index") : FRHooks.apiRoute().employee("detail", { id: editId })
-                mutation.post(route, {
+                console.log(isNew, editId, route.link());
+                mutation.post(route.link(), {
                   method: isNew ? "post" : "put",
                   except: isNew ? ["id"] : [],
                   validation: true,

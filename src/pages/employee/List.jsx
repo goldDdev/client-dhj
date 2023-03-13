@@ -146,7 +146,7 @@ export default () => {
         onOpen();
       },
       onSuccess: (resp) => {
-        mutation.setData(resp.data);
+        mutation.setData({ ...resp.data, email: resp.data.user.email });
       },
     });
   };
