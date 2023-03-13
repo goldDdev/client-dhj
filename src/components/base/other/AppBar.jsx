@@ -5,7 +5,7 @@ const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   [theme.breakpoints.up("lg")]: {
-    zIndex: theme.zIndex.drawer + 1,
+    zIndex: theme.zIndex.drawer ,
   },
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,

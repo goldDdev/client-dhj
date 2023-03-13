@@ -939,10 +939,10 @@ form-data@^4.0.0:
     combined-stream "^1.0.8"
     mime-types "^2.1.12"
 
-frhooks@^2.1.8-6:
-  version "2.1.8-6"
-  resolved "https://registry.yarnpkg.com/frhooks/-/frhooks-2.1.8-6.tgz#0686f208d3c4efc8ec0e0633f6122d3894de3998"
-  integrity sha512-FCfv858j5/99KFXvrnpNFS+eaZSvfjy4MFUCVROmYe6nfcPXSjWnK+gniO7OMwpnY032Lsn6OoE3rOuR0Y8k4Q==
+frhooks@^2.1.8-7:
+  version "2.1.8-7"
+  resolved "https://registry.yarnpkg.com/frhooks/-/frhooks-2.1.8-7.tgz#629aa76df33308165cad0cb95a346a2cb3ede80d"
+  integrity sha512-cdLfVtCRtcz30rQyU1lUDz6IhLkBZtRkyj5xmLR0S0+pylLYfLVHwgRl4hnwgd3wta3U1rf9jdG40JLf9FrnXQ==
 
 fsevents@~2.3.2:
   version "2.3.2"

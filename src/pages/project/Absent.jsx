@@ -7,247 +7,314 @@ import {
   Paper,
   List,
   Stack,
-  Typography,
   Card,
   CardHeader,
   Divider,
   Avatar,
+  Popper,
+  ListItemButton,
+  TextField,
+  Skeleton,
+  Typography,
 } from "@mui/material";
-import ProjectTemplate from "@components/templates/ProjectTemplate";
-import Edit from "@mui/icons-material/Edit";
-import FRHooks from "frhooks";
-import * as FORM from "./form";
-import * as Dummy from "../../constants/dummy";
-import * as utils from "@utils";
 import { useParams } from "react-router-dom";
-import { useSnackbar } from "notistack";
-import { useAlert } from "@contexts/AlertContext";
+import { ExpandMore, KeyboardArrowRight } from "@mui/icons-material";
+import { Select } from "@components/base";
+import ProjectTemplate from "@components/templates/ProjectTemplate";
+import FRHooks from "frhooks";
+import * as utils from "@utils";
 import _ from "lodash";
 import moment from "moment";
-let controller = new AbortController();
 
 export default () => {
   const { id } = useParams();
-  const { enqueueSnackbar } = useSnackbar();
-  const alert = useAlert();
-  const mutation = FRHooks.useMutation({
-    defaultValue: Dummy.project,
-    isNewRecord: (data) => data.id === 0,
-    schema: (y) =>
-      y.object().shape({
-        name: y.string().required(),
-        companyName: y.string().required(),
-        noSpk: y.string().nullable(),
-        contact: y.string().nullable(),
-        location: y.string().nullable(),
-        latitude: y.number().nullable(),
-        longitude: y.number().nullable(),
-        startAt: y.date().nullable(),
-        finishAt: y.date().nullable(),
-        status: y.string().required(),
-        duration: y.number().nullable(),
-      }),
-  });
-  const [resources, setResources] = React.useState({
-    worker: [],
-    selectedWorker: [],
-    lastMandorId: 0,
-  });
+  const [open, setOpen] = React.useState(false);
+  const [data, setData] = React.useState({});
+  const [absentAt, setAbsentAt] = React.useState("");
+  const [anchorEl, setAnchorEl] = React.useState(null);
   const [trigger, setTrigger] = React.useState({
-    form: false,
-    openWorker: false,
-    workerSearchLoading: false,
-    addWorkerLoading: [],
+    openDrawer: false,
   });
 
-  const onOpen = () => {
-    setTrigger((state) => ({ ...state, form: !state.form }));
-    mutation.clearData();
-    mutation.clearError();
-  };
-
-  const searchWorker = (e) => {
-    controller.abort();
-    controller = new AbortController();
-    mutation.get(FRHooks.apiRoute().employee("index").link(), {
-      options: {
-        signal: controller.signal,
-        params: {
-          name: e.target.value,
-        },
+  const absents = FRHooks.useFetch(
+    FRHooks.apiRoute().project("listAbsents", { id }).link(),
+    {
+      defaultValue: [],
+      selector: (resp) => resp.data,
+      getData: () => {
+        setAnchorEl(null);
+        setOpen(false);
+        setAbsentAt("");
       },
-      onBeforeSend: () => {
-        setTrigger((state) => ({ ...state, workerSearchLoading: true }));
-      },
-      onSuccess: ({ data }) => {
-        setResources((state) => ({
-          ...state,
-          worker: data.filter(
-            (v) => !state.selectedWorker.some((_v) => _v.employeeId == v.id)
-          ),
-        }));
-      },
-      onAlways: () => {
-        setTrigger((state) => ({ ...state, workerSearchLoading: false }));
-      },
-    });
-  };
-
-  const onAdd = (value) => async () => {
-    try {
-      const mandorExists =
-        resources.selectedWorker.length === 0 &&
-        !resources.selectedWorker.some((v) => v.role === "MANDOR") &&
-        value.role !== "MANDOR";
-
-      if (mandorExists) {
-        alert.set({
-          open: true,
-          title: "Mohon Perhatian",
-          message:
-            "Mandor dalam proyek ini belum tersedia mohon pilih mandor dulu kemudian pilih anggota",
-          type: "warning",
-          loading: false,
-          close: {
-            text: "Keluar, Cari Mandor",
-          },
-          confirm: false,
-        });
-        return;
-      }
-
-      setTrigger((state) => ({
-        ...state,
-        addWorkerLoading: state.addWorkerLoading.concat([value.id]),
-      }));
-
-      const data = await FRHooks.apiRoute()
-        .project("worker")
-        .data({
-          projectId: +id,
-          employeeId: value.id,
-          role: value.role,
-          parentId: value.role === "MANDOR" ? null : resources.lastMandorId,
-        })
-        .sendJson("post", (resp) => resp.data);
-
-      setResources((state) => ({
-        ...state,
-        selectedWorker: state.selectedWorker.concat([data]),
-        worker: state.worker.filter((v) => v.id !== value.id),
-        lastMandorId:
-          state.selectedWorker
-            .concat([data])
-            .filter((v) => v.role === "MANDOR")
-            .pop()?.id || null,
-      }));
-    } catch (err) {
-    } finally {
-      setTrigger((state) => ({
-        ...state,
-        addWorkerLoading: state.addWorkerLoading.filter((v) => v !== value.id),
-      }));
     }
+  );
+
+  const onOpenDrawer = () => {
+    setTrigger((state) => ({ ...state, openDrawer: !state.openDrawer }));
   };
 
-  const onRemove = (value) => async () => {
-    try {
-      setTrigger((state) => ({
-        ...state,
-        addWorkerLoading: state.addWorkerLoading.concat([value.id]),
-      }));
-
-      const data = await FRHooks.apiRoute()
-        .project("deleteWorker", { id: value.id })
-        .destroy((resp) => resp.data);
-
-      setResources((state) => ({
-        ...state,
-        worker: state.worker.concat([data]),
-        selectedWorker: state.selectedWorker.filter((_v) => _v.id !== value.id),
-        lastMandorId:
-          state.selectedWorker
-            .filter((_v) => _v.id !== value.id)
-            .filter((v) => v.role === "MANDOR")
-            .pop()?.id || null,
-      }));
-    } catch (err) {
-    } finally {
-      setTrigger((state) => ({
-        ...state,
-        addWorkerLoading: state.addWorkerLoading.filter((v) => v !== value.id),
-      }));
-    }
+  const handleClick = (value) => (event) => {
+    const current = anchorEl;
+    const ids = event.currentTarget.id;
+    setAnchorEl((state) =>
+      state && state.id === ids ? null : event.currentTarget
+    );
+    setOpen(!current ? true : current.id === ids ? false : true);
+    setAbsentAt(moment(value).format("yyyy-MM-DD"));
   };
-
-  const onOpenAddWorker = (e) => {
-    setResources((state) => ({ ...state, worker: [] }));
-    setTrigger((state) => ({
-      ...state,
-      openWorker: !state.openWorker,
-    }));
-
-    if (!trigger.openWorker) {
-      searchWorker(e);
-    }
-  };
-
-  React.useEffect(() => {
-    mutation.get(FRHooks.apiRoute().project("detail", { id }).link(), {
-      onSuccess: ({ data }) => {
-        mutation.setData(data);
-      },
-    });
-    mutation.get(FRHooks.apiRoute().project("listWorkers", { id }).link(), {
-      onSuccess: ({ data }) => {
-        const tmp = [];
-        data.forEach(({ members, ...other }) => {
-          tmp.push(other);
-          members.forEach((v) => tmp.push(v));
-        });
-        setResources((state) => ({
-          ...state,
-          selectedWorker: tmp,
-          lastMandorId: data.length > 0 ? data[data.length - 1].id : null,
-        }));
-      },
-    });
-  }, [id]);
-
-  console.log(utils.getDaysInMonthUTC(3, 2023));
 
   return (
     <ProjectTemplate
-      container={"container"}
       title="Proyek"
-      headRight={{
-        children: (
-          <Button disableElevation startIcon={<Edit />} onClick={onOpen}>
-            Ubah
-          </Button>
+      drawer={{
+        open: trigger.openDrawer,
+        title: "Detil Absensi Proyek",
+        onClose: () => {
+          setTrigger((state) => ({ ...state, openDrawer: !state.openDrawer }));
+        },
+
+        content: (
+          <Stack direction="column">
+            <ListItemText
+              primary={data.name || ""}
+              secondary={utils.typesLabel(data.role || "")}
+              primaryTypographyProps={{
+                variant: "subtitle1",
+              }}
+              secondaryTypographyProps={{
+                variant: "subtitle1",
+              }}
+              sx={{ my: 0, pl: 2 }}
+            />
+            <Divider />
+            <ListItemText
+              primary="Tanggal"
+              secondary={moment(data.absentAt).format("DD-MM-Y")}
+              primaryTypographyProps={{
+                variant: "subtitle1",
+              }}
+              secondaryTypographyProps={{
+                variant: "subtitle1",
+              }}
+              sx={{ my: 0, pl: 2 }}
+            />
+            <Divider />
+            <Stack direction="row" spacing={1}>
+              <ListItemText
+                primary="Total"
+                secondary={data.summary?.total || 0}
+                primaryTypographyProps={{
+                  variant: "subtitle1",
+                  sx: { textAlign: "center" },
+                }}
+                secondaryTypographyProps={{
+                  variant: "subtitle1",
+                  sx: { textAlign: "center" },
+                }}
+                sx={{ my: 0 }}
+              />
+              <Divider orientation="vertical" />
+              <ListItemText
+                primary="Hadir"
+                secondary={data.summary?.present || 0}
+                primaryTypographyProps={{
+                  variant: "subtitle1",
+                  sx: { textAlign: "center" },
+                }}
+                secondaryTypographyProps={{
+                  variant: "subtitle1",
+                  sx: { textAlign: "center" },
+                }}
+                sx={{ my: 0 }}
+              />
+              <Divider orientation="vertical" />
+              <ListItemText
+                primary="Absen"
+                secondary={data.summary?.absent || 0}
+                primaryTypographyProps={{
+                  variant: "subtitle1",
+                  sx: { textAlign: "center" },
+                }}
+                secondaryTypographyProps={{
+                  variant: "subtitle1",
+                  sx: { textAlign: "center" },
+                }}
+                sx={{ my: 0 }}
+              />
+              <Divider orientation="vertical" />
+              <ListItemText
+                primary="Belum"
+                secondary={data.summary?.noAbsent || 0}
+                primaryTypographyProps={{
+                  variant: "subtitle1",
+                  sx: { textAlign: "center" },
+                }}
+                secondaryTypographyProps={{
+                  variant: "subtitle1",
+                  sx: { textAlign: "center" },
+                }}
+                sx={{ my: 0 }}
+              />
+            </Stack>
+            <Divider />
+            <List dense>
+              <ListItem dense divider>
+                <ListItemText
+                  primary="Anggota"
+                  primaryTypographyProps={{ sx: { fontWeight: 600 } }}
+                />
+              </ListItem>
+              {Object.keys(data).length > 0 && data.members
+                ? data.members.map((val, idx) => (
+                    <ListItem
+                      key={idx}
+                      divider={idx !== data.members.length - 1}
+                    >
+                      <ListItemText
+                        primary={val.name}
+                        primaryTypographyProps={{ sx: { fontWeight: 600 } }}
+                        secondary={`${utils.typesLabel(val.role)} | ${
+                          val.absent
+                        }`}
+                        sx={{ my: 0 }}
+                      />
+                    </ListItem>
+                  ))
+                : null}
+            </List>
+          </Stack>
         ),
       }}
     >
-      <Grid container>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack direction="row" spacing={1}>
+              <Select
+                name="month"
+                value={absents.getQuery("month", moment().format("M") - 1)}
+                menu={utils.monthID.map((v, i) => ({ text: v, value: i + 1 }))}
+                setValue={absents.setQuery}
+              />
+              <TextField
+                value={absents.getQuery("year", moment().format("Y"))}
+                onChange={(e) => absents.setQuery({ year: +e.target.value })}
+              />
+            </Stack>
+
+            <Typography>{`${utils.getMonth(absents.getQuery("month", moment().format("M"))-1)} - ${absents.getQuery("year", moment().format("Y"))}`}</Typography>
+          </Stack>
+        </Grid>
         <Grid container item xs={14} columns={14} spacing={1}>
-          {utils.getDaysInMonthUTC(3, 2023).map((v, i) => (
-            <Grid item key={i} xs={2}>
-              <Card raised>
-                <CardHeader
-                  avatar={
-                    <Avatar variant="square">{moment(v).format("DD")}</Avatar>
-                  }
-                  title={utils.getDayName(moment(v).format("d"))}
-                  subheader={moment(v).format("MM/YYYY")}
-                  titleTypographyProps={{ variant: "subtitle1" }}
-                  subheaderTypographyProps={{ sx: { whiteSpace: "nowrap" } }}
-                  sx={{ p: 0.5 }}
-                />
-              </Card>
-            </Grid>
-          ))}
+          {utils
+            .getDaysInMonthUTC(
+              absents.getQuery("month", moment().format("M")),
+              absents.getQuery("year", moment().format("Y"))
+            )
+            .map((v, i) => (
+              <Grid item key={i} xs={2}>
+                <Card>
+                  <CardHeader
+                    avatar={
+                      <Avatar
+                        variant="square"
+                        sx={{
+                          backgroundColor: !absents.data.some(
+                            (_v) =>
+                              _v.absentAt === moment(v).format("yyyy-MM-DD")
+                          )
+                            ? "inherit.main"
+                            : "warning.main",
+                        }}
+                      >
+                        {moment(v).format("DD")}
+                      </Avatar>
+                    }
+                    title={utils.getDayName(moment(v).format("d"))}
+                    subheader={moment(v).format("MM/YYYY")}
+                    titleTypographyProps={{ variant: "subtitle2" }}
+                    subheaderTypographyProps={{ sx: { whiteSpace: "nowrap" } }}
+                    sx={{ p: 0.5 }}
+                  />
+                  <Divider />
+                  <Button
+                    id={`btn${i}`}
+                    disabled={
+                      !absents.data.some(
+                        (_v) => _v.absentAt === moment(v).format("yyyy-MM-DD")
+                      )
+                    }
+                    aria-describedby={`btn${i}`}
+                    variant={"text"}
+                    size="small"
+                    color={
+                      anchorEl && anchorEl.id === `btn${i}`
+                        ? "warning"
+                        : "inherit"
+                    }
+                    endIcon={
+                      absents.data.some(
+                        (_v) => _v.absentAt === moment(v).format("yyyy-MM-DD")
+                      ) ? (
+                        anchorEl && anchorEl.id === `btn${i}` ? (
+                          <ExpandMore />
+                        ) : (
+                          <KeyboardArrowRight />
+                        )
+                      ) : undefined
+                    }
+                    fullWidth
+                    onClick={handleClick(v)}
+                  >
+                    {absents.loading ? (
+                      <Skeleton width="100%" />
+                    ) : !absents.data.some(
+                        (_v) => _v.absentAt === moment(v).format("yyyy-MM-DD")
+                      ) ? (
+                      "Absen Belum Tersedia"
+                    ) : (
+                      "Lihat Detail"
+                    )}
+                  </Button>
+                </Card>
+              </Grid>
+            ))}
         </Grid>
       </Grid>
+
+      <Popper id={anchorEl?.id} open={open} anchorEl={anchorEl}>
+        <Paper
+          sx={(theme) => ({
+            minWidth: 200,
+            boxShadow: theme.shadows[15],
+          })}
+        >
+          <List dense>
+            {absents.data
+              .filter((v) => v.absentAt === absentAt)
+              .map((v, i) => (
+                <ListItemButton
+                  key={i}
+                  dense
+                  onClick={async () => {
+                    onOpenDrawer();
+                    const absent = await FRHooks.apiRoute()
+                      .project("detilAbsent", { id, parent: v.parentId })
+                      .params({ date: v.absentAt })
+                      .get((resp) => resp.data);
+                    setData({ name: v.name, role: v.role, ...absent });
+                  }}
+                >
+                  <ListItemText
+                    sx={{ my: 0 }}
+                    primary={v.name || ""}
+                    secondary={utils.typesLabel(v.role) || ""}
+                  />
+                </ListItemButton>
+              ))}
+          </List>
+        </Paper>
+      </Popper>
     </ProjectTemplate>
   );
 };

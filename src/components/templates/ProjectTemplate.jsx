@@ -1,16 +1,15 @@
 import {
   Box,
   Button,
+  Divider,
   Drawer,
-  List,
-  ListItem,
-  ListItemText,
   Stack,
+  Toolbar,
   Typography,
 } from "@mui/material";
-import { Breadcrumb } from "@components/";
+import { Breadcrumb, IconButton } from "@components/";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { People, ListAlt } from "@mui/icons-material";
+import { People, ListAlt, Close } from "@mui/icons-material";
 
 const path = (id) => [
   {
@@ -42,7 +41,7 @@ const ProjectTemplate = ({
   breadcrumb,
   children,
   headRight,
-  container,
+  drawer,
 }) => {
   document.title = title;
   const navigate = useNavigate();
@@ -87,6 +86,25 @@ const ProjectTemplate = ({
       </Stack>
 
       <Box sx={{ mt: "24px" }}>{children}</Box>
+
+      <Drawer
+        open={drawer.open}
+        anchor="right"
+        ModalProps={{
+          keepMounted: false,
+        }}
+        PaperProps={{ sx: { width: "30%" } }}
+        {...drawer.drawerProps}
+      >
+        <Toolbar>
+          <Typography flexGrow={1}>{drawer.title || ""}</Typography>
+          <IconButton onClick={drawer.onClose}>
+            <Close />
+          </IconButton>
+        </Toolbar>
+        <Divider />
+        {drawer.content || null}
+      </Drawer>
     </Stack>
   );
 };
@@ -97,4 +115,7 @@ ProjectTemplate.defaultProps = {
   title: "",
   subtitle: "",
   breadcrumb: false,
+  drawer: {
+    open: false,
+  },
 };
