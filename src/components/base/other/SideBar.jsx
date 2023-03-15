@@ -40,7 +40,7 @@ const menu = [
   {
     canAccess: [],
     text: "Absensi",
-    link: "",
+    link: "/absent",
     icon: icon.ListAlt,
   },
   {
@@ -52,7 +52,7 @@ const menu = [
   {
     canAccess: [],
     text: "Penggajian",
-    link: "",
+    link: "/payrol",
     icon: icon.Money,
   },
   {

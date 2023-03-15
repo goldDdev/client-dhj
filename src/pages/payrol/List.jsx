@@ -1,18 +1,16 @@
 import React from "react";
 import FRHooks from "frhooks";
-import { Chip, Paper } from "@mui/material";
-import { IconButton, Button } from "@components/base";
+import { Box, Chip, Paper } from "@mui/material";
 import { useSnackbar } from "notistack";
-import SettingTemplate from "@components/templates/SettingTemplate";
-import PersonAdd from "@mui/icons-material/PersonAdd";
-import Edit from "@mui/icons-material/Edit";
+import MainTemplate from "@components/templates/MainTemplate";
 import * as utils from "@utils/";
 // import * as Filter from "./filter";
-import * as FORM from "./Form";
-import * as Dummy from "../../../constants/dummy";
-import DataTable from "../../../components/base/table/DataTable";
+// import * as FORM from "./Form";
+import * as Dummy from "../../constants/dummy";
+import DataTable from "../../components/base/table/DataTable";
+import * as BASE from "@components/base";
 
-const columns = (table, t, utils, onUpdate) => [
+const columns = (table, t) => [
   {
     label: "No",
     value: (_, idx) => {
@@ -31,24 +29,6 @@ const columns = (table, t, utils, onUpdate) => [
     value: (value) => value.name,
   },
   {
-    label: 'Email',
-    value: (value) => value.user.email,
-  },
-  {
-    label: t("phoneNumber"),
-    value: (value) => utils.ccFormat(value.phoneNumber) || "-",
-    align: "center",
-    head: {
-      align: "center",
-      sx: {
-        width: "10%",
-      },
-    },
-    sx: {
-      whiteSpace: "nowrap",
-    },
-  },
-  {
     label: t("role"),
     value: (value) => t(value.role) || "-",
     align: "center",
@@ -60,17 +40,25 @@ const columns = (table, t, utils, onUpdate) => [
     },
   },
   {
-    label: "",
+    label: 'Potongan',
+    value: (value) => 'Rp.0',
+  },
+  {
+    label: 'Tunjangan',
+    value: (value) => 'Rp.0',
+  },
+  {
+    label: 'Total Gaji',
+    value: (value) => 'Rp.0',
+  },
+  {
+    label: "Aksi",
     value: (value) => (
-      <IconButton title={t("edit")} size="small" onClick={onUpdate(value.id)}>
+      <IconButton title="Kalkulasi" size="small">
         <Edit fontSize="small" />
       </IconButton>
     ),
     align: "center",
-    head: {
-      align: "center",
-      padding: "checkbox",
-    },
   },
 ];
 
@@ -113,37 +101,50 @@ export default () => {
   };
 
   return (
-    <SettingTemplate
-      title={t("user")}
-      subtitle={`Daftar semua data ${t("user")}`}
-      headRight={{
-        children: (
-          <Button startIcon={<PersonAdd />} onClick={onOpen}>
-            {t(["add", "user"])}
-          </Button>
-        ),
-      }}
+    <MainTemplate
+      title="Penggajian"
+      subtitle={`Daftar semua data penggajian karyawan`}
     >
       {/* <Filter.TableFilter t={t} table={table} /> */}
+      <Box display="flex" gap={2} sx={{ mb: 2 }}>
+        <BASE.Select
+          label="Bulan"
+          value={3}
+          menu={[
+            { text: 'Januari', value: 1 },
+            { text: 'Februari', value: 2 },
+            { text: 'Maret', value: 3 },
+            { text: 'April', value: 4 },
+            { text: 'Mei', value: 5 },
+            { text: 'Juni', value: 6 },
+            { text: 'Juli', value: 7 },
+            { text: 'Agustus', value: 8 },
+            { text: 'September', value: 9 },
+            { text: 'Oktober', value: 10 },
+            { text: 'November', value: 11 },
+            { text: 'Desember', value: 12 },
+          ]}
+        />
+        <BASE.Select
+          label="Tahun"
+          value={2023}
+          menu={[
+            { text: '2022', value: 2022 },
+            { text: '2023', value: 2023 },
+          ]}
+        />
+      </Box>
 
       <Paper elevation={0} variant="outlined">
         <DataTable
-          data={table.data}
+          data={[]}
           loading={table.loading}
-          column={columns(table, t, utils, onUpdate)}
+          column={columns(table, t)}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
 
-      <FORM.UserForm
-        open={trigger.form}
-        t={t}
-        r={r}
-        mutation={mutation}
-        snackbar={enqueueSnackbar}
-        table={table}
-        onOpen={onOpen}
-      />
-    </SettingTemplate>
+      {/* Modal to open calculation */}
+    </MainTemplate>
   );
 };
