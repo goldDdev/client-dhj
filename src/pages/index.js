@@ -4,6 +4,7 @@ import ProjectBoard from "./project/Board";
 import ProjectList from "./project/List";
 import ProjectDetail from "./project/Detail";
 import ProjectAbsent from "./project/Absent";
+import ProjectEvent from "./project/Event";
 
 import EmployeeList from "./employee/List";
 
@@ -18,6 +19,7 @@ export {
   ProjectList,
   ProjectDetail,
   ProjectAbsent,
+  ProjectEvent,
   EmployeeList,
   BoqList,
   UserList,

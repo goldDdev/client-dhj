@@ -76,6 +76,18 @@ const columns = (table, t, utils, onUpdate) => [
     },
   },
   {
+    label: "Alamat Email",
+    value: (value) => value.email|| "-",
+    align: "center",
+    head: {
+      align: "center",
+      sx: {
+        width: "10%",
+        whiteSpace: "nowrap"
+      },
+    },
+  },
+  {
     label: t("role"),
     value: (value) => t(value.role) || "-",
     align: "center",
@@ -83,6 +95,7 @@ const columns = (table, t, utils, onUpdate) => [
       align: "center",
       sx: {
         width: "10%",
+        whiteSpace: "nowrap"
       },
     },
   },

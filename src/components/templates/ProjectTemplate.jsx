@@ -17,7 +17,11 @@ const path = (id) => [
     link: `/project/${id}/detail`,
     startIcon: <ListAlt />,
   },
-
+  {
+    label: "BOQ",
+    link: `/project/${id}/boq`,
+    startIcon: <ListAlt />,
+  },
   {
     label: "Absen",
     link: `/project/${id}/absent`,

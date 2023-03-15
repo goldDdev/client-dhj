@@ -15,6 +15,7 @@ const router = createBrowserRouter([
       { path: "/projects/list", element: <Page.ProjectList /> },
       { path: "/project/:id/detail", element: <Page.ProjectDetail /> },
       { path: "/project/:id/absent", element: <Page.ProjectAbsent /> },
+      { path: "/project/:id/event", element: <Page.ProjectEvent /> },
       { path: "/tracking", element: <Page.MapTracking /> },
       { path: "/settings", element: <Page.SettingGeneral /> },
       { path: "/settings/employee", element: <Page.EmployeeList /> },
