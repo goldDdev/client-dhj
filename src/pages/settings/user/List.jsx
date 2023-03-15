@@ -32,7 +32,7 @@ const columns = (table, t, utils, onUpdate) => [
   },
   {
     label: 'Email',
-    value: (value) => value.user.email,
+    value: (value) => value.email,
   },
   {
     label: t("phoneNumber"),
