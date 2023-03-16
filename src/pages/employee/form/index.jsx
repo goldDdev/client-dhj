@@ -1,9 +1,9 @@
+import FRHooks from "frhooks";
+import _ from "lodash";
 import { Stack, TextField, Button, CircularProgress } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
-import _ from "lodash";
-import FRHooks from "frhooks";
 
 export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
   return (
@@ -33,7 +33,7 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
             <TextField
               id="empCard"
               disabled={mutation.loading}
-              label={t("cardID")}
+              label={'No. ID Karyawan'}
               value={mutation.data.cardID || ""}
               onChange={(e) => mutation.setData({ cardID: e.target.value })}
               onBlur={async () => mutation.validate("cardID")}
@@ -89,7 +89,7 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               id="empRole"
               label={t("role")}
               name="role"
-              menu={utils.types.map((v) => ({ text: t(v), value: v }))}
+              menu={utils.workerMobileTypes.map((v) => ({ text: t(v), value: v }))}
               value={mutation.data.role === "" ? "WORKER" : mutation.data.role}
               setValue={mutation.setData}
               error={mutation.error("role")}

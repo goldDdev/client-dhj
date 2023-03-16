@@ -4,6 +4,9 @@ export const user = {
   id: 0,
   email: "",
   employee_id: 0,
+  name: "",
+  phoneNumber: "",
+  role: "ADMIN",
 }
 
 export const boq = {

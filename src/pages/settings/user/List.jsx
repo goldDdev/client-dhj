@@ -91,7 +91,10 @@ export default () => {
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
+        name: y.string().required().min(3),
         email: y.string().required().min(3),
+        phoneNumber: y.string().required().min(10).max(12),
+        role: y.string().required(),
       }),
   });
 
@@ -107,7 +110,8 @@ export default () => {
         onOpen();
       },
       onSuccess: (resp) => {
-        mutation.setData(resp.data);
+        console.log(resp.data);
+        mutation.setData({ ...resp.data, email: resp.data.user.email });
       },
     });
   };
