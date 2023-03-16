@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const user = {
   id: 0,
   email: "",
@@ -36,4 +38,15 @@ export const project = {
   longitude: 0,
   status: "DRAFT",
   note: "",
+};
+
+
+export const kom = {
+  id: 0,
+  title: "",
+  projectId: 0,
+  description: "",
+  datePlan: moment().format("yyyy-MM-DD"),
+  timePlan: moment().format('HH:00:00'),
+  status: 'PLAN'
 };

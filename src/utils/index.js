@@ -208,3 +208,23 @@ export const projectStatus = {
   DONE: "Selesi",
   REVIEW: "Pratinjau",
 };
+
+export const komStatus = {
+  PLAN: "Plan",
+  CANCEL: "Batal",
+  DONE: "Selesai",
+};
+
+export const komStatusColor = (status) => {
+  return (
+    {
+      PLAN: "info",
+      CANCEL: "error",
+      DONE: "success",
+    }[status] || "default"
+  );
+};
+
+export const komStatusLabel = (status) => {
+  return komStatus[status] || "Plan";
+};

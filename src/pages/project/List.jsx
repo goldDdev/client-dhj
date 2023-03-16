@@ -68,7 +68,7 @@ const columns = (table, onUpdate) => [
       return (
         <LinearProgress
           color="success"
-          label={`${total}/${value.duration}Hari`}
+          label={`${total < 0 ? 0 : total}/${value.duration}Hari`}
           value={percent}
         />
       );

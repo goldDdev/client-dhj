@@ -24,24 +24,27 @@ const DataTable = ({
   tableProps,
   container,
   row,
+  disableHeader,
 }) => {
   return (
     <div>
       <TableContainer {...container}>
         <Table {...tableProps}>
-          <TableHead>
-            <TableRow>
-              {column.map(({ ...props }, i) => (
-                <HeadCell
-                  key={`th-${i}`}
-                  order={order}
-                  orderBy={orderBy}
-                  onOrder={onOrder}
-                  {...props}
-                />
-              ))}
-            </TableRow>
-          </TableHead>
+          {disableHeader ? null : (
+            <TableHead>
+              <TableRow>
+                {column.map(({ ...props }, i) => (
+                  <HeadCell
+                    key={`th-${i}`}
+                    order={order}
+                    orderBy={orderBy}
+                    onOrder={onOrder}
+                    {...props}
+                  />
+                ))}
+              </TableRow>
+            </TableHead>
+          )}
 
           <TableBody component="tbody">
             <>

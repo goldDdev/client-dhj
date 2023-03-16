@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Stack,
   TextField,
@@ -8,9 +9,11 @@ import {
   IconButton,
   Paper,
   Divider,
+  Chip,
 } from "@mui/material";
 import {
   Add,
+  Check,
   Close,
   ExpandMore,
   MoreVert,
@@ -23,6 +26,7 @@ import { SimpleList } from "@components/base/list";
 import * as utils from "@utils/";
 import moment from "moment";
 import _ from "lodash";
+import * as Filter from "../filter";
 
 export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
   return (
@@ -370,3 +374,188 @@ export const ListWorker = ({
     </Paper>
   );
 };
+
+export const EventCreate = ({
+  open,
+  mutation,
+  snackbar,
+  table,
+  onOpen,
+  route,
+  type,
+}) => (
+  <DialogForm
+    open={open}
+    onClose={onOpen}
+    title="Form Agenda"
+    maxWidth="md"
+    content={{
+      children: (
+        <Stack spacing={1.5} direction="column">
+          {type === "full" ? (
+            <TextField
+              disabled={mutation.loading || mutation.processing}
+              label="Nama Agenda"
+              value={mutation.data.title || ""}
+              onChange={(e) => mutation.setData({ title: e.target.value })}
+              onBlur={async () => mutation.validate("title")}
+              error={mutation.error("title")}
+              helperText={mutation.message("title")}
+              InputProps={{
+                endAdornment:
+                  mutation.loading || mutation.processing ? (
+                    <CircularProgress size={20} />
+                  ) : null,
+              }}
+            />
+          ) : null}
+
+          <FieldSet disabledDivider>
+            <TextField
+              InputLabelProps={{ shrink: true }}
+              disabled={mutation.loading || mutation.processing}
+              label={type === "full" ? "Tanggal" : "Tanggal Aktual"}
+              value={
+                mutation.data[type === "full" ? "datePlan" : "actualDate"] || ""
+              }
+              onChange={(e) =>
+                mutation.setData({
+                  [type === "full" ? "datePlan" : "actualDate"]: e.target.value,
+                })
+              }
+              onBlur={async () =>
+                mutation.validate(type === "full" ? "datePlan" : "actualDate")
+              }
+              error={mutation.error(
+                type === "full" ? "datePlan" : "actualDate"
+              )}
+              helperText={mutation.message(
+                type === "full" ? "datePlan" : "actualDate"
+              )}
+              InputProps={{
+                endAdornment:
+                  mutation.loading || mutation.processing ? (
+                    <CircularProgress size={20} />
+                  ) : null,
+              }}
+              sx={{ width: "75%" }}
+              type="date"
+            />
+
+            <TextField
+              InputLabelProps={{ shrink: true }}
+              disabled={mutation.loading || mutation.processing}
+              label={type === "full" ? "Waktu" : "Waktu Aktual"}
+              value={
+                mutation.data[type === "full" ? "timePlan" : "actualTime"] || ""
+              }
+              onChange={(e) =>
+                mutation.setData({
+                  [type === "full" ? "timePlan" : "actualTime"]: e.target.value,
+                })
+              }
+              onBlur={async () =>
+                mutation.validate(type === "full" ? "timePlan" : "actualTime")
+              }
+              error={mutation.error(
+                type === "full" ? "timePlan" : "actualTime"
+              )}
+              helperText={mutation.message(
+                type === "full" ? "timePlan" : "actualTime"
+              )}
+              InputProps={{
+                endAdornment:
+                  mutation.loading || mutation.processing ? (
+                    <CircularProgress size={20} />
+                  ) : null,
+              }}
+              sx={{ width: "75%" }}
+              type="time"
+            />
+          </FieldSet>
+
+          <FieldSet
+            label="Status Agenda"
+            stackProps={{
+              direction: "row",
+              spacing: 1,
+              justifyContent: "flex-start",
+            }}
+          >
+            {Object.entries(utils.komStatus).map(([k, v]) => (
+              <Filter.ChipKom
+                key={k}
+                status={k}
+                color={
+                  mutation.data.status === k
+                    ? utils.komStatusColor(k)
+                    : "default"
+                }
+                clickable
+                onClick={() => {
+                  mutation.setData({ status: k });
+                }}
+              />
+            ))}
+          </FieldSet>
+
+          {type === "full" ? (
+            <FieldSet
+              label="Deskripsi"
+              stackProps={{ direction: "column", spacing: 2 }}
+            >
+              <TextField
+                multiline
+                rows={2}
+                disabled={mutation.loading || mutation.processing}
+                fullWidth
+                label="Kontak"
+                value={mutation.data.description || ""}
+                onChange={(e) =>
+                  mutation.setData({ description: e.target.value })
+                }
+                sx={{ width: "100%" }}
+              />
+            </FieldSet>
+          ) : null}
+        </Stack>
+      ),
+    }}
+    actions={{
+      children: (
+        <>
+          <Button variant="outlined" onClick={onOpen}>
+            Batal
+          </Button>
+          <LoadingButton
+            loading={mutation.processing}
+            disabled={mutation.processing || mutation.loading}
+            disableElevation
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              mutation.post(route().project("listKom").link(), {
+                method: mutation.isNewRecord ? "post" : "put",
+                except: [].concat(mutation.isNewRecord ? ["id"] : []),
+                validation: true,
+
+                onSuccess: ({ data }) => {
+                  snackbar(`Agenda Berhasil Ditambahkan`);
+                  onOpen();
+                  if (table && mutation.isNewRecord) {
+                    table.data.unshift(data);
+                  } else {
+                    table.data[table.data.findIndex((v) => v.id === data.id)] =
+                      data;
+                  }
+                },
+              });
+            }}
+          >
+            {mutation.isNewRecord ? "Tambah Baru" : "Simpan Perubahan"}
+          </LoadingButton>
+        </>
+      ),
+    }}
+  />
+);

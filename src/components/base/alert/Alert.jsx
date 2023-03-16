@@ -10,7 +10,6 @@ import {
   Dialog,
   Stack,
   Typography,
-  Zoom,
 } from "@mui/material";
 
 const Alert = () => {
@@ -19,7 +18,6 @@ const Alert = () => {
   return (
     <Dialog
       open={alert.open}
-      TransitionComponent={Zoom}
       aria-describedby={"alert-" + alert.type}
       aria-labelledby={"alert-" + alert.type}
     >

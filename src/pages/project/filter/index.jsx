@@ -12,10 +12,12 @@ import * as utils from "@utils/";
 import _ from "lodash";
 import { Button } from "@components/base";
 import {
+  Block,
   Check,
-  ExpandLess,
+  CheckCircle,
   ExpandMore,
   FilterAlt,
+  Schedule,
   Work,
 } from "@mui/icons-material";
 
@@ -81,10 +83,10 @@ export const ButtonFilter = ({ t, table }) => {
       alignItems="center"
     >
       <Stack direction="row" spacing={1}>
-      <Paper elevation={0}>
-        <Button variant="outlined" color="inherit">
-          Semua 100
-        </Button>
+        <Paper elevation={0}>
+          <Button variant="outlined" color="inherit">
+            Semua 100
+          </Button>
         </Paper>
         <Button variant="outlined" color="inherit">
           Draft 100
@@ -117,5 +119,23 @@ export const ButtonFilter = ({ t, table }) => {
         </Paper>
       </Stack>
     </Stack>
+  );
+};
+
+export const ChipKom = ({ status, ...props }) => {
+  const icon = {
+    PLAN: <Schedule fontSize="small" />,
+    CANCEL: <Block fontSize="small" />,
+    DONE: <CheckCircle fontSize="small" />,
+  };
+
+  return (
+    <Chip
+      avatar={icon[status]}
+      label={utils.komStatusLabel(status)}
+      variant="outlined"
+      color={utils.komStatusColor(status)}
+      {...props}
+    />
   );
 };

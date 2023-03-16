@@ -1,129 +1,181 @@
 import React from "react";
-import { Button, Chip, Paper } from "@mui/material";
-import { IconButton, LinearProgress } from "@components/base";
+import { Button, Stack, Box, Typography } from "@mui/material";
+import { BasicDropdown, IconButton } from "@components/base";
 import { useSnackbar } from "notistack";
-
-import Add from "@mui/icons-material/Add";
-import Edit from "@mui/icons-material/Edit";
 import * as utils from "@utils/";
 import * as Filter from "./filter";
 import * as Dummy from "../../constants/dummy";
+import * as FORM from "./form";
 import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
-import MainTemplate from "@components/templates/MainTemplate";
-import * as FORM from "./form";
-import moment from "moment";
-import { Link } from "react-router-dom";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
+import moment from "moment";
+import { useParams } from "react-router-dom";
+import { ArrowRight, MoreVert, Add, Notes } from "@mui/icons-material";
+import { useAlert } from "@contexts/AlertContext";
 
-const columns = (table, onUpdate) => [
+const columns = (onDelete, onUpdate) => [
   {
-    label: "No",
-    value: (_, idx) => {
-      return table.pagination.from + idx;
-    },
-    head: {
-      align: "center",
-      padding: "checkbox",
-    },
-    align: "center",
-    padding: "checkbox",
-    size: "small",
-  },
-  {
-    label: "Nama",
     value: (value) => (
-      <Link
-        to={`/project/${value.id}/detail`}
-        style={{ textDecoration: "none", fontWeight: 500 }}
-      >
-        {value.name}
-      </Link>
+      <Box px={0.8} py={0.4}>
+        <Typography variant="h6">
+          {moment(value.datePlan).format("DD")}
+        </Typography>
+        <Typography variant="caption">
+          {utils.getMonth(moment(value.datePlan).format("m"))}
+        </Typography>
+      </Box>
     ),
-  },
-  {
-    label: "Perusahaan",
-    value: (value) => value.companyName,
-    head: {
-      noWrap: true,
-      sx: {
-        width: "15%",
-      },
+    align: "center",
+    padding: "none",
+    sx: {
+      width: "1%",
+      whiteSpace: "noWrap",
+      borderLeft: 1,
+      borderRight: 1,
+      borderTop: 1,
+      borderColor: "divider",
+      backgroundColor: "primary.main",
+      color: "white"
+
     },
   },
   {
-    label: "Status",
-    value: (value) => value.status,
-    head: {
-      sx: {
-        width: "10%",
-      },
+    value: (value) => (
+      <Typography variant="subtitle2">{value.title}</Typography>
+    ),
+    sx: {
+      borderTop: 1,
+      borderColor: "divider",
     },
   },
   {
-    label: "Durasi",
+    value: (value) => <Filter.ChipKom status={value.status} />,
+    align: "center",
+    sx: {
+      whiteSpace: "noWrap",
+      width: "1%",
+      borderTop: 1,
+      borderColor: "divider",
+    },
+  },
+  {
     value: (value) => {
-      const total =
-        value.duration - (moment(value.finishAt).diff(moment(), "days") || 0);
-      const percent = (total / value.duration) * 100;
+      const date = moment(value.datePlan).format("DD-MM-Y");
+
       return (
-        <LinearProgress
-          color="success"
-          label={`${total}/${value.duration}Hari`}
-          value={percent}
-        />
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <div>
+            <Typography variant="caption">Tanggal Plan</Typography>
+            <Typography variant="body2">
+              {date} {value.timePlan}
+            </Typography>
+          </div>
+
+          {value.actualDate || value.actualTime ? (
+            <>
+              <div>
+                <ArrowRight />
+              </div>
+
+              <div>
+                <Typography
+                  variant="caption"
+                  color="success.main"
+                  fontWeight={600}
+                >
+                  Tanggal Aktual
+                </Typography>
+                <Typography variant="body2">
+                  {value.actualDate
+                    ? moment(value.actualDate).format("DD-MM-Y")
+                    : date}
+                    {" "}
+                   {value.actualTime || value.timePlan}
+                </Typography>
+              </div>
+            </>
+          ) : null}
+        </Stack>
       );
     },
-    head: {
-      noWrap: true,
-      sx: {
-        width: "15%",
-      },
+    align: "left",
+    padding: "none",
+    sx: {
+      whiteSpace: "noWrap",
+      width: "1%",
+      borderTop: 1,
+      borderColor: "divider",
     },
   },
   {
-    label: "",
     value: (value) => (
-      <IconButton title="Ubah" size="small" onClick={onUpdate(value.id)}>
-        <Edit fontSize="small" />
+      <IconButton title="Lihat Detail">
+        <Notes />
       </IconButton>
     ),
     align: "center",
-    head: {
-      noWrap: true,
-      align: "center",
-      padding: "checkbox",
+    padding: "checkbox",
+    sx: { borderTop: 1, borderColor: "divider" },
+  },
+
+  {
+    value: (value) => (
+      <BasicDropdown
+        type="icon"
+        menu={[
+          {
+            text: "Agenda Ulang",
+            divider: true,
+            onClick: onUpdate(value.id, "actual"),
+          },
+          {
+            text: "Ubah Data",
+            divider: true,
+            onClick: onUpdate(value.id, "full"),
+          },
+          { text: "Hapus Agenda", onClick: onDelete(value.id) },
+        ]}
+        label={<MoreVert />}
+      />
+    ),
+    align: "center",
+    padding: "checkbox",
+    sx: {
+      borderRight: 1,
+      borderTop: 1,
+      borderColor: "divider",
     },
   },
 ];
 
 export default () => {
+  const { id } = useParams();
+  const alert = useAlert();
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
+    type: "full",
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().project("index").link(), {
-    selector: (resp) => resp.data,
-    total: (resp) => resp.meta.total,
-  });
+  const table = FRHooks.useTable(
+    FRHooks.apiRoute().project("listKoms").link(),
+    {
+      selector: (resp) => resp.data,
+      total: (resp) => resp.meta.total,
+    }
+  );
 
   const mutation = FRHooks.useMutation({
-    defaultValue: Dummy.project,
+    defaultValue: { ...Dummy.kom, projectId: id },
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
-        name: y.string().required(),
-        companyName: y.string().required(),
-        noSpk: y.string().nullable(),
-        contact: y.string().nullable(),
-        location: y.string().nullable(),
-        latitude: y.number().nullable(),
-        longitude: y.number().nullable(),
-        startAt: y.date().nullable(),
-        finishAt: y.date().nullable(),
-        status: y.string().required(),
-        duration: y.number().nullable(),
+        title: y.string().required(),
+        description: y.string().nullable(),
+        datePlan: y.string().nullable(),
+        timePlan: y.string().nullable(),
+        status: y.string().nullable(),
       }),
   });
 
@@ -133,13 +185,54 @@ export default () => {
     mutation.clearError();
   };
 
-  const onUpdate = (id) => async () => {
-    mutation.get(FRHooks.apiRoute().project("detail", { id }).link(), {
+  const onUpdate = (id, type) => async () => {
+    mutation.get(FRHooks.apiRoute().project("listKomDetail", { id }).link(), {
       onBeforeSend: () => {
-        onOpen();
+        setTrigger((state) => ({ ...state, form: !state.form, type }));
+        mutation.clearData();
+        mutation.clearError();
       },
-      onSuccess: (resp) => {
-        mutation.setData(resp.data);
+      onSuccess: ({ data }) => {
+        mutation.setData(data, { include: ["id"] });
+      },
+    });
+  };
+
+  const onDelete = (id) => async () => {
+    alert.set({
+      open: true,
+      title: "Mohon Perhatian",
+      message: "Anda akan mengahapus agenda ini dari daftar, apakah anda yain?",
+      type: "warning",
+      loading: false,
+      close: {
+        text: "Keluar",
+      },
+      confirm: {
+        text: "Ya, Saya Mengerti",
+        onClick: () => {
+          mutation.destroy(
+            FRHooks.apiRoute().project("listKomDetail", { id }).link(),
+            {
+              onBeforeSend: () => {
+                alert.set({ loading: true });
+              },
+              onSuccess: () => {
+                enqueueSnackbar("Agend berhasil dihapus dari daftar", {
+                  variant: "success",
+                });
+                table.data.splice(
+                  table.data.findIndex((v) => v.id === id),
+                  1
+                );
+                alert.reset();
+              },
+              onAlways: () => {
+                alert.set({ loading: false });
+              },
+            }
+          );
+        },
       },
     });
   };
@@ -155,22 +248,26 @@ export default () => {
         ),
       }}
     >
-      <Paper elevation={0} variant="outlined">
-        <DataTable
-          data={table.data}
-          loading={table.loading}
-          column={columns(table, onUpdate)}
-          pagination={utils.pagination(table.pagination)}
-        />
-      </Paper>
+      <DataTable
+        disableHeader
+        data={table.data}
+        loading={table.loading}
+        column={columns(onDelete, onUpdate)}
+        tableProps={{
+          size: "small",
+          sx: { borderCollapse: "separate", borderSpacing: "0 8px" },
+        }}
+        row={{ sx: { backgroundColor: "white" } }}
+      />
 
-      <FORM.Create
+      <FORM.EventCreate
         open={trigger.form}
         mutation={mutation}
         route={FRHooks.apiRoute}
         snackbar={enqueueSnackbar}
         table={table}
         onOpen={onOpen}
+        type={trigger.type}
       />
     </ProjectTemplate>
   );
