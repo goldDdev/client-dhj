@@ -68,6 +68,18 @@ export const getDaysInMonthUTC = (month, year) => {
   return days;
 };
 
+export const getDaysInWeekUTC = (month, year) => {
+  const date = new Date(Date.UTC(year, month - 1, 1));
+  const days = [];
+
+  while (date.getUTCMonth() === month - 1) {
+    days.push(new Date(date));
+    date.setUTCDate(date.getUTCDate() + 1);
+  }
+
+  return days;
+};
+
 export const getVideoCover = (file) => {
   return new Promise((resolve) => {
     const canvas = document.createElement("canvas");
