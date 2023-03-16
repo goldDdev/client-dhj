@@ -39,15 +39,21 @@ const menu = [
   },
   {
     canAccess: [],
+    text: "Pelacakan",
+    link: "/tracking",
+    icon: icon.Map,
+  },
+  {
+    canAccess: [],
     text: "Absensi",
     link: "/absent",
     icon: icon.ListAlt,
   },
   {
     canAccess: [],
-    text: "Pelacakan",
-    link: "/tracking",
-    icon: icon.Map,
+    text: "Weekly Plan",
+    link: "/weekly",
+    icon: icon.ListAlt,
   },
   {
     canAccess: [],

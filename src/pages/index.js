@@ -9,6 +9,7 @@ import ProjectEvent from "./project/Event";
 import EmployeeList from "./employee/List";
 import AbsentList from "./absent/List";
 import PayrolList from "./payrol/List";
+import WeeklyList from "./weekly/List";
 
 import SettingGeneral from "./settings/general/Form";
 import BoqList from "./settings/boq/List";
@@ -27,6 +28,7 @@ export {
   UserList,
   AbsentList,
   PayrolList,
+  WeeklyList,
   MapTracking,
   SettingGeneral,
 };
