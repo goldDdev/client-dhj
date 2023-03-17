@@ -1,9 +1,8 @@
 import React from "react";
-import { Button, Stack, Box, Typography } from "@mui/material";
-import { BasicDropdown, IconButton } from "@components/base";
+import { Button, Stack, Box, Typography, TextField } from "@mui/material";
+import { BasicDropdown, IconButton, Select } from "@components/base";
 import { useSnackbar } from "notistack";
 import * as utils from "@utils/";
-import * as Filter from "./filter";
 import * as Dummy from "../../constants/dummy";
 import * as FORM from "./form";
 import FRHooks from "frhooks";
@@ -11,7 +10,18 @@ import DataTable from "../../components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
 import { useParams } from "react-router-dom";
-import { ArrowRight, MoreVert, Add, Notes } from "@mui/icons-material";
+import {
+  ArrowRight,
+  MoreVert,
+  Add,
+  Notes,
+  Search,
+  Check,
+  ArrowUpward,
+  ArrowDownward,
+  Block,
+  Schedule,
+} from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
 
 const columns = (onDelete, onUpdate) => [
@@ -35,26 +45,29 @@ const columns = (onDelete, onUpdate) => [
       borderRight: 1,
       borderTop: 1,
       borderColor: "divider",
-      backgroundColor: "primary.main",
-      color: "white"
-
     },
   },
   {
     value: (value) => (
-      <Typography variant="subtitle2">{value.title}</Typography>
+      <Stack direction="column">
+        <Typography variant="subtitle2">{value.title}</Typography>
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+            {value.status === "PLAN" ? (
+              <Schedule fontSize="inherit" sx={{ verticalAlign: "center" }} />
+            ) : value.status === "CANCEL" ? (
+              <Block fontSize="inherit" sx={{ verticalAlign: "center" }} />
+            ) : (
+              <Check fontSize="inherit" sx={{ verticalAlign: "center" }} />
+            )}
+          <div>
+            <Typography variant="caption">
+              {utils.komStatusLabel(value.status)}
+            </Typography>
+          </div>
+        </Stack>
+      </Stack>
     ),
     sx: {
-      borderTop: 1,
-      borderColor: "divider",
-    },
-  },
-  {
-    value: (value) => <Filter.ChipKom status={value.status} />,
-    align: "center",
-    sx: {
-      whiteSpace: "noWrap",
-      width: "1%",
       borderTop: 1,
       borderColor: "divider",
     },
@@ -89,9 +102,8 @@ const columns = (onDelete, onUpdate) => [
                 <Typography variant="body2">
                   {value.actualDate
                     ? moment(value.actualDate).format("DD-MM-Y")
-                    : date}
-                    {" "}
-                   {value.actualTime || value.timePlan}
+                    : date}{" "}
+                  {value.actualTime || value.timePlan}
                 </Typography>
               </div>
             </>
@@ -159,7 +171,7 @@ export default () => {
   });
 
   const table = FRHooks.useTable(
-    FRHooks.apiRoute().project("listKoms").link(),
+    FRHooks.apiRoute().project("listKoms").params({ projectId: id }).link(),
     {
       selector: (resp) => resp.data,
       total: (resp) => resp.meta.total,
@@ -180,7 +192,7 @@ export default () => {
   });
 
   const onOpen = () => {
-    setTrigger((state) => ({ ...state, form: !state.form }));
+    setTrigger((state) => ({ ...state, form: !state.form, type: "full" }));
     mutation.clearData();
     mutation.clearError();
   };
@@ -240,6 +252,7 @@ export default () => {
   return (
     <ProjectTemplate
       title="Agenda"
+      subtitle="Menampilkan daftar agenda proyek"
       headRight={{
         children: (
           <Button disableElevation startIcon={<Add />} onClick={onOpen}>
@@ -248,6 +261,70 @@ export default () => {
         ),
       }}
     >
+      <Stack direction="row" spacing={1} mb={2} alignItems="center">
+        <TextField
+          placeholder="Cari"
+          value={table.query("title", "")}
+          onChange={(e) => table.setQuery({ title: e.target.value })}
+          InputProps={{ startAdornment: <Search color="disabled" /> }}
+        />
+        <Select
+          label="Urutkan"
+          menu={[
+            { text: "Pilih", divider: true, value: "id" },
+            { text: "Tanggal Plan", divider: true, value: "date_plan" },
+            { text: "Tanggal Aktual", value: "actual_date" },
+          ]}
+          sx={{
+            width: "25%",
+            "& .MuiOutlinedInput-root": {
+              paddingLeft: 0.8,
+            },
+          }}
+          value={table.orderBy}
+          onChange={(e) => {
+            table.onOrder(e.target.value);
+          }}
+          InputProps={{
+            startAdornment: (
+              <IconButton
+                title={"urutkan"}
+                size="small"
+                onClick={() => table.onOrder(table.orderBy)}
+                sx={{ mr: 1 }}
+              >
+                {table.order === "asc" ? (
+                  <ArrowUpward fontSize="inherit" />
+                ) : (
+                  <ArrowDownward fontSize="inherit" />
+                )}
+              </IconButton>
+            ),
+          }}
+        />
+        <Select
+          label="Status"
+          name="status"
+          menu={[
+            { text: "Pilih Status", divider: true, value: "00" },
+            { text: "Plan", divider: true, value: "PLAN" },
+            { text: "Batal", divider: true, value: "CANCEL" },
+            { text: "Selesai", value: "DONE" },
+          ]}
+          sx={{
+            width: "25%",
+          }}
+          value={table.query("status", "00")}
+          onChange={(e) => {
+            if (e.target.value === "00") {
+              table.remove("status");
+            } else {
+              table.setQuery({ status: e.target.value });
+            }
+          }}
+        />
+      </Stack>
+
       <DataTable
         disableHeader
         data={table.data}

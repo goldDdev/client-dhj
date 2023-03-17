@@ -484,14 +484,12 @@ export const EventCreate = ({
           >
             {Object.entries(utils.komStatus).map(([k, v]) => (
               <Filter.ChipKom
+                disableElevation
+                size="small"
                 key={k}
                 status={k}
-                color={
-                  mutation.data.status === k
-                    ? utils.komStatusColor(k)
-                    : "default"
-                }
-                clickable
+                color={mutation.data.status === k ? "primary" : "inherit"}
+                variant={mutation.data.status === k ? "contained" : "outlined"}
                 onClick={() => {
                   mutation.setData({ status: k });
                 }}
@@ -509,11 +507,11 @@ export const EventCreate = ({
                 rows={2}
                 disabled={mutation.loading || mutation.processing}
                 fullWidth
-                label="Kontak"
                 value={mutation.data.description || ""}
                 onChange={(e) =>
                   mutation.setData({ description: e.target.value })
                 }
+                placeholder="Tulis deskripsi disini"
                 sx={{ width: "100%" }}
               />
             </FieldSet>

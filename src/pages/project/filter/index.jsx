@@ -6,11 +6,11 @@ import {
   Typography,
   Chip,
   Box,
+  Button
 } from "@mui/material";
 import Search from "@mui/icons-material/Search";
 import * as utils from "@utils/";
 import _ from "lodash";
-import { Button } from "@components/base";
 import {
   Block,
   Check,
@@ -130,12 +130,16 @@ export const ChipKom = ({ status, ...props }) => {
   };
 
   return (
-    <Chip
-      avatar={icon[status]}
-      label={utils.komStatusLabel(status)}
-      variant="outlined"
-      color={utils.komStatusColor(status)}
-      {...props}
-    />
+    // <Chip
+    //   avatar={icon[status]}
+    //   label={utils.komStatusLabel(status)}
+    //   variant="outlined"
+    //   color={utils.komStatusColor(status)}
+    //   {...props}
+    // />
+
+    <Button variant="outlined" startIcon={icon[status]} {...props}>
+      {utils.komStatusLabel(status)}
+    </Button>
   );
 };
