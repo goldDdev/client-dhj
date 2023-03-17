@@ -182,10 +182,11 @@ export const pagination = (options) => {
 };
 
 export const types = [
+  "OWNER",
+  "ADMIN",
   "PM",
   "PCC",
   "PC",
-  "QS",
   "QCC",
   "QC",
   "SUP",
@@ -195,8 +196,28 @@ export const types = [
   "WORKER",
 ];
 
+export const workerWebTypes = [
+  "OWNER",
+  "ADMIN",
+  "PM",
+  "PCC",
+  "QCC",
+  "SUP",
+];
+
+export const workerMobileTypes = [
+  "PC",
+  "QC",
+  "SPV",
+  "MANDOR",
+  "STAFF",
+  "WORKER",
+];
+
 export const typesLabel = (type) => {
   const role = {
+    OWNER: "Owner",
+    ADMIN: "Admin",
     PM: "Project Manager",
     PCC: "Project Control Coordinator",
     PC: "Project Control",

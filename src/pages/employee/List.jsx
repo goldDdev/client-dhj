@@ -27,7 +27,7 @@ const columns = (table, t, utils, onUpdate) => [
     size: "small",
   },
   {
-    label: "ID",
+    label: "ID Karyawan",
     value: (value, idx) => {
       return value.cardID;
     },
@@ -43,24 +43,24 @@ const columns = (table, t, utils, onUpdate) => [
     label: t("name"),
     value: (value) => value.name,
   },
-  {
-    label: t("status"),
-    value: (value) => (
-      <Chip
-        label={t(value.status)}
-        color={!value.invoiceAt ? "success" : "default"}
-        size="small"
-        variant="outlined"
-      />
-    ),
-    align: "center",
-    head: {
-      align: "center",
-      sx: {
-        width: "10%",
-      },
-    },
-  },
+  // {
+  //   label: t("status"),
+  //   value: (value) => (
+  //     <Chip
+  //       label={t(value.status)}
+  //       color={!value.invoiceAt ? "success" : "default"}
+  //       size="small"
+  //       variant="outlined"
+  //     />
+  //   ),
+  //   align: "center",
+  //   head: {
+  //     align: "center",
+  //     sx: {
+  //       width: "10%",
+  //     },
+  //   },
+  // },
   {
     label: t("phoneNumber"),
     value: (value) => utils.ccFormat(value.phoneNumber) || "-",
