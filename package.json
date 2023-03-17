@@ -17,7 +17,7 @@
     "@mui/styles": "^5.11.9",
     "@mui/utils": "^5.10.9",
     "axios": "1.2.0",
-    "frhooks": "^2.1.9-0",
+    "frhooks": "^2.1.9-5",
     "leaflet": "^1.9.3",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",

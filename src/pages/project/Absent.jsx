@@ -65,7 +65,8 @@ export default () => {
 
   return (
     <ProjectTemplate
-      title="Proyek"
+      title="Absensi"
+      subtitle="Menampilkan daftar absen berdasarkan tanggal"
       drawer={{
         open: trigger.openDrawer,
         title: "Detil Absensi Proyek",

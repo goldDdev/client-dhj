@@ -7,13 +7,13 @@ export const user = {
   name: "",
   phoneNumber: "",
   role: "ADMIN",
-}
+};
 
 export const boq = {
   id: 0,
   name: "",
   typeUnit: "",
-}
+};
 
 export const employee = {
   id: 0,
@@ -43,13 +43,18 @@ export const project = {
   note: "",
 };
 
-
 export const kom = {
   id: 0,
   title: "",
   projectId: 0,
   description: "",
   datePlan: moment().format("yyyy-MM-DD"),
-  timePlan: moment().format('HH:00:00'),
-  status: 'PLAN'
+  timePlan: moment().format("HH:00:00"),
+  status: "PLAN",
+};
+
+export const projectBoq = {
+  id: 0,
+  boqId: 0,
+  projectId: 0
 };

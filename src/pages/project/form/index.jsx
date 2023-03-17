@@ -10,6 +10,10 @@ import {
   Paper,
   Divider,
   Chip,
+  List,
+  ListItem,
+  ListItemText,
+  Skeleton,
 } from "@mui/material";
 import {
   Add,
@@ -532,19 +536,17 @@ export const EventCreate = ({
             variant="contained"
             color="primary"
             onClick={() => {
-              mutation.post(route().project("listKom").link(), {
+              mutation.post(route().project("kom").link(), {
                 method: mutation.isNewRecord ? "post" : "put",
                 except: [].concat(mutation.isNewRecord ? ["id"] : []),
                 validation: true,
-
                 onSuccess: ({ data }) => {
                   snackbar(`Agenda Berhasil Ditambahkan`);
                   onOpen();
                   if (table && mutation.isNewRecord) {
-                    table.data.unshift(data);
+                    table.add(data, "start");
                   } else {
-                    table.data[table.data.findIndex((v) => v.id === data.id)] =
-                      data;
+                    table.update((v) => v.id === mutation.data.id, data);
                   }
                 },
               });
@@ -553,6 +555,106 @@ export const EventCreate = ({
             {mutation.isNewRecord ? "Tambah Baru" : "Simpan Perubahan"}
           </LoadingButton>
         </>
+      ),
+    }}
+  />
+);
+
+export const BOQCreate = ({
+  trigger,
+  table,
+  onOpen,
+  list,
+  mutation,
+  route,
+  setTrigger,
+}) => (
+  <DialogForm
+    open={trigger.form}
+    onClose={onOpen}
+    title="Cari BOQ"
+    maxWidth="sm"
+    content={{
+      sx: { px: 0, height: "480px" },
+      children: (
+        <Stack spacing={1.5} direction="column">
+          <TextField
+            InputProps={{ startAdornment: <Search /> }}
+            placeholder="Cari disini"
+            value={table.getQuery("name", "")}
+            onChange={(e) => table.setQuery({ name: e.target.value })}
+            sx={{ px: 2 }}
+          />
+
+          <List dense sx={{ maxHeight: "480px", overflow: "auto" }}>
+            {table.loading ? (
+              <ListItem>
+                <Skeleton width="100%" />{" "}
+              </ListItem>
+            ) : null}
+            {!table.loading && !table.isEmpty
+              ? table.data.map((v, index) => (
+                  <ListItem
+                    key={index}
+                    divider
+                    secondaryAction={
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          const id = v.id;
+                          mutation.merge({ boqId: id });
+                          mutation.post(route().project("boq").link(), {
+                            except: ["id"],
+                            onBeforeSend: () => {
+                              table.destroy((_v) => _v.id === id);
+                              setTrigger((state) => ({
+                                ...state,
+                                postLoading: state.postLoading.concat([v.id]),
+                              }));
+                              list.add({
+                                id: list.length === 0 ? 0 : list.length - 1,
+                                name: "loading",
+                                boqId: id,
+                                typeUnit: "loading",
+                                unit: 0,
+                                updateAt: new Date().toLocaleString(),
+                              });
+                            },
+                            onSuccess: ({ data }) => {
+                              list.update((_v) => _v.boqId === id, data);
+                            },
+                            onAlways: () => {
+                              setTrigger((state) => ({
+                                ...state,
+                                postLoading: state.postLoading.filter(
+                                  (_v) => _v !== id
+                                ),
+                              }));
+                            },
+                          });
+                        }}
+                      >
+                        <Add fontSize="inherit" />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemText primary={v.name} secondary={v.typeUnit} />
+                  </ListItem>
+                ))
+              : null}
+
+            {!table.loading && table.isEmpty ? (
+              <ListItem alignItems="center" divider>
+                <ListItemText
+                  primary="Oops data yang anda cari mungkin belum tersedia."
+                  primaryTypographyProps={{ align: "center" }}
+                  secondary="Coba Ketikkan nama lain mana tau ada"
+                  secondaryTypographyProps={{ align: "center" }}
+                />
+              </ListItem>
+            ) : null}
+          </List>
+        </Stack>
       ),
     }}
   />

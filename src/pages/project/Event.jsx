@@ -52,13 +52,13 @@ const columns = (onDelete, onUpdate) => [
       <Stack direction="column">
         <Typography variant="subtitle2">{value.title}</Typography>
         <Stack direction="row" alignItems="center" spacing={0.5}>
-            {value.status === "PLAN" ? (
-              <Schedule fontSize="inherit" sx={{ verticalAlign: "center" }} />
-            ) : value.status === "CANCEL" ? (
-              <Block fontSize="inherit" sx={{ verticalAlign: "center" }} />
-            ) : (
-              <Check fontSize="inherit" sx={{ verticalAlign: "center" }} />
-            )}
+          {value.status === "PLAN" ? (
+            <Schedule fontSize="inherit" sx={{ verticalAlign: "center" }} />
+          ) : value.status === "CANCEL" ? (
+            <Block fontSize="inherit" sx={{ verticalAlign: "center" }} />
+          ) : (
+            <Check fontSize="inherit" sx={{ verticalAlign: "center" }} />
+          )}
           <div>
             <Typography variant="caption">
               {utils.komStatusLabel(value.status)}
@@ -233,10 +233,7 @@ export default () => {
                 enqueueSnackbar("Agend berhasil dihapus dari daftar", {
                   variant: "success",
                 });
-                table.data.splice(
-                  table.data.findIndex((v) => v.id === id),
-                  1
-                );
+                table.destroy((v) => v.id === id);
                 alert.reset();
               },
               onAlways: () => {

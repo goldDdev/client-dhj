@@ -25,13 +25,14 @@ const DataTable = ({
   container,
   row,
   disableHeader,
+  headProps
 }) => {
   return (
     <div>
       <TableContainer {...container}>
         <Table {...tableProps}>
           {disableHeader ? null : (
-            <TableHead>
+            <TableHead {...headProps}>
               <TableRow>
                 {column.map(({ ...props }, i) => (
                   <HeadCell
