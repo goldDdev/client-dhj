@@ -1,33 +1,20 @@
 import React from "react";
-import {
-  Button,
-  Stack,
-  Box,
-  Typography,
-  TextField,
-  Skeleton,
-} from "@mui/material";
+import { Button, Stack, TextField, Skeleton } from "@mui/material";
 import { BasicDropdown, IconButton, Select } from "@components/base";
 import { useSnackbar } from "notistack";
-import * as utils from "@utils/";
 import * as Dummy from "../../constants/dummy";
 import * as FORM from "./form";
-import FRHooks, { apiRoute } from "frhooks";
+import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
 import { useParams } from "react-router-dom";
 import {
-  ArrowRight,
   MoreVert,
   Add,
-  Notes,
   Search,
-  Check,
   ArrowUpward,
   ArrowDownward,
-  Block,
-  Schedule,
 } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
 
@@ -180,7 +167,7 @@ export default () => {
                 enqueueSnackbar("BOQ berhasil dihapus dari daftar", {
                   variant: "success",
                 });
-                table.destroy(v => v.id === id)
+                table.destroy((v) => v.id === id);
                 alert.reset();
               },
               onAlways: () => {
