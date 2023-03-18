@@ -171,7 +171,7 @@ export const pagination = (options) => {
     page: options.page - 1,
     rowsPerPage: options.perPage,
     onPageChange: (event, pg) => {
-      options.setPage(pg);
+      options.setPage(pg + 1);
     },
     onRowsPerPageChange: (event) => {
       options.setPerPage(+event.target.value);
