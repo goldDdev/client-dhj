@@ -27,6 +27,9 @@ const apiRoute = {
     deleteWorker: "/project/:id/worker",
     detilAbsent: "/project/:id/:parent/absent",
   },
+  setting:{
+    index: "/setting"
+  }
 };
 
 export default apiRoute;

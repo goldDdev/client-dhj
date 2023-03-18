@@ -1,100 +1,190 @@
 import React from "react";
 import FRHooks from "frhooks";
-import { Box, Stack, TextField, Paper } from "@mui/material";
+import {
+  Stack,
+  TextField as MUITextField,
+  Paper,
+  ListItem,
+  ListItemText,
+  CircularProgress,
+  styled,
+} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import { IconButton, Button } from "@components/base";
 import { useSnackbar } from "notistack";
 import SettingTemplate from "@components/templates/SettingTemplate";
-import PersonAdd from "@mui/icons-material/PersonAdd";
-import * as Dummy from "../../../constants/dummy";
+
+const TextField = styled(MUITextField)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    borderColor: "white",
+    backgroundColor: theme.palette.grey[100],
+
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: "white",
+    },
+  },
+}));
 
 export default () => {
   const { t, r } = FRHooks.useLang();
   const { enqueueSnackbar } = useSnackbar();
-  const [trigger, setTrigger] = React.useState({
-    form: false,
-  });
-
-  const table = FRHooks.useTable(FRHooks.apiRoute().employee("index").link(), {
-    selector: (resp) => resp.data,
-    total: (resp) => resp.meta.total,
-  });
 
   const mutation = FRHooks.useMutation({
-    defaultValue: Dummy.employee,
-    isNewRecord: (data) => data.id === 0,
-    schema: (y) =>
-      y.object().shape({
-        name: y.string().required().min(3),
-        cardID: y.string().required(),
-        phoneNumber: y.string().required().min(10).max(12),
-      }),
+    defaultValue: {},
   });
 
-  const onOpen = () => {
-    setTrigger((state) => ({ ...state, form: !state.form }));
-    mutation.clearData();
-    mutation.clearError();
-  };
-
-  const onUpdate = (id) => async () => {
-    mutation.get(FRHooks.apiRoute().employee("detail", { id }).link(), {
-      onBeforeSend: () => {
-        onOpen();
-      },
-      onSuccess: (resp) => {
-        mutation.setData(resp.data);
-      },
-    });
-  };
+  const table = FRHooks.useFetch(FRHooks.apiRoute().setting("index").link(), {
+    defaultValue: [],
+    selector: (resp) => resp.data,
+    getData: (value) => {
+      mutation.setData(
+        value.reduce((p, n) => ({ ...p, [n.code]: n.value }), {})
+      );
+    },
+  });
 
   return (
     <SettingTemplate
       title={t(["setting", "general"])}
+      subtitle="Atur kerja kamu disini"
     >
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        pr={2}
+        component={Paper}
+        variant="outlined"
+      >
+        <ListItem component="div">
+          <ListItemText
+            primary="Jam Kerja"
+            secondary="Mengatur jam masuk dan pulang."
+          />
+        </ListItem>
+        <Stack direction="row" spacing={1} width={"80%"}>
+          <TextField
+            InputProps={{
+              endAdornment: table.loading ? <CircularProgress size={20} /> : null,
+            }}
+            type="time"
+            label={"Masuk"}
+            InputLabelProps={{ shrink: true }}
+            value={mutation.data.START_TIME || ""}
+            onChange={(e) => {
+              mutation.setData({ START_TIME: e.target.value });
+            }}
+            disabled={table.loading || mutation.processing}
+          />
 
-      <Paper elevation={0} variant="outlined" sx={{ p: 2 }}>
-        <Stack spacing={2}>
           <TextField
-            id="startTime"
+            InputProps={{
+              endAdornment: table.loading ? <CircularProgress size={20} /> : null,
+            }}
+            label={"Pulang"}
             type="time"
-            label="Jam Mulai Kerja"
-            disabled={mutation.loading}
-            InputLabelProps={{ shrink: true }} 
-          />
-          <TextField
-            id="endTime"
-            type="time"
-            label="Jam Selesai Kerja"
-            disabled={mutation.loading}
-            InputLabelProps={{ shrink: true }} 
-          />
-          <TextField
-            id="cut"
-            type="number"
-            label="Potongan Keterlambatan (Rp/menit)"
-            disabled={mutation.loading}
-          />
-          <TextField
-            id="fee"
-            type="number"
-            label="Tunjangan Lembur (Rp/menit)"
-            disabled={mutation.loading}
+            InputLabelProps={{ shrink: true }}
+            value={mutation.data.CLOSE_TIME || ""}
+            onChange={(e) => {
+              mutation.setData({ CLOSE_TIME: e.target.value });
+            }}
+            disabled={table.loading || mutation.processing}
           />
         </Stack>
-        <Box display="flex" gap={1} sx={{ mt: 2 }}>
-          <Button variant="outlined">
-            {t("cancel")}
-          </Button>
-          <LoadingButton
-            variant="contained"
-            color="primary"
-            onClick={() => { }}
-          >
-            {t("save")}
-          </LoadingButton>
-        </Box>
-      </Paper>
-    </SettingTemplate >
+      </Stack>
+
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        pr={2}
+        component={Paper}
+        variant="outlined"
+        mt={2}
+      >
+        <ListItem component="div">
+          <ListItemText
+            primary="Lembur"
+            secondary="Upan Lembur untuk setiap menit."
+          />
+        </ListItem>
+        <Stack direction="row" spacing={1} width={"80%"}>
+          <TextField
+            type="text"
+            InputLabelProps={{ shrink: true }}
+            placeholder="Masukan tunjangan lembur disini."
+            InputProps={{
+              startAdornment: "Rp.",
+              endAdornment: table.loading ? <CircularProgress size={20} /> : null,
+            }}
+            value={mutation.data.OVERTIME_PRICE_PER_MINUTE || ""}
+            onChange={(e) => {
+              mutation.setData({ OVERTIME_PRICE_PER_MINUTE: e.target.value });
+            }}
+            disabled={table.loading || mutation.processing}
+          />
+        </Stack>
+      </Stack>
+
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        pr={2}
+        component={Paper}
+        variant="outlined"
+        mt={2}
+      >
+        <ListItem component="div">
+          <ListItemText
+            primary="Keterlambatan"
+            secondary="Denda keterlambatan yang didapat untuk setiap menitnya."
+          />
+        </ListItem>
+        <Stack direction="row" spacing={1} width={"80%"}>
+          <TextField
+            type="text"
+            InputLabelProps={{ shrink: true }}
+            placeholder="Masukan denda keterlambatan disini."
+            InputProps={{
+              startAdornment: "Rp.",
+              endAdornment: table.loading ? <CircularProgress size={20} /> : null,
+            }}
+            value={mutation.data.LATETIME_PRICE_PER_MINUTE || ""}
+            onChange={(e) => {
+              mutation.setData({ LATETIME_PRICE_PER_MINUTE: e.target.value });
+            }}
+            disabled={table.loading || mutation.processing}
+          />
+        </Stack>
+      </Stack>
+
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mt={2}
+      >
+        <LoadingButton
+          loading={mutation.processing}
+          color="primary"
+          variant="contained"
+          disableElevation
+          onClick={() => {
+            mutation.put(FRHooks.apiRoute().setting("index").link(), {
+              onSuccess: ({ data }) => {
+                enqueueSnackbar("Perubahan behasil diperbaharui.", {
+                  variant: "success",
+                });
+                mutation.setData(
+                  data.reduce((p, n) => ({ ...p, [n.code]: n.value }), {})
+                );
+              },
+            });
+          }}
+        >
+          Simpan Perubahan
+        </LoadingButton>
+      </Stack>
+    </SettingTemplate>
   );
 };

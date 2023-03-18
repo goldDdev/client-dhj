@@ -196,14 +196,7 @@ export const types = [
   "WORKER",
 ];
 
-export const workerWebTypes = [
-  "OWNER",
-  "ADMIN",
-  "PM",
-  "PCC",
-  "QCC",
-  "SUP",
-];
+export const workerWebTypes = ["OWNER", "ADMIN", "PM", "PCC", "QCC", "SUP"];
 
 export const workerMobileTypes = [
   "PC",
@@ -260,4 +253,11 @@ export const komStatusColor = (status) => {
 
 export const komStatusLabel = (status) => {
   return komStatus[status] || "Plan";
+};
+
+export const settingCode = {
+  START_TIME: "START_TIME",
+  CLOSE_TIME: "CLOSE_TIME",
+  OVERTIME_PRICE_PER_MINUTE: "OVERTIME_PRICE_PER_MINUTE",
+  LATETIME_PRICE_PER_MINUTE: "LATETIME_PRICE_PER_MINUTE",
 };
