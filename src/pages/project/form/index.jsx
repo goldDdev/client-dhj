@@ -648,7 +648,7 @@ export const BOQCreate = ({
                 <ListItemText
                   primary="Oops data yang anda cari mungkin belum tersedia."
                   primaryTypographyProps={{ align: "center" }}
-                  secondary="Coba Ketikkan nama lain mana tau ada"
+                  secondary="Atau anda dapat mencoba ketikkan pencarian lain"
                   secondaryTypographyProps={{ align: "center" }}
                 />
               </ListItem>

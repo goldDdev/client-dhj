@@ -33,7 +33,7 @@ const columns = (table, t, onUpdate, onDelete) => [
   },
   {
     label: t("unit"),
-    value: (value) => value.type_unit || "-",
+    value: (value) => value.typeUnit || "-",
     align: "center",
     head: {
       align: "center",
@@ -101,7 +101,7 @@ export default () => {
         onOpen();
       },
       onSuccess: (resp) => {
-        mutation.setData({ ...resp.data, typeUnit: resp.data.type_unit });
+        mutation.setData({ ...resp.data, typeUnit: resp.data.typeUnit });
       },
     });
   };
@@ -126,7 +126,7 @@ export default () => {
       except: isNew ? ["id"] : [],
       validation: true,
       onSuccess: (resp) => {
-        enqueueSnackbar(t("commonSuccessCreate"));
+        enqueueSnackbar(t(isNew ? "commonSuccessCreate" : "commonSuccessUpdate"));
         if (isNew) {
           table.data.unshift(resp.data);
         } else {
