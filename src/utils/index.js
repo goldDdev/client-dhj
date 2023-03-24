@@ -241,6 +241,12 @@ export const komStatus = {
   DONE: "Selesai",
 };
 
+export const overtimeStatus = {
+  PENDING: "Menuggu",
+  REJECT: "Ditolak",
+  CONFIRM: "Setuju",
+};
+
 export const komStatusColor = (status) => {
   return (
     {
@@ -253,6 +259,10 @@ export const komStatusColor = (status) => {
 
 export const komStatusLabel = (status) => {
   return komStatus[status] || "Plan";
+};
+
+export const overtimeStatusLabel = (status) => {
+  return overtimeStatus[status] || "Menuggu";
 };
 
 export const settingCode = {

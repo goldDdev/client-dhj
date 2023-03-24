@@ -148,7 +148,7 @@ export default () => {
     alert.set({
       open: true,
       title: "Mohon Perhatian",
-      message: "Anda akan mengahapus BOQ ini dari daftar, apakah anda yain?",
+      message: "Anda akan menghapus BOQ ini dari daftar, apakah anda yakin?",
       type: "warning",
       loading: false,
       close: {

@@ -33,6 +33,11 @@ const path = (id) => [
     startIcon: <ListAlt />,
   },
   {
+    label: "Lembur",
+    link: `/project/${id}/overtime`,
+    startIcon: <ListAlt />,
+  },
+  {
     label: "Activity",
     link: `/project/${id}/activity`,
     startIcon: <ListAlt />,

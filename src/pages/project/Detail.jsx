@@ -54,7 +54,6 @@ export default () => {
 
   const onOpen = () => {
     setTrigger((state) => ({ ...state, form: !state.form }));
-    mutation.clearData();
     mutation.clearError();
   };
 

@@ -33,6 +33,7 @@ import _ from "lodash";
 import * as Filter from "../filter";
 
 export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
+  console.log(mutation.data)
   return (
     <DialogForm
       open={open}
@@ -159,7 +160,7 @@ export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
                 sx={{ width: "49%" }}
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                 type="number"
-                value={mutation.data.latitude}
+                value={mutation.data.latitude || 0}
                 onChange={(e) => mutation.setData({ latitude: e.target.value })}
                 InputLabelProps={{ shrink: true }}
               />
@@ -170,7 +171,7 @@ export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
                 sx={{ width: "49%" }}
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                 type="number"
-                value={mutation.data.longitude}
+                value={mutation.data.longitude || 0}
                 onChange={(e) =>
                   mutation.setData({ longitude: e.target.value })
                 }
@@ -183,7 +184,7 @@ export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
                 disabled={mutation.loading || mutation.processing}
                 label="Tanggal Mulai"
                 type="date"
-                value={mutation.data.startAt}
+                value={mutation.data.startAt || ""}
                 onChange={(e) => mutation.setData({ startAt: e.target.value })}
                 InputLabelProps={{ shrink: true }}
               />
@@ -194,7 +195,7 @@ export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
                   shrink: true,
                 }}
                 type="date"
-                value={mutation.data.finishAt}
+                value={mutation.data.finishAt || ""}
                 onChange={(e) => mutation.setData({ finishAt: e.target.value })}
               />
 

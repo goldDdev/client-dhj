@@ -6,6 +6,7 @@ import ProjectDetail from "./project/Detail";
 import ProjectAbsent from "./project/Absent";
 import ProjectEvent from "./project/Event";
 import ProjectBoq from "./project/Boq";
+import ProjectOvertime from "./project/Overtime";
 
 import EmployeeList from "./employee/List";
 import AbsentList from "./absent/List";
@@ -25,6 +26,7 @@ export {
   ProjectAbsent,
   ProjectEvent,
   ProjectBoq,
+  ProjectOvertime,
   EmployeeList,
   BoqList,
   UserList,

@@ -214,7 +214,7 @@ export default () => {
     alert.set({
       open: true,
       title: "Mohon Perhatian",
-      message: "Anda akan mengahapus agenda ini dari daftar, apakah anda yain?",
+      message: "Anda akan menghapus agenda ini dari daftar, apakah anda yakin?",
       type: "warning",
       loading: false,
       close: {

@@ -2,7 +2,7 @@ import * as React from "react";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import ListItemButton from "@mui/material/ListItemButton";
-import { IconButton } from "@mui/material";
+import { IconButton, Typography } from "@mui/material";
 
 export default ({ menu, label, type, ...props }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -59,7 +59,11 @@ export default ({ menu, label, type, ...props }) => {
             }}
             {...b}
           >
-            {text}
+            {typeof text === "string" ? (
+              <Typography variant="body2">{text}</Typography>
+            ) : (
+              text
+            )}
           </ListItemButton>
         ))}
       </Menu>
