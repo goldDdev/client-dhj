@@ -2,23 +2,26 @@ import React from "react";
 import {
   Button,
   Grid,
-  ListItem,
   ListItemText,
-  Paper,
   List,
   Stack,
   Card,
   CardHeader,
   Divider,
   Avatar,
-  Popper,
   ListItemButton,
   TextField,
   Skeleton,
   Typography,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Box,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { ExpandMore, KeyboardArrowRight } from "@mui/icons-material";
+import { KeyboardArrowRight } from "@mui/icons-material";
 import { Select } from "@components/base";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import FRHooks from "frhooks";
@@ -28,12 +31,11 @@ import moment from "moment";
 
 export default () => {
   const { id } = useParams();
-  const [open, setOpen] = React.useState(false);
   const [data, setData] = React.useState({});
   const [absentAt, setAbsentAt] = React.useState("");
-  const [anchorEl, setAnchorEl] = React.useState(null);
   const [trigger, setTrigger] = React.useState({
     openDrawer: false,
+    openTable: -1,
   });
 
   const absents = FRHooks.useFetch(
@@ -42,8 +44,6 @@ export default () => {
       defaultValue: [],
       selector: (resp) => resp.data,
       getData: () => {
-        setAnchorEl(null);
-        setOpen(false);
         setAbsentAt("");
       },
     }
@@ -54,13 +54,8 @@ export default () => {
   };
 
   const handleClick = (value) => (event) => {
-    const current = anchorEl;
-    const ids = event.currentTarget.id;
-    setAnchorEl((state) =>
-      state && state.id === ids ? null : event.currentTarget
-    );
-    setOpen(!current ? true : current.id === ids ? false : true);
     setAbsentAt(moment(value).format("yyyy-MM-DD"));
+    onOpenDrawer();
   };
 
   return (
@@ -69,127 +64,133 @@ export default () => {
       subtitle="Menampilkan daftar absen berdasarkan tanggal"
       drawer={{
         open: trigger.openDrawer,
-        title: "Detil Absensi Proyek",
+        title: "Absensi Proyek",
         onClose: () => {
-          setTrigger((state) => ({ ...state, openDrawer: !state.openDrawer }));
+          setData({});
+          setTrigger((state) => ({
+            ...state,
+            openDrawer: !state.openDrawer,
+            openTable: -1,
+          }));
         },
 
+        drawerProps: {
+          PaperProps: {
+            sx: { width: Object.keys(data).length === 0 ? "30%" : "80%" },
+          },
+        },
         content: (
-          <Stack direction="column">
-            <ListItemText
-              primary={data.name || ""}
-              secondary={utils.typesLabel(data.role || "")}
-              primaryTypographyProps={{
-                variant: "subtitle1",
-              }}
-              secondaryTypographyProps={{
-                variant: "subtitle1",
-              }}
-              sx={{ my: 0, pl: 2 }}
-            />
-            <Divider />
-            <ListItemText
-              primary="Tanggal"
-              secondary={moment(data.absentAt).format("DD-MM-Y")}
-              primaryTypographyProps={{
-                variant: "subtitle1",
-              }}
-              secondaryTypographyProps={{
-                variant: "subtitle1",
-              }}
-              sx={{ my: 0, pl: 2 }}
-            />
-            <Divider />
-            <Stack direction="row" spacing={1}>
-              <ListItemText
-                primary="Total"
-                secondary={data.summary?.total || 0}
-                primaryTypographyProps={{
-                  variant: "subtitle1",
-                  sx: { textAlign: "center" },
-                }}
-                secondaryTypographyProps={{
-                  variant: "subtitle1",
-                  sx: { textAlign: "center" },
-                }}
-                sx={{ my: 0 }}
-              />
-              <Divider orientation="vertical" />
-              <ListItemText
-                primary="Hadir"
-                secondary={data.summary?.present || 0}
-                primaryTypographyProps={{
-                  variant: "subtitle1",
-                  sx: { textAlign: "center" },
-                }}
-                secondaryTypographyProps={{
-                  variant: "subtitle1",
-                  sx: { textAlign: "center" },
-                }}
-                sx={{ my: 0 }}
-              />
-              <Divider orientation="vertical" />
-              <ListItemText
-                primary="Absen"
-                secondary={data.summary?.absent || 0}
-                primaryTypographyProps={{
-                  variant: "subtitle1",
-                  sx: { textAlign: "center" },
-                }}
-                secondaryTypographyProps={{
-                  variant: "subtitle1",
-                  sx: { textAlign: "center" },
-                }}
-                sx={{ my: 0 }}
-              />
-              <Divider orientation="vertical" />
-              <ListItemText
-                primary="Belum"
-                secondary={data.summary?.noAbsent || 0}
-                primaryTypographyProps={{
-                  variant: "subtitle1",
-                  sx: { textAlign: "center" },
-                }}
-                secondaryTypographyProps={{
-                  variant: "subtitle1",
-                  sx: { textAlign: "center" },
-                }}
-                sx={{ my: 0 }}
-              />
-            </Stack>
-            <Divider />
-            <List dense>
-              <ListItem dense divider>
-                <ListItemText
-                  primary="Anggota"
-                  primaryTypographyProps={{ sx: { fontWeight: 600 } }}
-                />
-              </ListItem>
-              {Object.keys(data).length > 0 && data.members
-                ? data.members.map((val, idx) => (
-                    <ListItem
-                      key={idx}
-                      divider={idx !== data.members.length - 1}
+          <Stack
+            direction="row"
+            justifyContent="flex-end"
+            height="100%"
+            overflow="auto"
+          >
+            <Box
+              sx={(theme) => ({
+                width: "0%",
+                overflow: "hidden",
+                ...(trigger.openTable > 0 && {
+                  width: "65%",
+                  transition: theme.transitions.create("width", {
+                    easing: theme.transitions.easing.sharp,
+                    duration: theme.transitions.duration.leavingScreen,
+                  }),
+                }),
+              })}
+            >
+              <Table size="small" sx={{ width: "100%" }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell padding="checkbox">No</TableCell>
+                    <TableCell>Nama</TableCell>
+                    <TableCell align="center">Role</TableCell>
+                    <TableCell align="center">Tanggal</TableCell>
+                    <TableCell align="center">Datang</TableCell>
+                    <TableCell align="center">Pulang</TableCell>
+                    <TableCell align="center">Keterangan</TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {Object.keys(data).length > 0 && data.members ? (
+                    data.members.map((val, idx) => (
+                      <TableRow
+                        key={idx}
+                        selected={trigger.openTable === val.workerId}
+                      >
+                        <TableCell align="center">{idx + 1}</TableCell>
+                        <TableCell>{val.name}</TableCell>
+                        <TableCell align="center">
+                          {utils.typesLabel(val.role)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {moment(val.absentAt).format("DD-MM-yyyy")}
+                        </TableCell>
+                        <TableCell align="center">
+                          {val.comeAt || "-"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {val.closeAt || "-"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {val.absent === "P" ? "Bekerja" : "Tidak Bekerja"}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} align="center">
+                        Tidak Ada Absent
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </Box>
+            <Divider flexItem orientation="vertical" />
+            <div style={{ width: trigger.openTable > 0 ? "35%" : "100%" }}>
+              <List dense>
+                {absents.data
+                  .filter((v) => v.absentAt === absentAt)
+                  .map((v, i) => (
+                    <ListItemButton
+                      key={i}
+                      dense
+                      divider
+                      selected={trigger.openTable === v.parentId}
+                      onClick={async () => {
+                        const absent = await FRHooks.apiRoute()
+                          .project("detilAbsent", { id, parent: v.parentId })
+                          .params({ date: v.absentAt })
+                          .get((resp) => resp.data);
+                        setData(absent);
+                        setTrigger((state) => ({
+                          ...state,
+                          openTable: v.parentId,
+                        }));
+                      }}
                     >
                       <ListItemText
-                        primary={val.name}
-                        primaryTypographyProps={{ sx: { fontWeight: 600 } }}
-                        secondary={`${utils.typesLabel(val.role)} | ${
-                          val.absent
-                        }`}
                         sx={{ my: 0 }}
+                        primary={v.name || ""}
+                        secondary={utils.typesLabel(v.role) || ""}
                       />
-                    </ListItem>
-                  ))
-                : null}
-            </List>
+                    </ListItemButton>
+                  ))}
+              </List>
+            </div>
           </Stack>
         ),
       }}
     >
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <Stack direction="row" spacing={1}>
               <Select
                 name="month"
@@ -203,7 +204,12 @@ export default () => {
               />
             </Stack>
 
-            <Typography>{`${utils.getMonth(absents.getQuery("month", moment().format("M"))-1)} - ${absents.getQuery("year", moment().format("Y"))}`}</Typography>
+            <Typography>{`${utils.getMonth(
+              absents.getQuery("month", moment().format("M")) - 1
+            )} - ${absents.getQuery(
+              "year",
+              moment().format("Y")
+            )}`}</Typography>
           </Stack>
         </Grid>
         <Grid container item xs={14} columns={14} spacing={1}>
@@ -248,22 +254,8 @@ export default () => {
                     aria-describedby={`btn${i}`}
                     variant={"text"}
                     size="small"
-                    color={
-                      anchorEl && anchorEl.id === `btn${i}`
-                        ? "warning"
-                        : "inherit"
-                    }
-                    endIcon={
-                      absents.data.some(
-                        (_v) => _v.absentAt === moment(v).format("yyyy-MM-DD")
-                      ) ? (
-                        anchorEl && anchorEl.id === `btn${i}` ? (
-                          <ExpandMore />
-                        ) : (
-                          <KeyboardArrowRight />
-                        )
-                      ) : undefined
-                    }
+                    color={"inherit"}
+                    endIcon={<KeyboardArrowRight />}
                     fullWidth
                     onClick={handleClick(v)}
                   >
@@ -272,7 +264,7 @@ export default () => {
                     ) : !absents.data.some(
                         (_v) => _v.absentAt === moment(v).format("yyyy-MM-DD")
                       ) ? (
-                      "Absen Belum Tersedia"
+                      "Belum Tersedia"
                     ) : (
                       "Lihat Detail"
                     )}
@@ -282,40 +274,6 @@ export default () => {
             ))}
         </Grid>
       </Grid>
-
-      <Popper id={anchorEl?.id} open={open} anchorEl={anchorEl}>
-        <Paper
-          sx={(theme) => ({
-            minWidth: 200,
-            boxShadow: theme.shadows[15],
-          })}
-        >
-          <List dense>
-            {absents.data
-              .filter((v) => v.absentAt === absentAt)
-              .map((v, i) => (
-                <ListItemButton
-                  key={i}
-                  dense
-                  onClick={async () => {
-                    onOpenDrawer();
-                    const absent = await FRHooks.apiRoute()
-                      .project("detilAbsent", { id, parent: v.parentId })
-                      .params({ date: v.absentAt })
-                      .get((resp) => resp.data);
-                    setData({ name: v.name, role: v.role, ...absent });
-                  }}
-                >
-                  <ListItemText
-                    sx={{ my: 0 }}
-                    primary={v.name || ""}
-                    secondary={utils.typesLabel(v.role) || ""}
-                  />
-                </ListItemButton>
-              ))}
-          </List>
-        </Paper>
-      </Popper>
     </ProjectTemplate>
   );
 };

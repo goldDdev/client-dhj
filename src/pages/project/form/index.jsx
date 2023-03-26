@@ -31,9 +31,9 @@ import * as utils from "@utils/";
 import moment from "moment";
 import _ from "lodash";
 import * as Filter from "../filter";
+import apiRoute from "@services/apiRoute";
 
 export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
-  console.log(mutation.data)
   return (
     <DialogForm
       open={open}
@@ -604,7 +604,7 @@ export const BOQCreate = ({
                         onClick={() => {
                           const id = v.id;
                           mutation.merge({ boqId: id });
-                          mutation.post(route().project("boq").link(), {
+                          mutation.post(apiRoute.project.boq, {
                             except: ["id"],
                             onBeforeSend: () => {
                               table.destroy((_v) => _v.id === id);
@@ -645,6 +645,72 @@ export const BOQCreate = ({
               : null}
 
             {!table.loading && table.isEmpty ? (
+              <ListItem alignItems="center" divider>
+                <ListItemText
+                  primary="Oops data yang anda cari mungkin belum tersedia."
+                  primaryTypographyProps={{ align: "center" }}
+                  secondary="Atau anda dapat mencoba ketikkan pencarian lain"
+                  secondaryTypographyProps={{ align: "center" }}
+                />
+              </ListItem>
+            ) : null}
+          </List>
+        </Stack>
+      ),
+    }}
+  />
+);
+
+export const WorkerCreate = ({
+  trigger,
+  onOpen,
+  onAddMember,
+  searchWorkers,
+}) => (
+  <DialogForm
+    open={trigger.openWorker}
+    onClose={onOpen("")}
+    title="Cari Pekerja"
+    maxWidth="sm"
+    content={{
+      sx: { px: 0, height: "480px" },
+      children: (
+        <Stack spacing={1.5} direction="column">
+          <TextField
+            InputProps={{ startAdornment: <Search /> }}
+            placeholder="Cari disini"
+            value={searchWorkers.getQuery("name", "")}
+            onChange={(e) => searchWorkers.setQuery({ name: e.target.value })}
+            sx={{ px: 2 }}
+          />
+
+          <List dense sx={{ maxHeight: "480px", overflow: "auto" }}>
+            {searchWorkers.loading ? (
+              <ListItem>
+                <Skeleton width="100%" />{" "}
+              </ListItem>
+            ) : null}
+
+            {!searchWorkers.loading && !searchWorkers.isEmpty
+              ? searchWorkers.data.map((v, index) => (
+                  <ListItem
+                    key={index}
+                    divider
+                    secondaryAction={
+                      <IconButton size="small" onClick={onAddMember(v)}>
+                        <Add fontSize="inherit" />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemText
+                      primary={v.name}
+                      secondary={utils.typesLabel(v.role)}
+                    />
+                  </ListItem>
+                ))
+              : null}
+
+            {!searchWorkers.loading && searchWorkers.isEmpty ? (
               <ListItem alignItems="center" divider>
                 <ListItemText
                   primary="Oops data yang anda cari mungkin belum tersedia."

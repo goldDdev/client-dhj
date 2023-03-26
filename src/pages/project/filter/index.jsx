@@ -6,7 +6,7 @@ import {
   Typography,
   Chip,
   Box,
-  Button
+  Button,
 } from "@mui/material";
 import Search from "@mui/icons-material/Search";
 import * as utils from "@utils/";
@@ -130,14 +130,6 @@ export const ChipKom = ({ status, ...props }) => {
   };
 
   return (
-    // <Chip
-    //   avatar={icon[status]}
-    //   label={utils.komStatusLabel(status)}
-    //   variant="outlined"
-    //   color={utils.komStatusColor(status)}
-    //   {...props}
-    // />
-
     <Button variant="outlined" startIcon={icon[status]} {...props}>
       {utils.komStatusLabel(status)}
     </Button>

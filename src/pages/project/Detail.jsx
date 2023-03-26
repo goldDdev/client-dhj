@@ -6,22 +6,29 @@ import {
   ListItemText,
   Paper,
   List,
+  Stack,
+  CircularProgress,
+  Divider,
+  Typography,
+  useTheme,
 } from "@mui/material";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
-import Edit from "@mui/icons-material/Edit";
+import { Edit, Close, MoreVert, PersonAddAlt } from "@mui/icons-material";
+import { BasicDropdown } from "@components/base";
 import FRHooks from "frhooks";
 import * as FORM from "./form";
+import * as utils from "@utils/";
 import * as Dummy from "../../constants/dummy";
 import { useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { useAlert } from "@contexts/AlertContext";
+import { SimpleList } from "@components/base/list";
 import _ from "lodash";
-let controller = new AbortController();
+import moment from "moment";
+import apiRoute from "@services/apiRoute";
 
 export default () => {
   const { id } = useParams();
   const { enqueueSnackbar } = useSnackbar();
-  const alert = useAlert();
   const mutation = FRHooks.useMutation({
     defaultValue: Dummy.project,
     isNewRecord: (data) => data.id === 0,
@@ -41,15 +48,33 @@ export default () => {
       }),
   });
   const [resources, setResources] = React.useState({
-    worker: [],
-    selectedWorker: [],
-    lastMandorId: 0,
+    members: [],
+    parentId: null,
   });
   const [trigger, setTrigger] = React.useState({
     form: false,
     openWorker: false,
-    workerSearchLoading: false,
     addWorkerLoading: [],
+  });
+
+  const workers = FRHooks.useFetch([apiRoute.project.listWorkers, { id }], {
+    selector: (resp) => resp.data,
+    defaultValue: [],
+    getData: (data) => {
+      if(data.length > 0){
+        setResources((state) => ({
+          ...state,
+          members: data[0].members,
+          parentId: data[0].id,
+        }));
+      }
+    },
+  });
+
+  const searchWorkers = FRHooks.useFetch(apiRoute.employee.index, {
+    selector: (resp) => resp.data,
+    defaultValue: [],
+    disabledOnDidMount: true,
   });
 
   const onOpen = () => {
@@ -57,60 +82,12 @@ export default () => {
     mutation.clearError();
   };
 
-  const searchWorker = (e) => {
-    controller.abort();
-    controller = new AbortController();
-    mutation.get(FRHooks.apiRoute().employee("index").link(), {
-      options: {
-        signal: controller.signal,
-        params: {
-          name: e.target.value,
-        },
-      },
-      onBeforeSend: () => {
-        setTrigger((state) => ({ ...state, workerSearchLoading: true }));
-      },
-      onSuccess: ({ data }) => {
-        setResources((state) => ({
-          ...state,
-          worker: data.filter(
-            (v) => !state.selectedWorker.some((_v) => _v.employeeId == v.id)
-          ),
-        }));
-      },
-      onAlways: () => {
-        setTrigger((state) => ({ ...state, workerSearchLoading: false }));
-      },
-    });
-  };
-
-  const onAdd = (value) => async () => {
+  const onAddMember = (value) => async () => {
     try {
-      const mandorExists =
-        resources.selectedWorker.length === 0 &&
-        !resources.selectedWorker.some((v) => v.role === "MANDOR") &&
-        value.role !== "MANDOR";
-
-      if (mandorExists) {
-        alert.set({
-          open: true,
-          title: "Mohon Perhatian",
-          message:
-            "Mandor dalam proyek ini belum tersedia mohon pilih mandor dulu kemudian pilih anggota",
-          type: "warning",
-          loading: false,
-          close: {
-            text: "Keluar, Cari Mandor",
-          },
-          confirm: false,
-        });
-        return;
-      }
-
-      setTrigger((state) => ({
-        ...state,
-        addWorkerLoading: state.addWorkerLoading.concat([value.id]),
-      }));
+      setTrigger((state) => {
+        state.addWorkerLoading.push(value.id);
+        return state;
+      });
 
       const data = await FRHooks.apiRoute()
         .project("worker")
@@ -118,20 +95,19 @@ export default () => {
           projectId: +id,
           employeeId: value.id,
           role: value.role,
-          parentId: value.role === "MANDOR" ? null : resources.lastMandorId,
+          parentId: value.role !== "WORKER" ? null : resources.parentId,
         })
         .sendJson("post", (resp) => resp.data);
 
-      setResources((state) => ({
-        ...state,
-        selectedWorker: state.selectedWorker.concat([data]),
-        worker: state.worker.filter((v) => v.id !== value.id),
-        lastMandorId:
-          state.selectedWorker
-            .concat([data])
-            .filter((v) => v.role === "MANDOR")
-            .pop()?.id || null,
-      }));
+      searchWorkers.destroy((v) => v.id === value.id);
+      if (value.role === "WORKER") {
+        setResources((state) => {
+          state.members.push(data);
+          return state;
+        });
+      } else {
+        workers.add({ ...data, members: [] });
+      }
     } catch (err) {
     } finally {
       setTrigger((state) => ({
@@ -141,28 +117,28 @@ export default () => {
     }
   };
 
-  const onRemove = (value) => async () => {
+  const onRemoveMembers = (value) => async () => {
     try {
       setTrigger((state) => ({
         ...state,
         addWorkerLoading: state.addWorkerLoading.concat([value.id]),
       }));
 
-      const data = await FRHooks.apiRoute()
+      await FRHooks.apiRoute()
         .project("deleteWorker", { id: value.id })
         .destroy((resp) => resp.data);
 
-      setResources((state) => ({
-        ...state,
-        worker: state.worker.concat([data]),
-        selectedWorker: state.selectedWorker.filter((_v) => _v.id !== value.id),
-        lastMandorId:
-          state.selectedWorker
-            .filter((_v) => _v.id !== value.id)
-            .filter((v) => v.role === "MANDOR")
-            .pop()?.id || null,
-      }));
-    } catch (err) {
+      if (value.role === "WORKER") {
+        setResources((state) => {
+          state.members.splice(
+            state.members.findIndex((v) => v.id === value.id),
+            1
+          );
+          return state;
+        });
+      } else {
+        workers.refresh();
+      }
     } finally {
       setTrigger((state) => ({
         ...state,
@@ -171,36 +147,21 @@ export default () => {
     }
   };
 
-  const onOpenAddWorker = (e) => {
-    setResources((state) => ({ ...state, worker: [] }));
+  const onOpenAddWorker = (type) => (e) => {
     setTrigger((state) => ({
       ...state,
       openWorker: !state.openWorker,
     }));
 
     if (!trigger.openWorker) {
-      searchWorker(e);
+      searchWorkers.setQuery({ type, except: id });
     }
   };
 
   React.useEffect(() => {
-    mutation.get(FRHooks.apiRoute().project("detail", { id }).link(), {
+    mutation.get([apiRoute.project.detail, { id }], {
       onSuccess: ({ data }) => {
         mutation.setData(data);
-      },
-    });
-    mutation.get(FRHooks.apiRoute().project("listWorkers", { id }).link(), {
-      onSuccess: ({ data }) => {
-        const tmp = [];
-        data.forEach(({ members, ...other }) => {
-          tmp.push(other);
-          members.forEach((v) => tmp.push(v));
-        });
-        setResources((state) => ({
-          ...state,
-          selectedWorker: tmp,
-          lastMandorId: data.length > 0 ? data[data.length - 1].id : null,
-        }));
       },
     });
   }, [id]);
@@ -218,13 +179,29 @@ export default () => {
       }}
     >
       <Grid container spacing={2} justifyContent="space-between">
-        <Grid item xs={trigger.openWorker ? 4 : 8}>
+        <Grid item xs={9}>
           <Paper elevation={0} variant="outlined">
             <List dense>
               <ListItem divider>
                 <ListItemText
                   primary="Nama Proyek"
                   secondary={mutation.data.name}
+                  primaryTypographyProps={{
+                    variant: "subtitle1",
+                    fontWeight: 500,
+                  }}
+                  secondaryTypographyProps={{ variant: "body1" }}
+                />
+              </ListItem>
+
+              <ListItem divider>
+                <ListItemText
+                  primary="Lama Pengerjaan"
+                  secondary={`${mutation.data.duration} Hari | ${moment(
+                    mutation.data.startAt
+                  ).format("DD-MM-yyyy")} - ${moment(
+                    mutation.data.startAt
+                  ).format("DD-MM-yyyy")}`}
                   primaryTypographyProps={{
                     variant: "subtitle1",
                     fontWeight: 500,
@@ -256,7 +233,7 @@ export default () => {
                 />
               </ListItem>
 
-              <ListItem dense>
+              <ListItem dense divider>
                 <ListItemText
                   primary="Kontak"
                   secondary={mutation.data.contact || "-"}
@@ -270,23 +247,160 @@ export default () => {
                   }}
                 />
               </ListItem>
+
+              {/* Lokasi */}
+              <ListItem divider>
+                <ListItemText
+                  primary="Lokasi Proyek"
+                  primaryTypographyProps={{
+                    variant: "subtitle1",
+                    fontWeight: 500,
+                  }}
+                />
+              </ListItem>
+
+              <ListItem dense>
+                <ListItemText
+                  primary={mutation.data.location || "-"}
+                  secondary={`Lat: ${mutation.data.latitude || "-"} | Long: ${
+                    mutation.data.longitude || "-"
+                  }`}
+                  primaryTypographyProps={{
+                    variant: "body1",
+                  }}
+                  secondaryTypographyProps={{ variant: "body1" }}
+                />
+              </ListItem>
             </List>
           </Paper>
         </Grid>
 
-        <Grid item xs={trigger.openWorker ? 8 : 4}>
-          <FORM.ListWorker
-            open={trigger.openWorker}
-            loading={mutation.loading}
-            searchLoading={trigger.workerSearchLoading}
-            addWorkerLoading={trigger.addWorkerLoading}
-            workers={resources.worker}
-            selectedWorkers={resources.selectedWorker}
-            onAdd={onAdd}
-            onRemove={onRemove}
-            onOpen={onOpenAddWorker}
-            searchWorker={searchWorker}
-          />
+        <Grid item xs={4}>
+          <Paper variant="outlined">
+            <Stack
+              p={1.5}
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography variant="subtitle1" fontWeight={500} gutterBottom>
+                Daftar Pekerja
+              </Typography>
+
+              <Button
+                variant="text"
+                startIcon={<PersonAddAlt />}
+                disableElevation
+                onClick={onOpenAddWorker("lead")}
+              >
+                Tambah Pekerja
+              </Button>
+            </Stack>
+            <Divider />
+            <SimpleList
+              type="button"
+              loading={mutation.loading}
+              data={workers.data.map((v, i) => ({
+                primary: v.name,
+                primaryTypographyProps: { variant: "subtitle2" },
+                secondary: utils.typesLabel(v.role),
+                secondaryTypographyProps: { variant: "body2" },
+                buttonProps: {
+                  sx: {
+                    py: 0,
+                    "&.MuiListItemButton-root:hover": {
+                      backgroundColor: "unset",
+                    },
+                  },
+                  onClick: () => {
+                    setResources((state) => ({
+                      ...state,
+                      members: v.members,
+                      parentId: v.id,
+                    }));
+                  },
+                },
+                itemProps: {
+                  selected: resources.parentId === v.id,
+                  divider: workers.data.length - 1 !== i,
+                  sx: { pl: 0 },
+                  secondaryAction: trigger.addWorkerLoading.some(
+                    (_v) => _v === v.id
+                  ) ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <BasicDropdown
+                      type="icon"
+                      menu={[
+                        {
+                          text: "Hapus",
+                          onClick: onRemoveMembers(v),
+                          disabled: v.members.length > 0,
+                        },
+                      ]}
+                      label={<MoreVert fontSize="small" />}
+                      size="small"
+                    />
+                  ),
+                },
+              }))}
+            />
+          </Paper>
+        </Grid>
+
+        <Grid item xs={8}>
+          <Paper variant="outlined">
+            <Stack
+              p={1.5}
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography variant="subtitle1" fontWeight={500} gutterBottom>
+                Daftar Anggota
+              </Typography>
+
+              <Button
+                variant="text"
+                startIcon={trigger.openWorker ? <Close /> : <PersonAddAlt />}
+                disableElevation
+                onClick={onOpenAddWorker("worker")}
+              >
+                Tambah Anggota
+              </Button>
+            </Stack>
+            <Divider />
+            <SimpleList
+              dense
+              data={resources.members.map((v, i) => ({
+                primary: v.name,
+                primaryTypographyProps: { variant: "subtitle2" },
+                secondary: utils.typesLabel(v.role),
+                secondaryTypographyProps: { variant: "body2" },
+                itemProps: {
+                  dense: true,
+                  divider: resources.members.length - 1 !== i,
+                  secondaryAction: trigger.addWorkerLoading.some(
+                    (_v) => _v === v.id
+                  ) ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <BasicDropdown
+                      type="icon"
+                      menu={[
+                        {
+                          text: "Hapus",
+                          onClick: onRemoveMembers(v),
+                        },
+                      ]}
+                      label={<MoreVert fontSize="small" />}
+                      size="small"
+                    />
+                  ),
+                },
+              }))}
+            />
+          </Paper>
         </Grid>
       </Grid>
 
@@ -296,6 +410,13 @@ export default () => {
         route={FRHooks.apiRoute}
         snackbar={enqueueSnackbar}
         onOpen={onOpen}
+      />
+
+      <FORM.WorkerCreate
+        trigger={trigger}
+        searchWorkers={searchWorkers}
+        onOpen={onOpenAddWorker}
+        onAddMember={onAddMember}
       />
     </ProjectTemplate>
   );

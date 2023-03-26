@@ -34,12 +34,13 @@ const DataTable = ({
           {disableHeader ? null : (
             <TableHead {...headProps}>
               <TableRow>
-                {column.map(({ ...props }, i) => (
+                {column.map(({sortKey, ...props }, i) => (
                   <HeadCell
                     key={`th-${i}`}
                     order={order}
                     orderBy={orderBy}
                     onOrder={onOrder}
+                    sortKey={sortKey}
                     {...props}
                   />
                 ))}
@@ -73,7 +74,7 @@ const DataTable = ({
                     selected={selected ? selected(_data) : undefined}
                     {...row}
                   >
-                    {column.map(({ value, ...col }, j) => (
+                    {column.map(({ value, sortKey, ...col }, j) => (
                       <TableCell key={`row-${i}-cell-${j}`} {...col}>
                         {value(_data, i)}
                       </TableCell>

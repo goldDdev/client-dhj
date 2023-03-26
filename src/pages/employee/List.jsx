@@ -11,6 +11,7 @@ import * as Filter from "./filter";
 import * as FORM from "./form";
 import * as Dummy from "../../constants/dummy";
 import DataTable from "../../components/base/table/DataTable";
+import apiRoute from "@services/apiRoute";
 
 const columns = (table, t, utils, onUpdate) => [
   {
@@ -77,13 +78,13 @@ const columns = (table, t, utils, onUpdate) => [
   },
   {
     label: "Alamat Email",
-    value: (value) => value.email|| "-",
+    value: (value) => value.email || "-",
     align: "center",
     head: {
       align: "center",
       sx: {
         width: "10%",
-        whiteSpace: "nowrap"
+        whiteSpace: "nowrap",
       },
     },
   },
@@ -95,7 +96,7 @@ const columns = (table, t, utils, onUpdate) => [
       align: "center",
       sx: {
         width: "10%",
-        whiteSpace: "nowrap"
+        whiteSpace: "nowrap",
       },
     },
   },
@@ -121,7 +122,7 @@ export default () => {
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().employee("index").link(), {
+  const table = FRHooks.useTable(apiRoute.employee.index, {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
@@ -156,10 +157,11 @@ export default () => {
   const onUpdate = (id) => async () => {
     mutation.get(FRHooks.apiRoute().employee("detail", { id }).link(), {
       onBeforeSend: () => {
-        onOpen();
+        setTrigger((state) => ({ ...state, form: !state.form }));
+        mutation.clearData();
       },
       onSuccess: (resp) => {
-        mutation.setData({ ...resp.data, email: resp.data.user.email });
+        mutation.setData({ ...resp.data, email: resp.data.user?.email || "" });
       },
     });
   };

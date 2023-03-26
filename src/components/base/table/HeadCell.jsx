@@ -15,7 +15,7 @@ const HeadCell = ({ sortKey, label, order, orderBy, onOrder, head }) => {
 
   return (
     <TableCell variant="head" {...otherHead}>
-      {sortKey && orderBy && onOrder && (
+      {sortKey ? (
         <TableSortLabel
           active={orderBy === sortKey || false}
           direction={order}
@@ -23,13 +23,15 @@ const HeadCell = ({ sortKey, label, order, orderBy, onOrder, head }) => {
             onOrder(sortKey);
           }}
         >
-          {disabledTypography && label}
-
-          {!disabledTypography && (
-            <Typography variant="inherit" noWrap={noWrap} fontWeight={600}>
-              {label}
-            </Typography>
-          )}
+          {sortKey ? (
+            disabledTypography ? (
+              label
+            ) : (
+              <Typography variant="inherit" noWrap={noWrap} fontWeight={600}>
+                {label}
+              </Typography>
+            )
+          ) : null}
 
           {orderBy && orderBy === sortKey ? (
             <Box component="span" sx={visuallyHidden}>
@@ -37,7 +39,7 @@ const HeadCell = ({ sortKey, label, order, orderBy, onOrder, head }) => {
             </Box>
           ) : null}
         </TableSortLabel>
-      )}
+      ) : null}
 
       {!sortKey && !disabledTypography && (
         <Typography variant="inherit" noWrap={noWrap} fontWeight={600}>

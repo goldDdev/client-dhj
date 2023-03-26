@@ -1,6 +1,6 @@
 import React from "react";
-import { Button, Stack, TextField, Skeleton } from "@mui/material";
-import { BasicDropdown, IconButton, Select } from "@components/base";
+import { Button, Stack, TextField, Skeleton, Paper } from "@mui/material";
+import { BasicDropdown } from "@components/base";
 import { useSnackbar } from "notistack";
 import * as Dummy from "../../constants/dummy";
 import * as FORM from "./form";
@@ -9,14 +9,9 @@ import DataTable from "../../components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
 import { useParams } from "react-router-dom";
-import {
-  MoreVert,
-  Add,
-  Search,
-  ArrowUpward,
-  ArrowDownward,
-} from "@mui/icons-material";
+import { MoreVert, Add, Search } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
+import apiRoute from "@services/apiRoute";
 
 const columns = (onDelete, postLoading) => [
   {
@@ -33,6 +28,7 @@ const columns = (onDelete, postLoading) => [
   },
   {
     label: "Nama",
+    sortKey: "name",
     value: (value) =>
       postLoading.some((v) => v === value.boqId) ? (
         <Skeleton width="100%" />
@@ -42,6 +38,7 @@ const columns = (onDelete, postLoading) => [
   },
   {
     label: "Satuan",
+    sortKey: "unit",
     value: (value) =>
       postLoading.some((v) => v === value.boqId) ? (
         <Skeleton width="100%" />
@@ -80,6 +77,7 @@ const columns = (onDelete, postLoading) => [
 
   {
     label: "Perbaharui Pada",
+    sortKey: "updated_at",
     value: (value) => moment(value.updatedAt).fromNow(),
     align: "center",
     padding: "checkbox",
@@ -111,21 +109,15 @@ export default () => {
     postLoading: [],
   });
 
-  const table = FRHooks.useTable(
-    FRHooks.apiRoute().project("listBoqs", { projectId: id }).link(),
-    {
-      selector: (resp) => resp.data,
-    }
-  );
+  const table = FRHooks.useTable([apiRoute.project.listBoqs, { id }], {
+    selector: (resp) => resp.data,
+  });
 
-  const boqs = FRHooks.useFetch(
-    FRHooks.apiRoute().project("listBoqSearch", { id }).link(),
-    {
-      selector: (resp) => resp.data,
-      defaultValue: [],
-      disabledOnDidMount: true,
-    }
-  );
+  const boqs = FRHooks.useFetch([apiRoute.project.listBoqSearch, { id }], {
+    selector: (resp) => resp.data,
+    defaultValue: [],
+    disabledOnDidMount: true,
+  });
 
   const mutation = FRHooks.useMutation({
     defaultValue: { ...Dummy.projectBoq, projectId: +id },
@@ -198,51 +190,20 @@ export default () => {
           value={table.query("name", "")}
           onChange={(e) => table.setQuery({ name: e.target.value })}
           InputProps={{ startAdornment: <Search color="disabled" /> }}
-        />
-        <Select
-          label="Urutkan"
-          menu={[
-            { text: "Pilih", divider: true, value: "id" },
-            { text: "Nama", divider: true, value: "name" },
-            { text: "Unit", value: "Unit", divider: true },
-            { text: "Tanggal Perbaharui", value: "updated_at" },
-          ]}
-          sx={{
-            width: "25%",
-            "& .MuiOutlinedInput-root": {
-              paddingLeft: 0.8,
-            },
-          }}
-          value={table.orderBy}
-          onChange={(e) => {
-            table.onOrder(e.target.value);
-          }}
-          InputProps={{
-            startAdornment: (
-              <IconButton
-                title={"urutkan"}
-                size="small"
-                onClick={() => table.onOrder(table.orderBy)}
-                sx={{ mr: 1 }}
-              >
-                {table.order === "asc" ? (
-                  <ArrowUpward fontSize="inherit" />
-                ) : (
-                  <ArrowDownward fontSize="inherit" />
-                )}
-              </IconButton>
-            ),
-          }}
+          sx={{ width: "30%" }}
         />
       </Stack>
 
-      <DataTable
-        data={table.data}
-        loading={table.loading}
-        column={columns(onDelete, trigger.postLoading)}
-        row={{ sx: { backgroundColor: "white" } }}
-        headProps={{ sx: { backgroundColor: "white" } }}
-      />
+      <Paper variant="outlined">
+        <DataTable
+          data={table.data}
+          loading={table.loading}
+          column={columns(onDelete, trigger.postLoading)}
+          order={table.order}
+          orderBy={table.orderBy}
+          onOrder={table.onOrder}
+        />
+      </Paper>
 
       <FORM.BOQCreate
         trigger={trigger}
