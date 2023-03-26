@@ -1,5 +1,4 @@
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -9,24 +8,69 @@ import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-
-const theme = createTheme();
+import { ThemeProvider } from "@mui/material/styles";
+import webTheme from "@components/layouts/webTheme";
+import bg from "../../assets/jpg/hero-bg.jpg";
+import logo from "../../assets/png/logo-dhj.png";
+import * as FRHooks from "frhooks";
+import apiRoute from "@services/apiRoute";
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 
 export default () => {
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+  let timer;
+
+  const { dispatch } = FRHooks.useDispatch("user", {
+    type: "mutation",
+    defaultValue: {},
+  });
+  const mutation = FRHooks.useMutation({
+    defaultValue: {
+      email: "",
+      password: "",
+    },
+  });
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
+    mutation.post(apiRoute.auth.login, {
+      validation: true,
+      onSuccess: ({ data }) => {
+        localStorage.setItem("token", data.token);
+        dispatch("user", data.user);
+        navigate("/");
+      },
+      onError: (e) => {
+        if (e.response?.status === 400) {
+          mutation.setError({ email: "Alamat email atau password salah" });
+        }
+      },
     });
   };
 
+  React.useEffect(() => {
+    if (!localStorage.getItem("token")) return;
+
+    enqueueSnackbar("Kamu Sudah Login Loh", {
+      variant: "success",
+    });
+
+    timer = setTimeout(() => {
+      navigate("/");
+      clearTimeout(timer);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+      mutation.cancel();
+    };
+  }, []);
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={webTheme}>
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid
@@ -35,7 +79,7 @@ export default () => {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: "url(https://source.unsplash.com/random)",
+            backgroundImage: `url(${bg})`,
             backgroundRepeat: "no-repeat",
             backgroundColor: (t) =>
               t.palette.mode === "light"
@@ -55,9 +99,7 @@ export default () => {
               alignItems: "center",
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-              <LockOutlinedIcon />
-            </Avatar>
+            <img src={logo} alt="" height={50} />
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
@@ -76,6 +118,12 @@ export default () => {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                value={mutation.data.email || ""}
+                onChange={(e) => {
+                  mutation.setData({ email: e.target.value });
+                }}
+                error={mutation.error("email")}
+                helperText={mutation.message("email")}
               />
               <TextField
                 margin="normal"
@@ -86,6 +134,10 @@ export default () => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                value={mutation.data.password || ""}
+                onChange={(e) => {
+                  mutation.setData({ password: e.target.value });
+                }}
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
@@ -111,7 +163,6 @@ export default () => {
                   </Link>
                 </Grid>
               </Grid>
-              {/* <Copyright sx={{ mt: 5 }} /> */}
             </Box>
           </Box>
         </Grid>

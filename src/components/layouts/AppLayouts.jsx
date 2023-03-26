@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Container,
@@ -8,8 +9,31 @@ import {
 import { Header, SideBar, Copyright, Alert } from "@components/";
 import { Outlet } from "react-router-dom";
 import webTheme from "./webTheme";
+import * as FRHooks from "frhooks";
 
 const App = () => {
+  const toket = localStorage.getItem("token");
+  const { user } = FRHooks.useSelector(["user"]);
+  const [trigger, setTrigger] = React.useState({
+    open: true,
+  });
+  const { dispatch, clearMutation } = FRHooks.useDispatch("user", {
+    type: "mutation",
+    defaultValue: {},
+  });
+
+  React.useEffect(() => {
+    (async () => {
+      clearMutation("user");
+      if (toket) {
+        const data = await FRHooks.apiRoute()
+          .auth("current")
+          .get((resp) => resp.data);
+        dispatch("user", data);
+      }
+    })();
+  }, []);
+
   return (
     <ThemeProvider theme={webTheme}>
       <CssBaseline />
@@ -23,17 +47,19 @@ const App = () => {
       >
         <CssBaseline />
         <Header
-          open={true}
-          headerRight={undefined}
-          onClickDrawer={function () {
-            throw new Error("Function not implemented.");
+          open={trigger.open}
+          headerRight={{
+            name: user?.name || "",
+            role: user?.role || "",
+          }}
+          onToggleDrawer={() => {
+            setTrigger((state) => ({ open: !state.open }));
           }}
         />
         <SideBar
-          open={true}
-          navItems={[]}
-          onClickDrawer={function () {
-            throw new Error("Function not implemented.");
+          open={trigger.open}
+          onToggleDrawer={() => {
+            setTrigger((state) => ({ open: !state.open }));
           }}
         />
         <Box

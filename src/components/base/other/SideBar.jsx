@@ -19,6 +19,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useNavigate } from "react-router-dom";
 import * as icon from "@mui/icons-material";
 import logo from "@assets/png/logo-dhj.png";
+import logoSmall from "@assets/png/logo-small.png";
 
 const menu = [
   {
@@ -93,7 +94,7 @@ const SideBar = (props) => {
   return (
     <>
       {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-      <MobileDrawer
+      {/* <MobileDrawer
         container={container}
         variant="temporary"
         open={props.open}
@@ -149,7 +150,7 @@ const SideBar = (props) => {
               ))}
           </li>
         </List>
-      </MobileDrawer>
+      </MobileDrawer> */}
 
       <Drawer
         variant="permanent"
@@ -168,14 +169,15 @@ const SideBar = (props) => {
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "center",
             px: [1],
           }}
         >
-          <img src={logo} alt="PT. Duta Hita Jaya" height={50} />
-          <IconButton onClick={props.onToggleDrawer}>
-            <icon.ChevronLeft />
-          </IconButton>
+          <img
+            src={props.open ? logo : logoSmall}
+            alt="PT. Duta Hita Jaya"
+            height={props.open ? 50 : 60}
+          />
         </Toolbar>
 
         <Divider />

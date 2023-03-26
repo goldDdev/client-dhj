@@ -233,10 +233,10 @@ export default () => {
         onClick: async () => {
           try {
             alert.set({ loading: true });
-            await FRHooks.apiRoute()
+            const data = await FRHooks.apiRoute()
               .project("overtimeStatus")
               .data({ id, status })
-              .sendJson("put");
+              .sendJson("put", (resp) => resp.data);
             enqueueSnackbar(
               `Permintaan lembur berhasil ${
                 status === "CONFIRM" ? "Disetujui" : "Ditolak"
@@ -245,7 +245,14 @@ export default () => {
                 variant: "success",
               }
             );
-            table.update((v) => v.id === id, { status });
+            table.update((v) => v.id === id, {
+              status,
+              acttionBy: data.actionBy,
+              actionEmployee: {
+                name: data.actionEmployee.name,
+                role: data.actionEmployee.role,
+              },
+            });
           } catch (err) {
           } finally {
             alert.reset();

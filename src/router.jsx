@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AppLayouts } from "@components/layouts";
 import * as Page from "./pages";
+import RequireAuth from "@components/layouts/RequireAuth";
 
 const router = createBrowserRouter([
   {
@@ -9,7 +10,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <AppLayouts />,
+    element: <RequireAuth page={<AppLayouts />} />,
     children: [
       { path: "/projects/board", element: <Page.ProjectBoard /> },
       { path: "/projects/list", element: <Page.ProjectList /> },

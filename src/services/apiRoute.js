@@ -14,6 +14,11 @@ const apiRoute = {
   absent: {
     index: "/absent",
   },
+  auth: {
+    login: "/login",
+    logout: "/logout",
+    current: "/current",
+  },
   project: {
     index: "/project",
     detail: "/project/:id/detail",
