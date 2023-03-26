@@ -194,29 +194,28 @@ export default () => {
             <Stack direction="row" spacing={1}>
               <Select
                 name="month"
-                value={absents.getQuery("month", moment().format("M") - 1)}
-                menu={utils.monthID.map((v, i) => ({ text: v, value: i + 1 }))}
-                setValue={absents.setQuery}
+                value={absents.getQuery("month", moment().month())}
+                menu={utils.monthID.map((v, i) => ({ text: v, value: i }))}
+                onChange={(e) =>
+                  absents.setQuery({ month: +e.target.value + 1 })
+                }
               />
               <TextField
-                value={absents.getQuery("year", moment().format("Y"))}
+                value={absents.getQuery("year", moment().year())}
                 onChange={(e) => absents.setQuery({ year: +e.target.value })}
               />
             </Stack>
 
             <Typography>{`${utils.getMonth(
-              absents.getQuery("month", moment().format("M")) - 1
-            )} - ${absents.getQuery(
-              "year",
-              moment().format("Y")
-            )}`}</Typography>
+              absents.getQuery("month", moment().month())
+            )} - ${absents.getQuery("year", moment().year())}`}</Typography>
           </Stack>
         </Grid>
         <Grid container item xs={14} columns={14} spacing={1}>
           {utils
             .getDaysInMonthUTC(
-              absents.getQuery("month", moment().format("M")),
-              absents.getQuery("year", moment().format("Y"))
+              absents.getQuery("month", moment().month() + 1),
+              absents.getQuery("year", moment().year())
             )
             .map((v, i) => (
               <Grid item key={i} xs={2}>
