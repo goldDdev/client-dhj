@@ -5,10 +5,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    commonjs(),
-  ],
+  plugins: [react(), commonjs()],
   define: {
     "process.env": import.meta,
   },
@@ -23,5 +20,8 @@ export default defineConfig({
       "@assets": path.resolve(__dirname, "./src/assets"),
       "@pages": path.resolve(__dirname, "./src/pages"),
     },
+  },
+  build: {
+    chunkSizeWarningLimit: 5000,
   },
 });
