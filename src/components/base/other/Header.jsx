@@ -16,7 +16,7 @@ import { ArrowBack } from "@mui/icons-material";
 
 const Header = (props) => {
   return (
-    <AppBar position="fixed" open={!props.isSmall && props.open}>
+    <AppBar position="fixed" open={!props.isSmall && props.open} color="inherit" elevation={0}> 
       {!props.enableBack && (
         <Toolbar
           sx={{

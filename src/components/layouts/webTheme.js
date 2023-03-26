@@ -1,12 +1,18 @@
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 
 let webTheme = createTheme({
+  palette:{
+    primary: {
+      main: '#0E3386'
+    }
+  },
   components: {
     MuiCssBaseline: {
     },
     MuiButton: {
       defaultProps: {
         variant: "contained",
+        disableElevation: true
       },
       styleOverrides: {
         root: {

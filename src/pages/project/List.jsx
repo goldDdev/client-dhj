@@ -64,11 +64,16 @@ const columns = (table, onUpdate) => [
     value: (value) => {
       const total =
         value.duration - (moment(value.finishAt).diff(moment(), "days") || 0);
-      const percent = (total / value.duration) * 100;
+      const percent =
+        ((total < 0 ? 0 : total > value.duration ? value.duration : total) /
+          value.duration) *
+        100;
       return (
         <LinearProgress
           color="success"
-          label={`${total < 0 ? 0 : total}/${value.duration}Hari`}
+          label={`${
+            total < 0 ? 0 : total > value.duration ? value.duration : total
+          }/${value.duration}Hari`}
           value={percent}
         />
       );
