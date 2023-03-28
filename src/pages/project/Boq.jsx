@@ -1,6 +1,18 @@
 import React from "react";
-import { Button, Stack, TextField, Skeleton, Paper } from "@mui/material";
-import { BasicDropdown } from "@components/base";
+import {
+  Button,
+  Stack,
+  TextField,
+  Skeleton,
+  Paper,
+  Box,
+  IconButton,
+  CircularProgress,
+  Grid,
+  Typography,
+  Divider,
+} from "@mui/material";
+import { BasicDropdown, Timeline } from "@components/base";
 import { useSnackbar } from "notistack";
 import * as Dummy from "../../constants/dummy";
 import * as FORM from "./form";
@@ -9,11 +21,29 @@ import DataTable from "../../components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
 import { useParams } from "react-router-dom";
-import { MoreVert, Add, Search } from "@mui/icons-material";
+import {
+  MoreVert,
+  Add,
+  Search,
+  Edit,
+  Close,
+  Check,
+  Clear,
+  RefreshOutlined,
+} from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
 import apiRoute from "@services/apiRoute";
 
-const columns = (onDelete, postLoading) => [
+const columns = (
+  onDelete,
+  onUpdate,
+  table,
+  mutation,
+  currentId,
+  url,
+  postLoading,
+  snackbar
+) => [
   {
     label: "No",
     value: (_, idx) => {
@@ -56,22 +86,81 @@ const columns = (onDelete, postLoading) => [
   },
   {
     label: "Jumlah",
-    value: (value) => value.unit,
-    align: "center",
-    padding: "checkbox",
-    head: {
-      align: "center",
-    },
-  },
+    value: (value) => (
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="center"
+        spacing={1}
+      >
+        <Box>
+          {currentId === value.id ? (
+            <TextField
+              size="small"
+              value={mutation.data.unit}
+              onChange={(e) => mutation.setData({ unit: +e.target.value })}
+              variant="standard"
+              error={mutation.error("unit")}
+              helperText={mutation.message("unit")}
+              InputProps={{
+                inputProps: {
+                  style: { textAlign: "center" },
+                  maxLength: 5,
+                },
+                startAdornment: (
+                  <IconButton
+                    disabled={mutation.processing}
+                    onClick={onUpdate(value)}
+                    size="small"
+                  >
+                    <Close fontSize="inherit" />
+                  </IconButton>
+                ),
+                endAdornment: (
+                  <IconButton
+                    disabled={mutation.processing}
+                    onClick={() => {
+                      mutation.put(url, {
+                        onSuccess: ({ data }) => {
+                          snackbar("BOQ proyek berhasil diperbaharui", {
+                            variant: "success",
+                          });
+                          value.unit = data.unit;
+                          value.updatedAt = data.updatedAt;
+                          onUpdate(data)();
+                        },
+                      });
+                    }}
+                    size="small"
+                  >
+                    {mutation.processing ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <Check fontSize="inherit" />
+                    )}
+                  </IconButton>
+                ),
+              }}
+              sx={{ minWidth: "150px" }}
+            />
+          ) : (
+            value.unit
+          )}
+        </Box>
 
-  {
-    label: "Tambahan",
-    value: (value) => value.additionalUnit,
+        {currentId === value.id ? null : (
+          <Box display="flex" flexDirection="row" gap={1}>
+            <IconButton onClick={onUpdate(value)} size="small">
+              <Edit fontSize="inherit" />
+            </IconButton>
+          </Box>
+        )}
+      </Stack>
+    ),
     align: "center",
     padding: "checkbox",
     head: {
       align: "center",
-      sx: { whiteSpace: "nowrap" },
     },
   },
 
@@ -91,7 +180,14 @@ const columns = (onDelete, postLoading) => [
     value: (value) => (
       <BasicDropdown
         type="icon"
-        menu={[{ text: "Hapus", onClick: onDelete(value.id) }]}
+        menu={[
+          {
+            text: "Riwayat",
+            onClick: () => table.setQuery({ pboid: value.id }),
+            divider: true,
+          },
+          { text: "Hapus", onClick: onDelete(value.id) },
+        ]}
         label={<MoreVert />}
       />
     ),
@@ -107,6 +203,8 @@ export default () => {
   const [trigger, setTrigger] = React.useState({
     form: false,
     postLoading: [],
+    currentId: 0,
+    pboid: 0,
   });
 
   const table = FRHooks.useTable([apiRoute.project.listBoqs, { id }], {
@@ -119,6 +217,11 @@ export default () => {
     disabledOnDidMount: true,
   });
 
+  const progres = FRHooks.useTable([apiRoute.project.listProgress, { id }], {
+    selector: (resp) => resp.data,
+    total: (resp) => resp.data.meta.total,
+  });
+
   const mutation = FRHooks.useMutation({
     defaultValue: { ...Dummy.projectBoq, projectId: +id },
     isNewRecord: (data) => data.id === 0,
@@ -129,11 +232,34 @@ export default () => {
       }),
   });
 
+  const boq = FRHooks.useMutation({
+    defaultValue: { id: 0, unit: 0 },
+    isNewRecord: (data) => data.id === 0,
+    schema: (y) =>
+      y.object().shape({
+        id: y.number().nullable(),
+        unit: y.number().nullable(),
+      }),
+  });
+
   const onOpen = () => {
     setTrigger((state) => ({ ...state, form: !state.form }));
     boqs.refresh();
     mutation.clearData();
     mutation.clearError();
+  };
+
+  const onUpdate = (value) => () => {
+    boq.clearError();
+    if (value.id === trigger.currentId) {
+      boq.clearData();
+    } else {
+      boq.setData({ id: value.id, unit: value.unit });
+    }
+    setTrigger((state) => {
+      state.currentId = state.currentId === value.id ? 0 : value.id;
+      return state;
+    });
   };
 
   const onDelete = (id) => async () => {
@@ -194,16 +320,73 @@ export default () => {
         />
       </Stack>
 
-      <Paper variant="outlined">
-        <DataTable
-          data={table.data}
-          loading={table.loading}
-          column={columns(onDelete, trigger.postLoading)}
-          order={table.order}
-          orderBy={table.orderBy}
-          onOrder={table.onOrder}
-        />
-      </Paper>
+      <Grid container direction="row" spacing={1}>
+        <Grid item xs={8}>
+          <Paper variant="outlined">
+            <DataTable
+              data={table.data}
+              loading={table.loading}
+              column={columns(
+                onDelete,
+                onUpdate,
+                progres,
+                boq,
+                trigger.currentId,
+                apiRoute.project.boqValue,
+                trigger.postLoading,
+                enqueueSnackbar
+              )}
+              selected={(v) => v.id === +progres.query("pboid")}
+              order={table.order}
+              orderBy={table.orderBy}
+              onOrder={table.onOrder}
+            />
+          </Paper>
+        </Grid>
+
+        <Grid item xs={4}>
+          <Paper variant="outlined" sx={{ maxHeight: 480, overflow: "scroll" }}>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              m={1}
+            >
+              <Typography flexGrow={1}>Riwayat</Typography>
+              <div>
+                <IconButton size="small" onClick={() => progres.clear()}>
+                  <RefreshOutlined fontSize="inherit" />
+                </IconButton>
+              </div>
+            </Stack>
+
+            <Divider />
+
+            {progres.isEmpty ? (
+              <Typography variant="body2" m={2}>
+                Belum Ada Riwayat Pengerjaan
+              </Typography>
+            ) : null}
+
+            <Timeline
+              data={progres.data}
+              value={(v, i) => {
+                return (
+                  <>
+                    <Typography variant="body2">{v.submitedName}</Typography>
+                    <Typography variant="body2">
+                      {v.progres} ({v.name})
+                    </Typography>
+                    <Typography variant="caption" fontStyle="italic">
+                      {moment(v.createdAt).format("DD-MM-yyyy HH:mm:ss")}
+                    </Typography>
+                  </>
+                );
+              }}
+            />
+          </Paper>
+        </Grid>
+      </Grid>
 
       <FORM.BOQCreate
         trigger={trigger}

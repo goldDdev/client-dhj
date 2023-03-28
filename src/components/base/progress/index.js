@@ -1,2 +1,3 @@
 import LinearProgress from "./LinearProgress";
-export { LinearProgress };
+import Timeline from "./Timeline";
+export { LinearProgress, Timeline };

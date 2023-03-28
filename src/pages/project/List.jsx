@@ -160,7 +160,7 @@ export default () => {
         ),
       }}
     >
-      <Filter.ButtonFilter />
+      <Filter.ButtonFilter table={table} />
 
       <Paper elevation={0} variant="outlined">
         <DataTable

@@ -73,7 +73,7 @@ export const TableFilter = ({ t, table }) => {
   );
 };
 
-export const ButtonFilter = ({ t, table }) => {
+export const ButtonFilter = ({ table }) => {
   return (
     <Stack
       mb={2}
@@ -83,40 +83,29 @@ export const ButtonFilter = ({ t, table }) => {
       alignItems="center"
     >
       <Stack direction="row" spacing={1}>
-        <Paper elevation={0}>
-          <Button variant="outlined" color="inherit">
-            Semua 100
+        {Object.keys(utils.projectStatus).map((v) => (
+          <Button
+            key={v}
+            variant="outlined"
+            color={table.query("status") === v ? "primary" : "inherit"}
+            onClick={() => {
+              table.setQuery({ status: v });
+            }}
+          >
+            {utils.projectLabel(v)}
           </Button>
-        </Paper>
-        <Button variant="outlined" color="inherit">
-          Draft 100
-        </Button>
-        <Button variant="outlined" color="inherit" startIcon={<Work />}>
-          Progress 100
-        </Button>
-        <Button variant="outlined" color="inherit" startIcon={<Check />}>
-          Selesai 100
-        </Button>
+        ))}
       </Stack>
 
       <Stack direction="row" flexGrow={1} spacing={1} alignItems="center">
         <TextField
-          placeholder="Cari Kat sini"
+          value={table.query("name", "")}
+          placeholder="Cari disini"
           InputProps={{
             endAdornment: <Search />,
           }}
+          onChange={(e) => table.setQuery({ name: e.target.value })}
         />
-        <Paper elevation={0}>
-          <Button
-            startIcon={<FilterAlt />}
-            variant="outlined"
-            color="primary"
-            disableElevation
-            sx={{ height: 40 }}
-          >
-            <ExpandMore />
-          </Button>
-        </Paper>
       </Stack>
     </Stack>
   );
