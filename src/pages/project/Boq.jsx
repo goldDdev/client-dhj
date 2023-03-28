@@ -345,8 +345,13 @@ export default () => {
         </Grid>
 
         <Grid item xs={4}>
-          <Paper variant="outlined">
-            <Stack direction="row" justifyContent="space-between" alignItems="center" m={1}>
+          <Paper variant="outlined" sx={{ maxHeight: 480, overflow: "scroll" }}>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              m={1}
+            >
               <Typography flexGrow={1}>Riwayat</Typography>
               <div>
                 <IconButton size="small" onClick={() => progres.clear()}>
