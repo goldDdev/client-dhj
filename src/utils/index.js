@@ -228,11 +228,15 @@ export const typesLabel = (type) => {
 
 export const projectStatus = {
   DRAFT: "Draft",
-  PROGRESS: "Progress",
-  CANCELLED: "Batal",
   PENDING: "Tunda",
-  DONE: "Selesi",
   REVIEW: "Pratinjau",
+  PROGRESS: "Progress",
+  DONE: "Selesai",
+  CANCELLED: "Batal",
+};
+
+export const projectLabel = (status) => {
+  return projectStatus[status] || "Draft";
 };
 
 export const komStatus = {
