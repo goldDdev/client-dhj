@@ -54,13 +54,24 @@ const menu = [
     canAccess: [],
     text: "Weekly Plan",
     link: "/weekly",
-    icon: icon.ListAlt,
+    icon: icon.SummarizeOutlined,
   },
   {
     canAccess: [],
     text: "Penggajian",
     link: "/payrol",
-    icon: icon.Money,
+    icon: icon.RequestQuote,
+  },
+  {
+    canAccess: [],
+    text: "Inventori",
+    link: "",
+    icon: icon.Inventory,
+    children: [
+      { canAccess: [], text: "Master Item", link: "/inventory" },
+      { canAccess: [], text: "Penggunaan", link: "/inventory" },
+      { canAccess: [], text: "Laporan", link: "/inventory" },
+    ],
   },
   {
     canAccess: [],

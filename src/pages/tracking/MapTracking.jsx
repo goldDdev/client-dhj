@@ -37,17 +37,27 @@ const MapTracking = () => {
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().tracking("index").link(), {
+  const table = FRHooks.useTable(apiRoute.tracking.index, {
     selector: (resp) => resp.data,
     total: (resp) => resp.data.length,
+    // TODO : default query ?
+    // queryParams: { projectId: 0, date: "2023-03-19" },
   });
 
   const projects = FRHooks.useFetch(apiRoute.project.index, {
-    selector: (resp) => resp.data.map((v) => ({ id: v.id, name: v.name })),
+    selector: (resp) => resp.data.map((v) => ({ id: v.id, name: `${v.name} (${v.location})` })),
     defaultValue: [],
     disabledOnDidMount: false,
+    // TODO on success set projectId table query
+    onSuccess: (resp) => {
+      if (!resp.data.length) return;
+      const first = resp.data[0];
+      console.log('table.query >', first)
+      table.setQuery({ projectId: first.id, project: first.name });
+    }
   });
 
+  console.log('table.data >', table.data)
   return (
     <MainTemplate
       title={t("project")}
@@ -64,6 +74,7 @@ const MapTracking = () => {
             id="asynchronous-demo"
             freeSolo
             fullWidth
+            value={table.query('projectId') ? { projectId: table.query('id'), project: table.query('project') } : undefined}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             getOptionLabel={(option) => option.name}
             options={projects.data}
@@ -73,9 +84,9 @@ const MapTracking = () => {
             loading={false}
             onChange={(e, v, r) => {
               if (r === "clear") {
-                table.clearOnly(["id", "project"]);
+                table.clearOnly(["projectId", "project"]);
               } else {
-                table.setQuery({ id: v.id, project: v.name });
+                table.setQuery({ ...table.query, projectId: v.id, project: v.name });
               }
             }}
             renderOption={(props, option) => (
@@ -101,44 +112,67 @@ const MapTracking = () => {
             )}
           />
         </Paper>
-        <TextField type="date" />
+        <TextField
+          type="date"
+          sx={{ width: '20%' }}
+          value={table.query('date') || undefined}
+          onChange={(e) => table.setQuery({ ...table.query, date: e.target.value })}
+        />
       </Stack>
 
-      <Paper elevation={0} variant="outlined">
-        <Box sx={{ height: '500px', width: '100%' }}>
-          <MapContainer center={[1.598333, 101.431827]} zoom={13} scrollWheelZoom={false} style={{ height: '500px', width: '100%' }}>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Marker position={[1.598333, 101.431827]}>
-              <Popup>
-                Budi Subandi (Mandor)
-              </Popup>
-            </Marker>
-            <Marker position={[1.592471, 101.424707]}>
-              <Popup>
-                Joko Susilo (SPV)
-              </Popup>
-            </Marker>
-            <Marker position={[1.593727, 101.435177]}>
-              <Popup>
-                Rudi S (Mandor)
-              </Popup>
-            </Marker>
-          </MapContainer>
-        </Box>
+      <Paper elevation={0} variant="outlined" sx={{ minHeight: '500px' }}>
+        {table.query('projectId') && table.query('date') ? (
+          <>
+            {table.data.length > 0 ? (
+              <Box>
+                <Box sx={{ height: '500px', width: '100%' }}>
+                  {/* table.meta.center */}
+                  <MapContainer center={[1.598333, 101.431827]} zoom={13} scrollWheelZoom={false} style={{ height: '500px', width: '100%' }}>
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {table.data.map((track) => (
+                      <Marker position={[track.latitude, track.longitude]}>
+                        <Popup>
+                          Budi Subandi (Mandor)
+                        </Popup>
+                      </Marker>
+                    ))}
+                    {/* <Marker position={[1.592471, 101.424707]}>
+                      <Popup>
+                        Joko Susilo (SPV)
+                      </Popup>
+                    </Marker>
+                    <Marker position={[1.593727, 101.435177]}>
+                      <Popup>
+                        Rudi S (Mandor)
+                      </Popup>
+                    </Marker> */}
+                  </MapContainer>
+                </Box>
 
-        <Box sx={{ mt: 2 }}>
-          <Typography sx={{ ml: 2 }}>Daftar Karyawan : Project A (Dumai)</Typography>
-          {/* TODO : show list employee with project assign in prgress for now */}
-          <DataTable
-            data={[]}
-            loading={false}
-            column={columns(table, t)}
-            pagination={utils.pagination(table.pagination)}
-          />
-        </Box>
+                <Box sx={{ mt: 2 }}>
+                  <Typography sx={{ ml: 2 }}>Daftar Karyawan : {table.query('project')}</Typography>
+                  {/* TODO : show list employee with project assign in prgress for now */}
+                  <DataTable
+                    data={table.data}
+                    loading={table.loading}
+                    column={columns(table, t)}
+                  />
+                </Box>
+              </Box>
+            ) : (
+              <Typography variant="h6" textAlign="center" sx={{ m: 2 }}>
+                Maaf data tidak tersedia, silahkan coba ubah pencarian.
+              </Typography>
+            )}
+          </>
+        ) : (
+          <Typography variant="h6" textAlign="center" sx={{ m: 2 }}>
+            Mohon Pilih Project & Tanggal
+          </Typography>
+        )}
       </Paper>
     </MainTemplate>
   );
