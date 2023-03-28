@@ -38,6 +38,9 @@ const apiRoute = {
     deleteWorker: "/project/:id/worker",
     detilAbsent: "/project/:id/:parent/absent",
   },
+  tracking: {
+    index: "/tracking",
+  },
   setting: {
     index: "/setting",
   },

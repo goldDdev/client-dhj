@@ -1,11 +1,12 @@
 import React from "react";
 import FRHooks from "frhooks";
 import { useSnackbar } from "notistack";
-import { Button, Chip, Paper, Box, Typography } from "@mui/material";
+import { Autocomplete, Stack, Paper, Box, Typography, TextField, CircularProgress } from "@mui/material";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MainTemplate from "@components/templates/MainTemplate";
 import DataTable from "../../components/base/table/DataTable";
 import * as utils from "@utils/";
+import apiRoute from "@services/apiRoute";
 import * as BASE from "@components/base";
 
 import 'leaflet/dist/leaflet.css';
@@ -36,26 +37,72 @@ const MapTracking = () => {
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().employee("index").link(), {
+  const table = FRHooks.useTable(FRHooks.apiRoute().tracking("index").link(), {
     selector: (resp) => resp.data,
-    total: (resp) => resp.meta.total,
+    total: (resp) => resp.data.length,
+  });
+
+  const projects = FRHooks.useFetch(apiRoute.project.index, {
+    selector: (resp) => resp.data.map((v) => ({ id: v.id, name: v.name })),
+    defaultValue: [],
+    disabledOnDidMount: false,
   });
 
   return (
     <MainTemplate
       title={t("project")}
     >
-      {/* TODO : Filter by on-going project here */}
-      {/* <Filter.ButtonFilter /> */}
-      <BASE.Select
-        label="Project Selected"
-        value={0}
-        menu={[
-          { text: 'Project A (Dumai)', value: 0 },
-          { text: 'Project B (Rumbai)', value: 1 },
-          { text: 'Project ABC (Dumai)', value: 2 }
-        ]}
-      />
+      <Stack
+        spacing={2}
+        direction="row"
+        mb={2}
+        justifyContent="flex-start"
+        alignItems="center"
+      >
+        <Paper elevation={0} sx={{ width: "50%" }}>
+          <Autocomplete
+            id="asynchronous-demo"
+            freeSolo
+            fullWidth
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            getOptionLabel={(option) => option.name}
+            options={projects.data}
+            onOpen={() => {
+              projects.clear();
+            }}
+            loading={false}
+            onChange={(e, v, r) => {
+              if (r === "clear") {
+                table.clearOnly(["id", "project"]);
+              } else {
+                table.setQuery({ id: v.id, project: v.name });
+              }
+            }}
+            renderOption={(props, option) => (
+              <li {...props} key={option.id} children={option.name} />
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Proyek"
+                onChange={(e) => projects.setQuery({ name: e.target.value })}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <React.Fragment>
+                      {projects.loading ? (
+                        <CircularProgress color="inherit" size={20} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </React.Fragment>
+                  ),
+                }}
+              />
+            )}
+          />
+        </Paper>
+        <TextField type="date" />
+      </Stack>
 
       <Paper elevation={0} variant="outlined">
         <Box sx={{ height: '500px', width: '100%' }}>
