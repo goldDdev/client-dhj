@@ -11,6 +11,7 @@ import {
   Grid,
   Typography,
   Divider,
+  Badge,
 } from "@mui/material";
 import { BasicDropdown, Timeline } from "@components/base";
 import { useSnackbar } from "notistack";
@@ -37,6 +38,7 @@ import apiRoute from "@services/apiRoute";
 const columns = (
   onDelete,
   onUpdate,
+  onHistory,
   table,
   mutation,
   currentId,
@@ -163,6 +165,23 @@ const columns = (
       align: "center",
     },
   },
+  {
+    label: "Progres",
+    value: (value) =>
+      postLoading.some((v) => v === value.boqId) ? (
+        <Skeleton width="100%" />
+      ) : (
+        value.totalProgres
+      ),
+    align: "center",
+    padding: "checkbox",
+    head: {
+      align: "center",
+    },
+    sx: {
+      whiteSpace: "noWrap",
+    },
+  },
 
   {
     label: "Perbaharui Pada",
@@ -178,18 +197,36 @@ const columns = (
 
   {
     value: (value) => (
-      <BasicDropdown
-        type="icon"
-        menu={[
-          {
-            text: "Riwayat",
-            onClick: () => table.setQuery({ pboid: value.id }),
-            divider: true,
-          },
-          { text: "Hapus", onClick: onDelete(value.id) },
-        ]}
-        label={<MoreVert />}
-      />
+      <Badge
+        badgeContent={value.totalPending || 0}
+        color="error"
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        <BasicDropdown
+          type="icon"
+          size="small"
+          menu={[
+            {
+              text: `${
+                value.totalPending > 0 ? `(${value.totalPending})` : ""
+              } Menunggu Konfirmasi`,
+              onClick: onHistory(value),
+              disabled: value.totalPending === 0,
+              divider: true,
+            },
+            {
+              text: "Riwayat",
+              onClick: onHistory(value),
+              divider: true,
+            },
+            { text: "Hapus", onClick: onDelete(value.id) },
+          ]}
+          label={<MoreVert fontSize="inherit" />}
+        />
+      </Badge>
     ),
     align: "center",
     padding: "checkbox",
@@ -205,6 +242,7 @@ export default () => {
     postLoading: [],
     currentId: 0,
     pboid: 0,
+    history: false,
   });
 
   const table = FRHooks.useTable([apiRoute.project.listBoqs, { id }], {
@@ -249,6 +287,11 @@ export default () => {
     mutation.clearError();
   };
 
+  const onHistory = (value) => () => {
+    setTrigger((state) => ({ ...state, history: !state.history }));
+    table.setQuery({ pboid: value.id, pending: 1 });
+  };
+
   const onUpdate = (value) => () => {
     boq.clearError();
     if (value.id === trigger.currentId) {
@@ -263,6 +306,42 @@ export default () => {
   };
 
   const onDelete = (id) => async () => {
+    alert.set({
+      open: true,
+      title: "Mohon Perhatian",
+      message: "Anda akan menghapus BOQ ini dari daftar, apakah anda yakin?",
+      type: "warning",
+      loading: false,
+      close: {
+        text: "Keluar",
+      },
+      confirm: {
+        text: "Ya, Saya Mengerti",
+        onClick: () => {
+          mutation.destroy(
+            FRHooks.apiRoute().project("listBoqDetail", { id }).link(),
+            {
+              onBeforeSend: () => {
+                alert.set({ loading: true });
+              },
+              onSuccess: () => {
+                enqueueSnackbar("BOQ berhasil dihapus dari daftar", {
+                  variant: "success",
+                });
+                table.destroy((v) => v.id === id);
+                alert.reset();
+              },
+              onAlways: () => {
+                alert.set({ loading: false });
+              },
+            }
+          );
+        },
+      },
+    });
+  };
+
+  const onConfirm = (id) => async () => {
     alert.set({
       open: true,
       title: "Mohon Perhatian",
@@ -321,7 +400,7 @@ export default () => {
       </Stack>
 
       <Grid container direction="row" spacing={1}>
-        <Grid item xs={8}>
+        <Grid item xs={trigger.history ? 8 : 12}>
           <Paper variant="outlined">
             <DataTable
               data={table.data}
@@ -329,6 +408,7 @@ export default () => {
               column={columns(
                 onDelete,
                 onUpdate,
+                onHistory,
                 progres,
                 boq,
                 trigger.currentId,
@@ -344,7 +424,11 @@ export default () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={4}>
+        <Grid
+          item
+          xs={4}
+          sx={{ ...(trigger.history ? {} : { display: "none" }) }}
+        >
           <Paper variant="outlined" sx={{ maxHeight: 480, overflow: "scroll" }}>
             <Stack
               direction="row"
@@ -372,15 +456,19 @@ export default () => {
               data={progres.data}
               value={(v, i) => {
                 return (
-                  <>
-                    <Typography variant="body2">{v.submitedName}</Typography>
-                    <Typography variant="body2">
-                      {v.progres} ({v.name})
-                    </Typography>
-                    <Typography variant="caption" fontStyle="italic">
-                      {moment(v.createdAt).format("DD-MM-yyyy HH:mm:ss")}
-                    </Typography>
-                  </>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Box flexGrow={1}>
+                      <Typography variant="body2">{v.submitedName}</Typography>
+                      <Typography variant="body2">
+                        {v.progres} ({v.name})
+                      </Typography>
+                      <Typography variant="caption" fontStyle="italic">
+                        {moment(v.createdAt).format("DD-MM-yyyy HH:mm:ss")}
+                      </Typography>
+                    </Box>
+
+                    <div><Button onClick={onConfirm(v.id)} size="small">Konfirmnasi</Button></div>
+                  </Stack>
                 );
               }}
             />
