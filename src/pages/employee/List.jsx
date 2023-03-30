@@ -12,6 +12,7 @@ import * as FORM from "./form";
 import * as Dummy from "../../constants/dummy";
 import DataTable from "../../components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
+import { Link } from "react-router-dom";
 
 const columns = (table, t, utils, onUpdate) => [
   {
@@ -29,16 +30,17 @@ const columns = (table, t, utils, onUpdate) => [
   },
   {
     label: "ID Karyawan",
-    value: (value, idx) => {
-      return value.cardID;
-    },
+    value: (value, idx) =>   <Link to={`/employee/${value.id}/detail`}>{value.cardID}</Link>
+    ,
     head: {
       align: "center",
       padding: "checkbox",
+      noWrap: true
     },
     align: "center",
     padding: "checkbox",
     size: "small",
+
   },
   {
     label: t("name"),

@@ -2,6 +2,8 @@ const apiRoute = {
   employee: {
     index: "/employee",
     detail: "/employee/:id/detail",
+    project: "/employee/:id/project",
+    absent: "/employee/:id/absent",
   },
   boq: {
     index: "/boq",
