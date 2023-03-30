@@ -9,6 +9,7 @@ import ProjectBoq from "./project/Boq";
 import ProjectOvertime from "./project/Overtime";
 
 import EmployeeList from "./employee/List";
+import EmployeeDetail from "./employee/Detail";
 import AbsentList from "./absent/List";
 import PayrolList from "./payrol/List";
 import WeeklyList from "./weekly/List";
@@ -28,6 +29,7 @@ export {
   ProjectBoq,
   ProjectOvertime,
   EmployeeList,
+  EmployeeDetail,
   BoqList,
   UserList,
   AbsentList,
