@@ -32,11 +32,12 @@ import moment from "moment";
 import _ from "lodash";
 import * as Filter from "../filter";
 import apiRoute from "@services/apiRoute";
+import { boq } from "@constants/dummy";
 export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
-  const duration = mutation.data.startAt && mutation.data.finishAt ? moment(mutation.data.finishAt).diff(
-    mutation.data.startAt,
-    "day"
-  ): 0 
+  const duration =
+    mutation.data.startAt && mutation.data.finishAt
+      ? moment(mutation.data.finishAt).diff(mutation.data.startAt, "day")
+      : 0;
   return (
     <DialogForm
       open={open}
@@ -389,7 +390,6 @@ export const EventCreate = ({
   route,
   type,
 }) => {
-
   return (
     <DialogForm
       open={open}
@@ -515,7 +515,6 @@ export const EventCreate = ({
                 label="Deskripsi"
                 stackProps={{ direction: "column", spacing: 2 }}
               >
-
                 <div id="description"></div>
                 {/* <TextField
                   id="description"
@@ -738,3 +737,61 @@ export const WorkerCreate = ({
     }}
   />
 );
+
+export const ProgresUpdate = ({
+  loading,
+  open,
+  boq,
+  current,
+  onOpen,
+  onSubmit,
+  onChange,
+}) => {
+  return (
+    <DialogForm
+      open={open}
+      onClose={onOpen}
+      title="Form Progres"
+      maxWidth="xs"
+      content={{
+        children: (
+          <Stack spacing={1.5} direction="column">
+            <Typography>
+              {boq.name} ({boq.typeUnit})
+            </Typography>
+            <TextField
+              InputLabelProps={{ shrink: true }}
+              label="Unit"
+              value={current.progres || 0}
+              onChange={onChange}
+              InputProps={{
+                inputProps: {
+                  min: 0,
+                },
+              }}
+              type="number"
+            />
+          </Stack>
+        ),
+      }}
+      actions={{
+        children: (
+          <>
+            <Button variant="outlined" onClick={onOpen}>
+              Batal
+            </Button>
+            <LoadingButton
+              loading={loading}
+              disableElevation
+              variant="contained"
+              color="primary"
+              onClick={onSubmit}
+            >
+              Simpan Perubahan
+            </LoadingButton>
+          </>
+        ),
+      }}
+    />
+  );
+};

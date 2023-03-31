@@ -21,6 +21,12 @@ const apiRoute = {
     logout: "/logout",
     current: "/current",
   },
+  progres: {
+    all: "/progres/:id/all",
+    confirm: "/progres/confirm",
+    index: "/progres",
+    detail: "/progres/:id",
+  },
   project: {
     index: "/project",
     detail: "/project/:id/detail",
