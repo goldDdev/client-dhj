@@ -7,8 +7,10 @@ import ProjectAbsent from "./project/Absent";
 import ProjectEvent from "./project/Event";
 import ProjectBoq from "./project/Boq";
 import ProjectOvertime from "./project/Overtime";
+import ProjectProgres from "./project/Progres";
 
 import EmployeeList from "./employee/List";
+import EmployeeDetail from "./employee/Detail";
 import AbsentList from "./absent/List";
 import PayrolList from "./payrol/List";
 import WeeklyList from "./weekly/List";
@@ -27,7 +29,9 @@ export {
   ProjectEvent,
   ProjectBoq,
   ProjectOvertime,
+  ProjectProgres,
   EmployeeList,
+  EmployeeDetail,
   BoqList,
   UserList,
   AbsentList,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Stack,
@@ -11,6 +11,7 @@ import {
   Grid,
   Typography,
   Divider,
+  Badge,
 } from "@mui/material";
 import { BasicDropdown, Timeline } from "@components/base";
 import { useSnackbar } from "notistack";
@@ -20,7 +21,7 @@ import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   MoreVert,
   Add,
@@ -37,12 +38,14 @@ import apiRoute from "@services/apiRoute";
 const columns = (
   onDelete,
   onUpdate,
+  onHistory,
   table,
   mutation,
   currentId,
   url,
   postLoading,
-  snackbar
+  snackbar,
+  navigate
 ) => [
   {
     label: "No",
@@ -163,6 +166,23 @@ const columns = (
       align: "center",
     },
   },
+  {
+    label: "Progres",
+    value: (value) =>
+      postLoading.some((v) => v === value.boqId) ? (
+        <Skeleton width="100%" />
+      ) : (
+        value.totalProgres
+      ),
+    align: "center",
+    padding: "checkbox",
+    head: {
+      align: "center",
+    },
+    sx: {
+      whiteSpace: "noWrap",
+    },
+  },
 
   {
     label: "Perbaharui Pada",
@@ -178,18 +198,36 @@ const columns = (
 
   {
     value: (value) => (
-      <BasicDropdown
-        type="icon"
-        menu={[
-          {
-            text: "Riwayat",
-            onClick: () => table.setQuery({ pboid: value.id }),
-            divider: true,
-          },
-          { text: "Hapus", onClick: onDelete(value.id) },
-        ]}
-        label={<MoreVert />}
-      />
+      <Badge
+        badgeContent={value.totalPending || 0}
+        color="error"
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        <BasicDropdown
+          type="icon"
+          size="small"
+          menu={[
+            {
+              text: `${
+                value.totalPending > 0 ? `(${value.totalPending})` : ""
+              } Menunggu Konfirmasi`,
+              onClick: navigate,
+              disabled: value.totalPending === 0,
+              divider: true,
+            },
+            {
+              text: "Riwayat",
+              onClick: onHistory(value),
+              divider: true,
+            },
+            { text: "Hapus", onClick: onDelete(value.id) },
+          ]}
+          label={<MoreVert fontSize="inherit" />}
+        />
+      </Badge>
     ),
     align: "center",
     padding: "checkbox",
@@ -197,14 +235,16 @@ const columns = (
 ];
 
 export default () => {
-  const { id } = useParams();
   const alert = useAlert();
+  const navigate = useNavigate();
+  const { id } = useParams();
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
     postLoading: [],
     currentId: 0,
     pboid: 0,
+    history: false,
   });
 
   const table = FRHooks.useTable([apiRoute.project.listBoqs, { id }], {
@@ -217,7 +257,8 @@ export default () => {
     disabledOnDidMount: true,
   });
 
-  const progres = FRHooks.useTable([apiRoute.project.listProgress, { id }], {
+  const progres = FRHooks.useFetch([apiRoute.project.listProgress, { id }], {
+    defaultValue: [],
     selector: (resp) => resp.data,
     total: (resp) => resp.data.meta.total,
   });
@@ -247,6 +288,11 @@ export default () => {
     boqs.refresh();
     mutation.clearData();
     mutation.clearError();
+  };
+
+  const onHistory = (value) => () => {
+    setTrigger((state) => ({ ...state, history: !state.history }));
+    progres.setQuery({ pboid: value.id });
   };
 
   const onUpdate = (value) => () => {
@@ -329,14 +375,16 @@ export default () => {
               column={columns(
                 onDelete,
                 onUpdate,
+                onHistory,
                 progres,
                 boq,
                 trigger.currentId,
                 apiRoute.project.boqValue,
                 trigger.postLoading,
-                enqueueSnackbar
+                enqueueSnackbar,
+                () => navigate(`/project/${id}/progres`)
               )}
-              selected={(v) => v.id === +progres.query("pboid")}
+              selected={(v) => v.id === +progres.getQuery("pboid")}
               order={table.order}
               orderBy={table.orderBy}
               onOrder={table.onOrder}
@@ -345,7 +393,7 @@ export default () => {
         </Grid>
 
         <Grid item xs={4}>
-          <Paper variant="outlined" sx={{ maxHeight: 480, overflow: "scroll" }}>
+          <Paper variant="outlined">
             <Stack
               direction="row"
               justifyContent="space-between"
@@ -368,22 +416,26 @@ export default () => {
               </Typography>
             ) : null}
 
-            <Timeline
-              data={progres.data}
-              value={(v, i) => {
-                return (
-                  <>
-                    <Typography variant="body2">{v.submitedName}</Typography>
-                    <Typography variant="body2">
-                      {v.progres} ({v.name})
-                    </Typography>
-                    <Typography variant="caption" fontStyle="italic">
-                      {moment(v.createdAt).format("DD-MM-yyyy HH:mm:ss")}
-                    </Typography>
-                  </>
-                );
-              }}
-            />
+            <Box sx={{ maxHeight: 480, overflow: "scroll" }}>
+              <Timeline
+                data={progres.data}
+                value={(v, i) => {
+                  return (
+                    <>
+                      <Typography variant="body2" fontWeight={600}>
+                        {v.submitedName}
+                      </Typography>
+                      <Typography variant="body2">
+                        {v.progres} {v.typeUnit} ({v.name})
+                      </Typography>
+                      <Typography variant="caption" fontStyle="italic">
+                        {moment(v.createdAt).format("DD-MM-yyyy HH:mm:ss")}
+                      </Typography>
+                    </>
+                  );
+                }}
+              />
+            </Box>
           </Paper>
         </Grid>
       </Grid>

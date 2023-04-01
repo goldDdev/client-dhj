@@ -39,7 +39,7 @@ const path = (id) => [
   },
   {
     label: "Activity",
-    link: `/project/${id}/activity`,
+    link: `/project/${id}/progres`,
     startIcon: <ListAlt />,
   },
 ];

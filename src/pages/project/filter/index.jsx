@@ -86,7 +86,7 @@ export const ButtonFilter = ({ table }) => {
         {Object.keys(utils.projectStatus).map((v) => (
           <Button
             key={v}
-            variant="outlined"
+            variant={table.query("status") === v ? "contained" : "outlined"}
             color={table.query("status") === v ? "primary" : "inherit"}
             onClick={() => {
               table.setQuery({ status: v });

@@ -200,7 +200,7 @@ export default () => {
                   secondary={`${mutation.data.duration} Hari | ${moment(
                     mutation.data.startAt
                   ).format("DD-MM-yyyy")} - ${moment(
-                    mutation.data.startAt
+                    mutation.data.finishAt
                   ).format("DD-MM-yyyy")}`}
                   primaryTypographyProps={{
                     variant: "subtitle1",

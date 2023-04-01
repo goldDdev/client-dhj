@@ -19,12 +19,16 @@ const router = createBrowserRouter([
       { path: "/project/:id/event", element: <Page.ProjectEvent /> },
       { path: "/project/:id/boq", element: <Page.ProjectBoq /> },
       { path: "/project/:id/overtime", element: <Page.ProjectOvertime /> },
+      { path: "/project/:id/progres", element: <Page.ProjectProgres /> },
       { path: "/tracking", element: <Page.MapTracking /> },
       { path: "/weekly", element: <Page.WeeklyList /> },
       { path: "/absent", element: <Page.AbsentList /> },
       { path: "/payrol", element: <Page.PayrolList /> },
       { path: "/settings", element: <Page.SettingGeneral /> },
       { path: "/settings/employee", element: <Page.EmployeeList /> },
+      { path: "/employee/:id/detail", element: <Page.EmployeeDetail
+      
+    /> },
       { path: "/settings/boq", element: <Page.BoqList /> },
       { path: "/settings/user", element: <Page.UserList /> },
     ],
