@@ -85,6 +85,9 @@ const columns = (table, t, utils, onUpdate, onDelete) => [
         whiteSpace: "nowrap",
       },
     },
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
   {
     label: "",
