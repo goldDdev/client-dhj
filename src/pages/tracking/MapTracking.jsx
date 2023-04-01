@@ -9,7 +9,8 @@ import * as utils from "@utils/";
 import apiRoute from "@services/apiRoute";
 import * as BASE from "@components/base";
 
-import 'leaflet/dist/leaflet.css';
+// import 'leaflet/dist/leaflet.css';
+import '../../assets/leaflet.scss';
 
 const columns = (table, t) => [
   {
@@ -126,8 +127,8 @@ const MapTracking = () => {
             {table.data.length > 0 ? (
               <Box>
                 <Box sx={{ height: '500px', width: '100%' }}>
-                  {/* table.meta.center */}
-                  <MapContainer center={[1.598333, 101.431827]} zoom={13} scrollWheelZoom={false} style={{ height: '500px', width: '100%' }}>
+                  {/* TODO  : center from table.meta.center */}
+                  <MapContainer center={[1.655743, 101.387603]} zoom={18} scrollWheelZoom={false} style={{ height: '500px', width: '100%' }}>
                     <TileLayer
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
