@@ -9,7 +9,6 @@ import {
   IconButton,
   Paper,
   Divider,
-  Chip,
   List,
   ListItem,
   ListItemText,
@@ -17,7 +16,6 @@ import {
 } from "@mui/material";
 import {
   Add,
-  Check,
   Close,
   ExpandMore,
   MoreVert,
@@ -32,8 +30,8 @@ import moment from "moment";
 import _ from "lodash";
 import * as Filter from "../filter";
 import apiRoute from "@services/apiRoute";
-import { boq } from "@constants/dummy";
-export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
+
+export const Create = ({ open, mutation, onOpen, onSubmit }) => {
   const duration =
     mutation.data.startAt && mutation.data.finishAt
       ? moment(mutation.data.finishAt).diff(mutation.data.startAt, "day")
@@ -227,20 +225,7 @@ export const Create = ({ open, mutation, snackbar, table, onOpen, route }) => {
               disableElevation
               variant="contained"
               color="primary"
-              onClick={() => {
-                mutation.post(route().project("index").link(), {
-                  method: mutation.isNewRecord ? "post" : "put",
-                  except: [].concat(mutation.isNewRecord ? ["id"] : []),
-                  validation: true,
-                  onSuccess: (resp) => {
-                    snackbar(`Proyek Berhasil Ditambahkan`);
-                    onOpen();
-                    if (table && mutation.isNewRecord) {
-                      table.data.unshift(resp.data);
-                    }
-                  },
-                });
-              }}
+              onClick={onSubmit}
             >
               {mutation.isNewRecord ? "Tambah Baru" : "Simpan Perubahan"}
             </LoadingButton>

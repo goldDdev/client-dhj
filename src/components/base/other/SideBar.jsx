@@ -31,12 +31,8 @@ const menu = [
   {
     canAccess: [],
     text: "Proyek",
-    link: "/projects",
+    link: "/projects/list",
     icon: icon.Add,
-    children: [
-      { canAccess: [], text: "Board", link: "/projects/board" },
-      { canAccess: [], text: "Daftar", link: "/projects/list" },
-    ],
   },
   {
     canAccess: [],

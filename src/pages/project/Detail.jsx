@@ -1,4 +1,17 @@
 import React from "react";
+import ProjectTemplate from "@components/templates/ProjectTemplate";
+import FRHooks from "frhooks";
+import * as FORM from "./form";
+import * as utils from "@utils/";
+import * as Dummy from "../../constants/dummy";
+import _ from "lodash";
+import moment from "moment";
+import apiRoute from "@services/apiRoute";
+import { useParams } from "react-router-dom";
+import { useSnackbar } from "notistack";
+import { SimpleList } from "@components/base/list";
+import { Edit, Close, MoreVert, PersonAddAlt } from "@mui/icons-material";
+import { BasicDropdown, IconButton } from "@components/base";
 import {
   Button,
   Grid,
@@ -10,25 +23,24 @@ import {
   CircularProgress,
   Divider,
   Typography,
-  useTheme,
 } from "@mui/material";
-import ProjectTemplate from "@components/templates/ProjectTemplate";
-import { Edit, Close, MoreVert, PersonAddAlt } from "@mui/icons-material";
-import { BasicDropdown } from "@components/base";
-import FRHooks from "frhooks";
-import * as FORM from "./form";
-import * as utils from "@utils/";
-import * as Dummy from "../../constants/dummy";
-import { useParams } from "react-router-dom";
-import { useSnackbar } from "notistack";
-import { SimpleList } from "@components/base/list";
-import _ from "lodash";
-import moment from "moment";
-import apiRoute from "@services/apiRoute";
 
 export default () => {
   const { id } = useParams();
   const { enqueueSnackbar } = useSnackbar();
+
+  const validation = FRHooks.useServerValidation({
+    url: apiRoute.project.validation,
+    param: {
+      path: "field",
+      type: "rule",
+    },
+    withErrorResponse: (resp) => resp.response.data.error.messages.errors,
+    option: {
+      unique: (param) => "Nomor SPK ini sudah ada",
+    },
+  });
+
   const mutation = FRHooks.useMutation({
     defaultValue: Dummy.project,
     isNewRecord: (data) => data.id === 0,
@@ -47,10 +59,12 @@ export default () => {
         duration: y.number().nullable(),
       }),
   });
+
   const [resources, setResources] = React.useState({
     members: [],
     parentId: null,
   });
+
   const [trigger, setTrigger] = React.useState({
     form: false,
     openWorker: false,
@@ -61,7 +75,7 @@ export default () => {
     selector: (resp) => resp.data,
     defaultValue: [],
     getData: (data) => {
-      if(data.length > 0){
+      if (data.length > 0) {
         setResources((state) => ({
           ...state,
           members: data[0].members,
@@ -158,6 +172,22 @@ export default () => {
     }
   };
 
+  const onSubmit = () => {
+    mutation.put(apiRoute.project.index, {
+      serverValidation: {
+        serve: validation.serve,
+        method: "post",
+      },
+      validation: true,
+      onSuccess: (resp) => {
+        onOpen();
+        enqueueSnackbar(`Proyek berhasil diperbaharui`, {
+          variant: "success",
+        });
+      },
+    });
+  };
+
   React.useEffect(() => {
     mutation.get([apiRoute.project.detail, { id }], {
       onSuccess: ({ data }) => {
@@ -170,22 +200,35 @@ export default () => {
     <ProjectTemplate
       container={"container"}
       title="Proyek"
-      headRight={{
-        children: (
-          <Button disableElevation startIcon={<Edit />} onClick={onOpen}>
-            Ubah
-          </Button>
-        ),
-      }}
+      subtitle={"Detail Proyek"}
     >
       <Grid container spacing={2} justifyContent="space-between">
         <Grid item xs={9}>
           <Paper elevation={0} variant="outlined">
             <List dense>
-              <ListItem divider>
+              <ListItem
+                divider
+                secondaryAction={
+                  <IconButton title="Ubah" onClick={onOpen}>
+                    <Edit />
+                  </IconButton>
+                }
+              >
                 <ListItemText
                   primary="Nama Proyek"
                   secondary={mutation.data.name}
+                  primaryTypographyProps={{
+                    variant: "subtitle1",
+                    fontWeight: 500,
+                  }}
+                  secondaryTypographyProps={{ variant: "body1" }}
+                />
+              </ListItem>
+
+              <ListItem divider>
+                <ListItemText
+                  primary="Nomor SPK"
+                  secondary={mutation.data.noSpk}
                   primaryTypographyProps={{
                     variant: "subtitle1",
                     fontWeight: 500,
@@ -407,9 +450,8 @@ export default () => {
       <FORM.Create
         open={trigger.form}
         mutation={mutation}
-        route={FRHooks.apiRoute}
-        snackbar={enqueueSnackbar}
         onOpen={onOpen}
+        onSubmit={onSubmit}
       />
 
       <FORM.WorkerCreate
