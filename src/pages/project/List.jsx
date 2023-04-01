@@ -1,10 +1,12 @@
 import React from "react";
-import { Button, Chip, Paper } from "@mui/material";
-import { IconButton, LinearProgress } from "@components/base";
+import { Button, Paper } from "@mui/material";
+import { LinearProgress, BasicDropdown } from "@components/base";
 import { useSnackbar } from "notistack";
+import { MoreVert } from "@mui/icons-material";
+import { useAlert } from "@contexts/AlertContext";
+import { Link } from "react-router-dom";
 
 import Add from "@mui/icons-material/Add";
-import Edit from "@mui/icons-material/Edit";
 import * as utils from "@utils/";
 import * as Filter from "./filter";
 import * as Dummy from "../../constants/dummy";
@@ -13,9 +15,9 @@ import DataTable from "../../components/base/table/DataTable";
 import MainTemplate from "@components/templates/MainTemplate";
 import * as FORM from "./form";
 import moment from "moment";
-import { Link } from "react-router-dom";
+import apiRoute from "@services/apiRoute";
 
-const columns = (table, onUpdate) => [
+const columns = (table, onUpdate, onDelete) => [
   {
     label: "No",
     value: (_, idx) => {
@@ -88,9 +90,15 @@ const columns = (table, onUpdate) => [
   {
     label: "",
     value: (value) => (
-      <IconButton title="Ubah" size="small" onClick={onUpdate(value.id)}>
-        <Edit fontSize="small" />
-      </IconButton>
+      <BasicDropdown
+        type="icon"
+        size="small"
+        label={<MoreVert fontSize="inherit" />}
+        menu={[
+          { text: "Ubah", onClick: onUpdate(value.id), divider: true },
+          { text: "Hapus", onClick: onDelete(value.id) },
+        ]}
+      />
     ),
     align: "center",
     head: {
@@ -102,12 +110,25 @@ const columns = (table, onUpdate) => [
 ];
 
 export default () => {
+  const alert = useAlert();
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().project("index").link(), {
+  const validation = FRHooks.useServerValidation({
+    url: apiRoute.project.validation,
+    param: {
+      path: "field",
+      type: "rule",
+    },
+    withErrorResponse: (resp) => resp.response.data.error.messages.errors,
+    option: {
+      unique: (param) => "Nomor SPK ini sudah ada",
+    },
+  });
+
+  const table = FRHooks.useTable(apiRoute.project.index, {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
@@ -137,13 +158,69 @@ export default () => {
     mutation.clearError();
   };
 
-  const onUpdate = (id) => async () => {
-    mutation.get(FRHooks.apiRoute().project("detail", { id }).link(), {
+  const onUpdate = (id) => () => {
+    mutation.get([apiRoute.project.detail, { id }], {
       onBeforeSend: () => {
         onOpen();
       },
       onSuccess: (resp) => {
         mutation.setData(resp.data);
+      },
+    });
+  };
+
+  const onSubmit = () => {
+    mutation.post(apiRoute.project.index, {
+      serverValidation: {
+        serve: validation.serve,
+        method: "post",
+      },
+      validation: true,
+      except: mutation.isNewRecord ? ["id"] : [],
+      method: mutation.isNewRecord ? "post" : "put",
+      onSuccess: ({ data }) => {
+        enqueueSnackbar(`Proyek Berhasil disimpan`, {
+          variant: "success",
+        });
+        if (mutation.isNewRecord) {
+          table.add(data, "start");
+        } else {
+          table.update((c) => c.id === data.id, data);
+        }
+        onOpen();
+      },
+    });
+  };
+
+  const onDelete = (id) => () => {
+    alert.set({
+      open: true,
+      title: "Mohon Perhatian",
+      message: "Anda akan menghapus proyek ini dari daftar, apakah anda yakin?",
+      type: "warning",
+      loading: false,
+      close: {
+        text: "Keluar",
+      },
+      confirm: {
+        text: "Ya, Saya Mengerti",
+        onClick: () => {
+          mutation.destroy([apiRoute.project.detail, { id }], {
+            onBeforeSend: () => {
+              alert.set({ loading: true });
+            },
+            onSuccess: () => {
+              enqueueSnackbar("Proyek berhasil dihapus dari daftar", {
+                variant: "success",
+              });
+              table.destroy((v) => v.id === id);
+              alert.reset();
+            },
+            onAlways: () => {
+              alert.set({ loading: false });
+            },
+          });
+        },
       },
     });
   };
@@ -166,7 +243,7 @@ export default () => {
         <DataTable
           data={table.data}
           loading={table.loading}
-          column={columns(table, onUpdate)}
+          column={columns(table, onUpdate, onDelete)}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
@@ -174,10 +251,8 @@ export default () => {
       <FORM.Create
         open={trigger.form}
         mutation={mutation}
-        route={FRHooks.apiRoute}
-        snackbar={enqueueSnackbar}
-        table={table}
         onOpen={onOpen}
+        onSubmit={onSubmit}
       />
     </MainTemplate>
   );

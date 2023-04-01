@@ -3,9 +3,6 @@ import FRHooks from "frhooks";
 import {
   ListItemText,
   Paper,
-  Autocomplete,
-  TextField,
-  CircularProgress,
   Typography,
   Chip,
   Stack,
@@ -22,7 +19,7 @@ import * as BASE from "@components/base";
 import * as FORM from "./form";
 import apiRoute from "@services/apiRoute";
 import DataTable from "../../components/base/table/DataTable";
-import { MoreVert, Refresh, Square } from "@mui/icons-material";
+import { Refresh, Square } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { useAlert } from "@contexts/AlertContext";
@@ -339,7 +336,7 @@ export default () => {
               Konfirmasi
             </ListItemButton>
           )}
-          <ListItemButton onClick={onDelete}>Hapus</ListItemButton>
+          {/* <ListItemButton onClick={onDelete}>Hapus</ListItemButton> */}
         </List>
       </Popper>
 

@@ -308,7 +308,7 @@ export default () => {
     });
   };
 
-  const onDelete = (id) => async () => {
+  const onDelete = (id) => () => {
     alert.set({
       open: true,
       title: "Mohon Perhatian",

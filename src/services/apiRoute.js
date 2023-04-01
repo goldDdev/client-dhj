@@ -1,9 +1,10 @@
 const apiRoute = {
   employee: {
     index: "/employee",
-    detail: "/employee/:id/detail",
+    detail: "/employee/:id",
     project: "/employee/:id/project",
     absent: "/employee/:id/absent",
+    validation: "/employee/validation",
   },
   boq: {
     index: "/boq",
@@ -29,7 +30,8 @@ const apiRoute = {
   },
   project: {
     index: "/project",
-    detail: "/project/:id/detail",
+    validation: "/project/validation",
+    detail: "/project/:id",
     worker: "/project/worker",
     listWorkers: "/project/:id/worker",
     listAbsents: "/project/:id/absent",
