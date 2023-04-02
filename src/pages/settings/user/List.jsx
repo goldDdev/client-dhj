@@ -55,7 +55,7 @@ const columns = (table, t, utils, onUpdate) => [
     head: {
       align: "center",
       sx: {
-        width: "10%",
+        width: "15%",
       },
     },
   },

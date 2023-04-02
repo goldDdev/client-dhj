@@ -26,11 +26,12 @@ const router = createBrowserRouter([
       { path: "/payrol", element: <Page.PayrolList /> },
       { path: "/settings", element: <Page.SettingGeneral /> },
       { path: "/settings/employee", element: <Page.EmployeeList /> },
-      { path: "/employee/:id/detail", element: <Page.EmployeeDetail
-      
-    /> },
+      { path: "/employee/:id/detail", element: <Page.EmployeeDetail /> },
       { path: "/settings/boq", element: <Page.BoqList /> },
       { path: "/settings/user", element: <Page.UserList /> },
+      { path: "/inventory/master", element: <Page.MasterInventoryList /> },
+      { path: "/inventory/using", element: <Page.UsingInventoryList /> },
+      { path: "/inventory/report", element: <Page.ReportInventoryList /> },
     ],
   },
 ]);

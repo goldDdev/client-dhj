@@ -51,7 +51,7 @@ const MapTracking = () => {
     disabledOnDidMount: false,
     selector: (resp) => resp.data,
     getData: (resp) => {
-      console.log(resp.length);
+      console.log('resp>',resp.length);
     }
   });
 
@@ -130,8 +130,7 @@ const MapTracking = () => {
             {tracks.data.length > 0 ? (
               <Box>
                 <Box sx={{ height: '500px', width: '100%' }}>
-                  {/* TODO : center from table.meta.center */}
-                  <MapContainer center={[1.655743, 101.387603]} zoom={15} scrollWheelZoom={false} style={{ height: '500px', width: '100%' }}>
+                  <MapContainer center={[tracks.data[0].project_latitude, tracks.data[0].project_longitude]} zoom={15} scrollWheelZoom={false} style={{ height: '500px', width: '100%' }}>
                     <TileLayer
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -139,7 +138,7 @@ const MapTracking = () => {
                     {tracks.data.map((track, i) => (
                       <Marker key={i} position={[track.latitude, track.longitude]}>
                         <Popup>
-                          Budi Subandi (Mandor)
+                          {track.name} {t(track.role)}
                         </Popup>
                       </Marker>
                     ))}
@@ -148,7 +147,6 @@ const MapTracking = () => {
 
                 <Box sx={{ mt: 2 }}>
                   <Typography sx={{ ml: 2 }}>Daftar Karyawan : {tracks.query.project}</Typography>
-                  {/* TODO : show list employee with project assign in prgress for now */}
                   <DataTable
                     data={tracks.data}
                     loading={tracks.loading}

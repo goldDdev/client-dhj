@@ -16,6 +16,8 @@
     "QC": "Quality Control",
     "SUP": "Superintendent Coordinator",
     "SPV": "Supervisor",
+    "OWNER": "Owner",
+    "ADMIN": "Admin",
     "MANDOR": "Mandor",
     "STAFF": "Staff",
     "WORKER": "Pekerja",
