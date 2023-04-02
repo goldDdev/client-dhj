@@ -58,3 +58,13 @@ export const projectBoq = {
   boqId: 0,
   projectId: 0
 };
+
+export const inventory = {
+  id: 0,
+  name: '',
+  unit: '',
+  qty: 0,
+  minQty: 0,
+  type: 'MATERIAL',
+  projectId: 0
+};

@@ -14,6 +14,10 @@ import * as BASE from "@components/base";
 
 const columns = (table, t) => [
   {
+    label: 'Tangal',
+    value: (value) => '',
+  },
+  {
     label: t("name"),
     value: (value) => value.name,
   },
@@ -40,6 +44,14 @@ const columns = (table, t) => [
         whiteSpace: "nowrap",
       },
     },
+  },
+  {
+    label: 'Project',
+    value: (value) => '',
+  },
+  {
+    label: 'Oleh',
+    value: (value) => '',
   },
 ]
 

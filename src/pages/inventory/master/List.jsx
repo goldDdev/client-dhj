@@ -7,7 +7,7 @@ import moment from "moment";
 import MainTemplate from "@components/templates/MainTemplate";
 import * as utils from "@utils/";
 // import * as Filter from "./filter";
-// import * as FORM from "./Form";
+import * as FORM from "./Form";
 import * as Dummy from "../../../constants/dummy";
 import DataTable from "../../../components/base/table/DataTable";
 import * as BASE from "@components/base";
@@ -50,17 +50,20 @@ export default () => {
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().user("index").link(), {
+  const table = FRHooks.useTable(FRHooks.apiRoute().inventory("index").link(), {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
 
   const mutation = FRHooks.useMutation({
-    defaultValue: Dummy.user,
+    defaultValue: Dummy.inventory,
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
-        email: y.string().required().min(3),
+        name: y.string().required(),
+        unit: y.string().required(),
+        qty: y.number().required().min(0),
+        minQty: y.number().required().min(0),
       }),
   });
 
@@ -71,7 +74,7 @@ export default () => {
   };
 
   const onUpdate = (id) => async () => {
-    mutation.get(FRHooks.apiRoute().user("detail", { id }).link(), {
+    mutation.get(FRHooks.apiRoute().inventory("detail", { id }).link(), {
       onBeforeSend: () => {
         onOpen();
       },
@@ -87,7 +90,7 @@ export default () => {
       subtitle={`Daftar semua master data Material & Equipment`}
       headRight={{
         children: (
-          <Button startIcon={<Add />} onClick={console.log()}>
+          <Button startIcon={<Add />} onClick={onOpen}>
             Tambah Data Inventori
           </Button>
         ),
@@ -131,6 +134,16 @@ export default () => {
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
+
+      <FORM.InventoryForm
+        open={trigger.form}
+        t={t}
+        r={r}
+        mutation={mutation}
+        snackbar={enqueueSnackbar}
+        table={table}
+        onOpen={onOpen}
+      />
     </MainTemplate>
   );
 };
