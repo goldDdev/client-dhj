@@ -84,8 +84,8 @@ export default () => {
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
-        name: y.string().required().min(3),
-        typeUnit: y.string().required().min(3),
+        name: y.string().required(),
+        typeUnit: y.string().required(),
       }),
   });
 

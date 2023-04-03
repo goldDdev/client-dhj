@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FRHooks from "frhooks";
 import { Box, Chip, Paper, Stack, Button } from "@mui/material";
 import { Add, ListAlt, Close } from "@mui/icons-material";
@@ -19,24 +19,24 @@ const columns = (table, t) => [
   },
   {
     label: "Satuan",
-    value: (value) => "-",
+    value: (value) => value.unit,
     align: "center",
     head: {
       align: "center",
       sx: {
-        width: "10%",
+        width: "20%",
         whiteSpace: "nowrap",
       },
     },
   },
   {
     label: "Jumlah",
-    value: (value) => "-",
+    value: (value) => value.qty,
     align: "center",
     head: {
       align: "center",
       sx: {
-        width: "10%",
+        width: "20%",
         whiteSpace: "nowrap",
       },
     },
@@ -53,6 +53,9 @@ export default () => {
   const table = FRHooks.useTable(FRHooks.apiRoute().inventory("index").link(), {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
+    config: {
+      // params: { type: 'MATERIAL' }
+    }
   });
 
   const mutation = FRHooks.useMutation({
@@ -83,6 +86,11 @@ export default () => {
       },
     });
   };
+
+  useEffect(() => {
+    if (table.query('type')) return;
+    table.setQuery('type', 'MATERIAL');
+  }, [table.query])
 
   return (
     <MainTemplate
@@ -128,7 +136,7 @@ export default () => {
 
       <Paper elevation={0} variant="outlined">
         <DataTable
-          data={[]}
+          data={table.data}
           loading={table.loading}
           column={columns(table, t)}
           pagination={utils.pagination(table.pagination)}
