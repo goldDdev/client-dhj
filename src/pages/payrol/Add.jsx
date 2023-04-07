@@ -74,13 +74,23 @@ export default () => {
   const mutation = FRHooks.useMutation({
     defaultValue: {
       items: [],
+      month: 0,
+      year: 0,
     },
     isNewRecord: (data) => data.id === 0,
   });
 
   const onSelectEmployee = (value) => async (e, checked) => {};
 
-  console.log(mutation.data.items);
+  const onSubmit = () => {
+    mutation.post(apiRoute.payrol.addMulti, {
+      validation: false,
+      onBeforeSend: () => {
+        mutation.merge(form);
+      },
+      onSuccess: ({ data }) => {},
+    });
+  };
 
   return (
     <SettingTemplate
@@ -176,6 +186,27 @@ export default () => {
             </Stack>
           </ListForm>
 
+          {mutation.data.items.length > 0 ? (
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={2}
+            >
+              <div>
+                <Typography gutterBottom>
+                  Dipilih ({mutation.data.items.length})
+                </Typography>
+              </div>
+
+              <div>
+                <Button title="Bayar" onClick={onSubmit}>
+                  Bayar
+                </Button>
+              </div>
+            </Stack>
+          ) : null}
+
           {payrols.data.map((value, i) => (
             <Paper key={i} sx={{ mb: 1 }} variant="outlined">
               <Table size="small">
@@ -194,7 +225,9 @@ export default () => {
                                   ? mutation.data.items.filter(
                                       (v) => v.id !== value.id
                                     )
-                                  : mutation.data.items.concat([value.id]),
+                                  : mutation.data.items.concat([
+                                      { id: value.id },
+                                    ]),
                               });
                             }}
                           />

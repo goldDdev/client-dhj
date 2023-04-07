@@ -1,6 +1,6 @@
 import React from "react";
 import FRHooks from "frhooks";
-import { Box, Chip, Paper } from "@mui/material";
+import { Box, Button, Chip, Paper } from "@mui/material";
 import { useSnackbar } from "notistack";
 import MainTemplate from "@components/templates/MainTemplate";
 import * as utils from "@utils/";
@@ -9,6 +9,8 @@ import * as utils from "@utils/";
 import * as Dummy from "../../constants/dummy";
 import DataTable from "../../components/base/table/DataTable";
 import * as BASE from "@components/base";
+import { Add } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const columns = (table, t) => [
   {
@@ -64,6 +66,7 @@ const columns = (table, t) => [
 
 export default () => {
   const { t, r } = FRHooks.useLang();
+  const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
@@ -104,6 +107,13 @@ export default () => {
     <MainTemplate
       title="Penggajian"
       subtitle={`Daftar semua data penggajian karyawan`}
+      headRight={{
+        children: (
+          <Button disableElevation startIcon={<Add />} onClick={() => navigate('/payrol/add')}>
+            Tambah Penggajian
+          </Button>
+        ),
+      }}
     >
       {/* <Filter.TableFilter t={t} table={table} /> */}
       <Box display="flex" gap={2} sx={{ mb: 2 }}>
