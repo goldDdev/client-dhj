@@ -3,12 +3,10 @@ import FRHooks from "frhooks";
 import moment from "moment";
 import { useSnackbar } from "notistack";
 import { Autocomplete, Stack, Paper, Box, Typography, TextField, CircularProgress } from "@mui/material";
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import MainTemplate from "@components/templates/MainTemplate";
 import DataTable from "../../components/base/table/DataTable";
-import * as utils from "@utils/";
 import apiRoute from "@services/apiRoute";
-import * as BASE from "@components/base";
 
 // import 'leaflet/dist/leaflet.css';
 import '../../assets/leaflet.scss';

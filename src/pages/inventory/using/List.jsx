@@ -1,24 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FRHooks from "frhooks";
-import { Box, Chip, Paper, Stack, Button } from "@mui/material";
-import { People, ListAlt, Close } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import moment from "moment";
+import { Paper, Stack, Button } from "@mui/material";
+import { Add, ListAlt } from "@mui/icons-material";
 import MainTemplate from "@components/templates/MainTemplate";
 import * as utils from "@utils/";
-// import * as Filter from "./filter";
-// import * as FORM from "./Form";
+import * as FORM from "./Form";
 import * as Dummy from "../../../constants/dummy";
 import DataTable from "../../../components/base/table/DataTable";
-import * as BASE from "@components/base";
 
-const columns = (table, t) => [
+const columns = () => [
   {
     label: 'Tangal',
     value: (value) => '',
   },
   {
-    label: t("name"),
+    label: "Nama",
     value: (value) => value.name,
   },
   {
@@ -65,6 +62,7 @@ export default () => {
   const table = FRHooks.useTable(FRHooks.apiRoute().inventory("index").link(), {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
+    disabledOnDidMount: true
   });
 
   const mutation = FRHooks.useMutation({
@@ -80,6 +78,7 @@ export default () => {
     setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
+    mutation.setData({ type: table.query("type") })
   };
 
   const onUpdate = (id) => async () => {
@@ -93,10 +92,21 @@ export default () => {
     });
   };
 
+  useEffect(() => {
+    // table.setQuery({ type: 'MATERIAL' });
+  }, [])
+
   return (
     <MainTemplate
       title="Penggunaan Inventori"
       subtitle={`Daftar penggunaan inventori dalam proyek`}
+      headRight={{
+        children: (
+          <Button startIcon={<Add />} onClick={onOpen}>
+            Tambah Penggunaan Inventori
+          </Button>
+        ),
+      }}
     >
       <Stack
         direction="row"
@@ -104,6 +114,17 @@ export default () => {
         spacing={1}
         alignItems="center"
       >
+        <div>
+          <Button
+            disableElevation
+            variant={!table.query("type") ? "contained" : "outlined"}
+            color={!table.query("type") ? "primary" : "inherit"}
+            startIcon={<ListAlt />}
+            onClick={() => table.setQuery({ type: '' })}
+          >
+            Semua Inventori
+          </Button>
+        </div>
         <div>
           <Button
             disableElevation
@@ -132,10 +153,20 @@ export default () => {
         <DataTable
           data={[]}
           loading={table.loading}
-          column={columns(table, t)}
+          column={columns()}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
+
+      <FORM.InventoryForm
+        open={trigger.form}
+        t={t}
+        r={r}
+        mutation={mutation}
+        snackbar={enqueueSnackbar}
+        table={table}
+        onOpen={onOpen}
+      />
     </MainTemplate>
   );
 };
