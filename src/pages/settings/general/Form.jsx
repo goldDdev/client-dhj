@@ -172,9 +172,7 @@ export default () => {
           onClick={() => {
             mutation.put(FRHooks.apiRoute().setting("index").link(), {
               onSuccess: ({ data }) => {
-                enqueueSnackbar("Perubahan behasil diperbaharui.", {
-                  variant: "success",
-                });
+                enqueueSnackbar("Perubahan behasil diperbaharui.");
                 mutation.setData(
                   data.reduce((p, n) => ({ ...p, [n.code]: n.value }), {})
                 );

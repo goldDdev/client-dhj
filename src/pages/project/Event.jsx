@@ -230,9 +230,7 @@ export default () => {
                 alert.set({ loading: true });
               },
               onSuccess: () => {
-                enqueueSnackbar("Agend berhasil dihapus dari daftar", {
-                  variant: "success",
-                });
+                enqueueSnackbar("Agend berhasil dihapus dari daftar");
                 table.destroy((v) => v.id === id);
                 alert.reset();
               },

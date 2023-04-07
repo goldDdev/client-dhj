@@ -404,6 +404,7 @@ export default () => {
               </Typography>
 
               <Button
+              disabled={resources.parentId === null}
                 variant="text"
                 startIcon={trigger.openWorker ? <Close /> : <PersonAddAlt />}
                 disableElevation

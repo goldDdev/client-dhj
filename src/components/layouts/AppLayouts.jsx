@@ -72,6 +72,7 @@ const App = () => {
                   : theme.palette.grey[900],
               flexGrow: 1,
               minHeight: "100vh",
+              height: "100vh",
               overflow: "auto",
               display: "flex",
               flexDirection: "column",

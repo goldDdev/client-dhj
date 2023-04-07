@@ -150,9 +150,7 @@ export default () => {
               progres.data[index]["data"] = progres.data[index]["data"].filter(
                 (v) => v.id !== currentProgres.id
               );
-              enqueueSnackbar("Progres berhasil dihapus dari daftar", {
-                variant: "success",
-              });
+              enqueueSnackbar("Progres berhasil dihapus dari daftar");
               alert.reset();
               setAnchorEl(undefined);
               setCurrentProgres({});
@@ -198,9 +196,7 @@ export default () => {
 
             progres.data[index]["data"][idxData]["aproveName"] = "APPROVE";
             alert.reset();
-            enqueueSnackbar("Progres berhasil dikonfirmasi", {
-              variant: "success",
-            });
+            enqueueSnackbar("Progres berhasil dikonfirmasi");
             setCurrentProgres({});
             setAnchorEl(undefined);
           } catch (err) {
@@ -375,9 +371,7 @@ export default () => {
                   currentProgres.progres;
                 progres.data[index]["data"][idxData]["submitedProgres"] =
                   currentProgres.progres;
-                enqueueSnackbar("Progres berhasil diperbaharui", {
-                  variant: "success",
-                });
+                enqueueSnackbar("Progres berhasil diperbaharui");
                 setTrigger((state) => ({ ...state, open: false }));
               }
             }

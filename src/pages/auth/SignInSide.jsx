@@ -54,10 +54,7 @@ export default () => {
   React.useEffect(() => {
     if (!localStorage.getItem("token")) return;
 
-    enqueueSnackbar("Kamu Sudah Login Loh", {
-      variant: "success",
-    });
-
+    enqueueSnackbar("Kamu Sudah Login Loh");
     timer = setTimeout(() => {
       navigate("/");
       clearTimeout(timer);

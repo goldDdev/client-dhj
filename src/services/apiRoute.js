@@ -1,8 +1,10 @@
 const apiRoute = {
   employee: {
     index: "/employee",
+    all: "/employee/all",
     detail: "/employee/:id",
     project: "/employee/:id/project",
+    optional: "/employee/optional",
     absent: "/employee/:id/absent",
     validation: "/employee/validation",
   },
@@ -27,6 +29,10 @@ const apiRoute = {
     confirm: "/progres/confirm",
     index: "/progres",
     detail: "/progres/:id",
+  },
+  payrol: {
+    employee: "/payrol/:id/employee",
+    employeeAll: "/payrol/employee/all",
   },
   project: {
     index: "/project",

@@ -12,7 +12,10 @@ import ProjectProgres from "./project/Progres";
 import EmployeeList from "./employee/List";
 import EmployeeDetail from "./employee/Detail";
 import AbsentList from "./absent/List";
+
 import PayrolList from "./payrol/List";
+import PayrolAdd from "./payrol/Add";
+
 import WeeklyList from "./weekly/List";
 
 import SettingGeneral from "./settings/general/Form";
@@ -36,6 +39,7 @@ export {
   UserList,
   AbsentList,
   PayrolList,
+  PayrolAdd,
   WeeklyList,
   MapTracking,
   SettingGeneral,

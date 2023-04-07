@@ -24,11 +24,10 @@ const router = createBrowserRouter([
       { path: "/weekly", element: <Page.WeeklyList /> },
       { path: "/absent", element: <Page.AbsentList /> },
       { path: "/payrol", element: <Page.PayrolList /> },
+      { path: "/payrol/add", element: <Page.PayrolAdd /> },
       { path: "/settings", element: <Page.SettingGeneral /> },
       { path: "/settings/employee", element: <Page.EmployeeList /> },
-      { path: "/employee/:id/detail", element: <Page.EmployeeDetail
-      
-    /> },
+      { path: "/employee/:id/detail", element: <Page.EmployeeDetail /> },
       { path: "/settings/boq", element: <Page.BoqList /> },
       { path: "/settings/user", element: <Page.UserList /> },
     ],

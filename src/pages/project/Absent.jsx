@@ -194,10 +194,10 @@ export default () => {
             <Stack direction="row" spacing={1}>
               <Select
                 name="month"
-                value={absents.getQuery("month", moment().month())}
-                menu={utils.monthID.map((v, i) => ({ text: v, value: i }))}
+                value={absents.getQuery("month", moment().month() + 1)}
+                menu={utils.monthID.map((v, i) => ({ text: v, value: i + 1 }))}
                 onChange={(e) =>
-                  absents.setQuery({ month: +e.target.value + 1 })
+                  absents.setQuery({ month: +e.target.value })
                 }
               />
               <TextField
@@ -207,7 +207,7 @@ export default () => {
             </Stack>
 
             <Typography>{`${utils.getMonth(
-              absents.getQuery("month", moment().month())
+              absents.getQuery("month") ? absents.getQuery('month') - 1 : moment().month()
             )} - ${absents.getQuery("year", moment().year())}`}</Typography>
           </Stack>
         </Grid>

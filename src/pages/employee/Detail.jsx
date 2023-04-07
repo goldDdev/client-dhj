@@ -12,6 +12,7 @@ import {
   Divider,
   Tabs,
   Tab,
+  TextField,
 } from "@mui/material";
 import { IconButton, Button } from "@components/base";
 import { useSnackbar } from "notistack";
@@ -27,6 +28,7 @@ import DataTable from "../../components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
 import { useParams } from "react-router-dom";
 import { TabContext, TabPanel } from "@mui/lab";
+import { Check, Close } from "@mui/icons-material";
 
 const ListItem = styled(MuiListItem)(({ theme }) => ({
   paddingTop: 0,
@@ -38,8 +40,10 @@ export default () => {
   const location = useLocation();
   const { enqueueSnackbar } = useSnackbar();
   const [value, setValue] = React.useState("project");
+  const [employee, setEmployee] = React.useState(Dummy.employee);
   const [trigger, setTrigger] = React.useState({
     form: false,
+    editSalary: false,
   });
   const projects = FRHooks.useTable([apiRoute.employee.project, { id }], {
     selector: (resp) => resp.data,
@@ -81,6 +85,7 @@ export default () => {
     mutation.get([apiRoute.employee.detail, { id }], {
       onSuccess: ({ data }) => {
         mutation.setData(data);
+        setEmployee(data);
       },
     });
   }, [id]);
@@ -90,8 +95,6 @@ export default () => {
     if (location.hash === "#absents") absents.reload();
     setValue(location.hash.replace("#", ""));
   }, [location]);
-
-  console.log(location);
 
   return (
     <SettingTemplate title={"Karyawan"} subtitle={"Detail Karyawam"}>
@@ -104,34 +107,34 @@ export default () => {
             <Divider />
             <List dense>
               <ListItem>
-                <ListItemText primary={"Nama"} secondary={mutation.data.name} />
+                <ListItemText primary={"Nama"} secondary={employee.name} />
               </ListItem>
 
               <ListItem>
                 <ListItemText
                   primary={"Role"}
-                  secondary={utils.typesLabel(mutation.data.role)}
+                  secondary={utils.typesLabel(employee.role)}
                 />
               </ListItem>
 
               <ListItem>
                 <ListItemText
                   primary={"Karyawan ID"}
-                  secondary={mutation.data.cardID}
+                  secondary={employee.cardID}
                 />
               </ListItem>
 
               <ListItem>
                 <ListItemText
                   primary={"No HP"}
-                  secondary={mutation.data.phoneNumber}
+                  secondary={employee.phoneNumber}
                 />
               </ListItem>
 
               <ListItem>
                 <ListItemText
                   primary={"Email"}
-                  secondary={mutation.data.email || "-"}
+                  secondary={employee.email || "-"}
                 />
               </ListItem>
             </List>
@@ -143,17 +146,77 @@ export default () => {
             </Typography>
             <Divider />
             <List dense>
-              <ListItem>
-                <ListItemText
-                  primary={"Gaji Pokok"}
-                  secondary={utils.formatCurrency(mutation.data.salary)}
-                />
+              <ListItem
+                secondaryAction={
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      {
+                        trigger.editSalary
+                          ? mutation.put(apiRoute.employee.optional, {
+                              only: ["id", "salary"],
+                              onSuccess: ({ data }) => {
+                                enqueueSnackbar("Gaji berhasil diperbaharui");
+                                setEmployee((state) => ({
+                                  ...state,
+                                  salary: mutation.data.salary,
+                                }));
+                                setTrigger((state) => ({
+                                  ...state,
+                                  editSalary: false,
+                                }));
+                              },
+                            })
+                          : setTrigger((state) => ({
+                              ...state,
+                              editSalary: !state.editSalary,
+                            }));
+                      }
+                    }}
+                  >
+                    {trigger.editSalary ? (
+                      <Check fontSize="inherit" />
+                    ) : (
+                      <Edit fontSize="inherit" />
+                    )}
+                  </IconButton>
+                }
+              >
+                {trigger.editSalary ? (
+                  <TextField
+                    value={mutation.data.salary}
+                    onChange={(e) => {
+                      mutation.setData({ salary: +e.target.value });
+                    }}
+                    InputProps={{
+                      inputProps: { style: { textAlign: "right" } },
+                      startAdornment: (
+                        <IconButton
+                          onClick={() => {
+                            setTrigger((state) => ({
+                              ...state,
+                              editSalary: !state.editSalary,
+                            }));
+                          }}
+                          size="small"
+                        >
+                          <Close fontSize="inherit" />
+                        </IconButton>
+                      ),
+                    }}
+                  />
+                ) : (
+                  <ListItemText
+                    primary={"Gaji Pokok"}
+                    secondary={utils.formatCurrency(employee.salary)}
+                  />
+                )}
               </ListItem>
 
               <ListItem>
                 <ListItemText
                   primary={"Upah Perjam"}
-                  secondary={utils.formatCurrency(mutation.data.hourlyWages)}
+                  secondary={utils.formatCurrency(employee.hourlyWages)}
                 />
               </ListItem>
             </List>

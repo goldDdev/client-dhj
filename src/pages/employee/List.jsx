@@ -193,9 +193,7 @@ export default () => {
               alert.set({ loading: true });
             },
             onSuccess: () => {
-              enqueueSnackbar("Karyawan berhasil dihapus dari daftar", {
-                variant: "success",
-              });
+              enqueueSnackbar("Karyawan berhasil dihapus dari daftar");
               table.destroy((v) => v.id === id);
               alert.reset();
             },
@@ -218,9 +216,7 @@ export default () => {
         method: "post",
       },
       onSuccess: ({ data }) => {
-        enqueueSnackbar("Karyawan baru berhasil disimpan", {
-          variant: "success",
-        });
+        enqueueSnackbar("Karyawan baru berhasil disimpan");
         if (mutation.isNewRecord) {
           table.add(data, "start");
         } else {

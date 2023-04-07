@@ -12,12 +12,6 @@ export const ucword = (text) => {
   });
 };
 
-export const filesize = (size) => {
-  const i = Math.floor(Math.log(size) / Math.log(1024));
-  const result = (size / Math.pow(1024, i)).toFixed(2) * 1;
-  return result + " " + ["B", "kB", "MB", "GB", "TB"][i];
-};
-
 export const monthID = [
   "Januari",
   "Februari",
@@ -78,52 +72,6 @@ export const getDaysInWeekUTC = (month, year) => {
   }
 
   return days;
-};
-
-export const getVideoCover = (file) => {
-  return new Promise((resolve) => {
-    const canvas = document.createElement("canvas");
-    const video = document.createElement("video");
-
-    // this is important
-    video.autoplay = true;
-    video.muted = true;
-    video.src = file;
-
-    video.onloadeddata = () => {
-      let ctx = canvas.getContext("2d");
-
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-      video.pause();
-      return resolve(canvas.toDataURL("image/png"));
-    };
-  });
-};
-
-export const getVideoCoverFromArray = (array) => {
-  const data = [];
-
-  (async () => {
-    for (let i = 0; i < array.length; i++) {
-      const cover = await getVideoCover(array[i]);
-      data.push({ link: array[i], path: cover });
-    }
-  })();
-
-  return data;
-};
-
-export const textToImage = (text, { height, width }, { x, y }) => {
-  let canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  let ctx = canvas.getContext("2d");
-  ctx.fillText(text, x, y);
-
-  return canvas.toDataURL();
 };
 
 export const ccFormat = (value) => {
@@ -275,3 +223,13 @@ export const settingCode = {
   OVERTIME_PRICE_PER_MINUTE: "OVERTIME_PRICE_PER_MINUTE",
   LATETIME_PRICE_PER_MINUTE: "LATETIME_PRICE_PER_MINUTE",
 };
+
+export const toHoursAndMinutes = (totalMinutes) => {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${padToTwoDigits(hours)} Jam ${padToTwoDigits(minutes)} Menit`;
+};
+
+function padToTwoDigits(num) {
+  return num.toString().padStart(2, "0");
+}

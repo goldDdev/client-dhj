@@ -210,9 +210,7 @@ export default () => {
               alert.set({ loading: true });
             },
             onSuccess: () => {
-              enqueueSnackbar("Proyek berhasil dihapus dari daftar", {
-                variant: "success",
-              });
+              enqueueSnackbar("Proyek berhasil dihapus dari daftar");
               table.destroy((v) => v.id === id);
               alert.reset();
             },

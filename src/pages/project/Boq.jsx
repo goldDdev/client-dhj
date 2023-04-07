@@ -328,9 +328,7 @@ export default () => {
                 alert.set({ loading: true });
               },
               onSuccess: () => {
-                enqueueSnackbar("BOQ berhasil dihapus dari daftar", {
-                  variant: "success",
-                });
+                enqueueSnackbar("BOQ berhasil dihapus dari daftar");
                 table.destroy((v) => v.id === id);
                 alert.reset();
               },
@@ -367,7 +365,7 @@ export default () => {
       </Stack>
 
       <Grid container direction="row" spacing={1}>
-        <Grid item xs={8}>
+        <Grid item xs={9}>
           <Paper variant="outlined">
             <DataTable
               data={table.data}
@@ -392,7 +390,7 @@ export default () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <Paper variant="outlined">
             <Stack
               direction="row"
@@ -416,7 +414,7 @@ export default () => {
               </Typography>
             ) : null}
 
-            <Box sx={{ maxHeight: 480, overflow: "scroll" }}>
+            <Box sx={{ height: "480px", maxHeight: '420px', overflow: "scroll" }}>
               <Timeline
                 data={progres.data}
                 value={(v, i) => {
