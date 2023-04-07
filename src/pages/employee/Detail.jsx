@@ -80,7 +80,7 @@ export default () => {
   React.useEffect(() => {
     mutation.get([apiRoute.employee.detail, { id }], {
       onSuccess: ({ data }) => {
-        mutation.setData(data);
+        mutation.setData({ ...data, email: data.user.email });
       },
     });
   }, [id]);
