@@ -211,26 +211,26 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
               variant="contained"
               color="primary"
               onClick={() => {
-                const isNew = mutation.isNewRecord;
-                const editId = mutation.data.id;
-                const route = isNew ? FRHooks.apiRoute().inventory("index") : FRHooks.apiRoute().inventory("detail", { id: editId })
-                mutation.post(route.link(), {
-                  method: mutation.isNewRecord ? "post" : "put",
-                  except: mutation.isNewRecord ? ["id"] : [],
-                  validation: true,
-                  onSuccess: (resp) => {
-                    snackbar(t("commonSuccessCreate"));
-                    if (isNew) {
-                      table.data.unshift(resp.data);
-                    } else {
-                      const idx = table.data.findIndex(d => d.id === editId)
-                      table.data[idx] = resp.data;
-                    }
-                    mutation.clearData();
-                    mutation.clearError();
-                    onOpen();
-                  },
-                });
+                // const isNew = mutation.isNewRecord;
+                // const editId = mutation.data.id;
+                // const route = isNew ? FRHooks.apiRoute().inventory("index") : FRHooks.apiRoute().inventory("detail", { id: editId })
+                // mutation.post(route.link(), {
+                //   method: mutation.isNewRecord ? "post" : "put",
+                //   except: mutation.isNewRecord ? ["id"] : [],
+                //   validation: true,
+                //   onSuccess: (resp) => {
+                //     snackbar(t("commonSuccessCreate"));
+                //     if (isNew) {
+                //       table.data.unshift(resp.data);
+                //     } else {
+                //       const idx = table.data.findIndex(d => d.id === editId)
+                //       table.data[idx] = resp.data;
+                //     }
+                //     mutation.clearData();
+                //     mutation.clearError();
+                //     onOpen();
+                //   },
+                // });
               }}
             >
               {t("save")}
