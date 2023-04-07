@@ -50,7 +50,7 @@ export default () => {
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().user("index").link(), {
+  const table = FRHooks.useTable(FRHooks.apiRoute().inventory("index").link(), {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
@@ -71,7 +71,7 @@ export default () => {
   };
 
   const onUpdate = (id) => async () => {
-    mutation.get(FRHooks.apiRoute().user("detail", { id }).link(), {
+    mutation.get(FRHooks.apiRoute().inventory("detail", { id }).link(), {
       onBeforeSend: () => {
         onOpen();
       },
@@ -95,10 +95,10 @@ export default () => {
         <div>
           <Button
             disableElevation
-            variant={"contained"}
+            variant={table.query("type") == 'MATERIAL' ? "contained" : "outlined"}
+            color={table.query("type") == 'MATERIAL' ? "primary" : "inherit"}
             startIcon={<ListAlt />}
-            onClick={() => console.log('')}
-            color="inherit"
+            onClick={() => table.setQuery({ type: 'MATERIAL' })}
           >
             Material
           </Button>
@@ -106,10 +106,10 @@ export default () => {
         <div>
           <Button
             disableElevation
-            variant={"contained"}
+            variant={table.query("type") == 'EQUIPMENT' ? "contained" : "outlined"}
+            color={table.query("type") == 'EQUIPMENT' ? "primary" : "inherit"}
             startIcon={<ListAlt />}
-            onClick={() => console.log('')}
-            color="inherit"
+            onClick={() => table.setQuery({ type: 'EQUIPMENT' })}
           >
             Equipment
           </Button>

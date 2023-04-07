@@ -1,20 +1,20 @@
 import React, { useEffect } from "react";
 import FRHooks from "frhooks";
-import { Box, Chip, Paper, Stack, Button } from "@mui/material";
-import { Add, ListAlt, Close } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import moment from "moment";
+import { Paper, Stack } from "@mui/material";
+import { Add, ListAlt, MoreVert } from "@mui/icons-material";
 import MainTemplate from "@components/templates/MainTemplate";
 import * as utils from "@utils/";
-// import * as Filter from "./filter";
+import { useAlert } from "@contexts/AlertContext";
+import apiRoute from "@services/apiRoute";
+import { Button, BasicDropdown } from "@components/base";
 import * as FORM from "./Form";
 import * as Dummy from "../../../constants/dummy";
 import DataTable from "../../../components/base/table/DataTable";
-import * as BASE from "@components/base";
 
-const columns = (table, t) => [
+const columns = (onUpdate, onDelete) => [
   {
-    label: t("name"),
+    label: "Nama",
     value: (value) => value.name,
   },
   {
@@ -41,10 +41,30 @@ const columns = (table, t) => [
       },
     },
   },
+  {
+    label: "",
+    value: (value) => (
+      <BasicDropdown
+        type="icon"
+        size="small"
+        label={<MoreVert fontSize="inherit" />}
+        menu={[
+          { text: "Ubah", onClick: onUpdate(value.id), divider: true },
+          { text: "Hapus", onClick: onDelete(value.id) },
+        ]}
+      />
+    ),
+    align: "center",
+    head: {
+      align: "center",
+      padding: "checkbox",
+    },
+  },
 ]
 
 export default () => {
   const { t, r } = FRHooks.useLang();
+  const alert = useAlert();
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
@@ -53,9 +73,7 @@ export default () => {
   const table = FRHooks.useTable(FRHooks.apiRoute().inventory("index").link(), {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
-    config: {
-      // params: { type: 'MATERIAL' }
-    }
+    disabledOnDidMount: true,
   });
 
   const mutation = FRHooks.useMutation({
@@ -74,6 +92,7 @@ export default () => {
     setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
+    mutation.setData({ type: table.query("type") })
   };
 
   const onUpdate = (id) => async () => {
@@ -87,10 +106,43 @@ export default () => {
     });
   };
 
+  const onDelete = (id) => () => {
+    alert.set({
+      open: true,
+      title: "Mohon Perhatian",
+      message:
+        "Anda akan menghapus item ini dari daftar, apakah anda yakin?",
+      type: "warning",
+      loading: false,
+      close: {
+        text: "Keluar",
+      },
+      confirm: {
+        text: "Ya, Saya Mengerti",
+        onClick: () => {
+          mutation.destroy([apiRoute.inventory.detail, { id }], {
+            onBeforeSend: () => {
+              alert.set({ loading: true });
+            },
+            onSuccess: () => {
+              enqueueSnackbar("Item berhasil dihapus dari daftar", {
+                variant: "success",
+              });
+              table.destroy((v) => v.id === id);
+              alert.reset();
+            },
+            onAlways: () => {
+              alert.set({ loading: false });
+            },
+          });
+        },
+      },
+    });
+  };
+
   useEffect(() => {
-    if (table.query('type')) return;
-    table.setQuery('type', 'MATERIAL');
-  }, [table.query])
+    table.setQuery({ type: 'MATERIAL' });
+  }, [])
 
   return (
     <MainTemplate
@@ -113,10 +165,10 @@ export default () => {
         <div>
           <Button
             disableElevation
-            variant={"contained"}
+            variant={table.query("type") == 'MATERIAL' ? "contained" : "outlined"}
+            color={table.query("type") == 'MATERIAL' ? "primary" : "inherit"}
             startIcon={<ListAlt />}
-            onClick={() => console.log('')}
-            color="inherit"
+            onClick={() => table.setQuery({ type: 'MATERIAL' })}
           >
             Material
           </Button>
@@ -124,10 +176,10 @@ export default () => {
         <div>
           <Button
             disableElevation
-            variant={"contained"}
+            variant={table.query("type") == 'EQUIPMENT' ? "contained" : "outlined"}
+            color={table.query("type") == 'EQUIPMENT' ? "primary" : "inherit"}
             startIcon={<ListAlt />}
-            onClick={() => console.log('')}
-            color="inherit"
+            onClick={() => table.setQuery({ type: 'EQUIPMENT'})}
           >
             Equipment
           </Button>
@@ -138,7 +190,7 @@ export default () => {
         <DataTable
           data={table.data}
           loading={table.loading}
-          column={columns(table, t)}
+          column={columns(onUpdate, onDelete)}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
@@ -152,6 +204,6 @@ export default () => {
         table={table}
         onOpen={onOpen}
       />
-    </MainTemplate>
+    </MainTemplate >
   );
 };

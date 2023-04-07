@@ -10,22 +10,10 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
     <BASE.DialogForm
       open={open}
       onClose={onOpen}
-      title="Form Master Data Inventori"
+      title={`Form Master Data Inventori ${utils.ucword(mutation.data.type)}`}
       content={{
         children: (
           <Stack spacing={2}>
-
-            <BASE.Select
-              readonly
-              id="type"
-              label="Tipe"
-              name="type"
-              menu={[{ text: 'Material', value: 'MATERIAL' }, { text: 'Equipment', value: 'EQUIPMENT' }]}
-              value={mutation.data.type === "" ? "MATERIAL" : mutation.data.type}
-              setValue={mutation.setData}
-              error={mutation.error("type")}
-              helperText={mutation.message("type")}
-            />
 
             <Stack spacing={2} direction={{ xs: "column", sm: "row" }}>
               <TextField
