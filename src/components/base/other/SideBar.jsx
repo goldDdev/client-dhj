@@ -64,9 +64,9 @@ const menu = [
     link: "",
     icon: icon.Inventory,
     children: [
-      { canAccess: [], text: "Master Item", link: "/inventory" },
-      { canAccess: [], text: "Penggunaan", link: "/inventory" },
-      { canAccess: [], text: "Laporan", link: "/inventory" },
+      { canAccess: [], text: "Master Item", link: "/inventory/master" },
+      { canAccess: [], text: "Penggunaan", link: "/inventory/using" },
+      { canAccess: [], text: "Laporan", link: "/inventory/report" },
     ],
   },
   {

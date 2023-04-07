@@ -23,6 +23,10 @@ import BoqList from "./settings/boq/List";
 import UserList from "./settings/user/List";
 import MapTracking from "./tracking/MapTracking";
 
+import MasterInventoryList from "./inventory/master/List";
+import UsingInventoryList from "./inventory/using/List";
+import ReportInventoryList from "./inventory/report/List";
+
 export {
   SignInSide,
   ProjectBoard,
@@ -42,5 +46,8 @@ export {
   PayrolAdd,
   WeeklyList,
   MapTracking,
+  MasterInventoryList,
+  UsingInventoryList,
+  ReportInventoryList,
   SettingGeneral,
 };

@@ -62,6 +62,10 @@ const apiRoute = {
   setting: {
     index: "/setting",
   },
+  inventory: {
+    index: "/inventory",
+    detail: "/inventory/:id",
+  },
 };
 
 export default apiRoute;

@@ -83,6 +83,16 @@ export const ButtonFilter = ({ table }) => {
       alignItems="center"
     >
       <Stack direction="row" spacing={1}>
+        <Button
+          key={99}
+          variant={!table.query("status") ? "contained" : "outlined"}
+          color={!table.query("status") ? "primary" : "inherit"}
+          onClick={() => {
+            table.setQuery({ status: '' });
+          }}
+        >
+          Semua Status
+        </Button>
         {Object.keys(utils.projectStatus).map((v) => (
           <Button
             key={v}
