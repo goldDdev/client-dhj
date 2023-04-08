@@ -1,18 +1,18 @@
 import React from "react";
 import FRHooks from "frhooks";
-import { Box, Button, Chip, Paper } from "@mui/material";
+import { Box, Button, Paper } from "@mui/material";
 import { useSnackbar } from "notistack";
 import MainTemplate from "@components/templates/MainTemplate";
 import * as utils from "@utils/";
-// import * as Filter from "./filter";
-// import * as FORM from "./Form";
 import * as Dummy from "../../constants/dummy";
-import DataTable from "../../components/base/table/DataTable";
 import * as BASE from "@components/base";
-import { Add } from "@mui/icons-material";
+import { Add, MoreVert } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import apiRoute from "@services/apiRoute";
+import DataTable from "../../components/base/table/DataTable";
+import moment from "moment";
 
-const columns = (table, t) => [
+const columns = (table) => [
   {
     label: "No",
     value: (_, idx) => {
@@ -27,81 +27,74 @@ const columns = (table, t) => [
     size: "small",
   },
   {
-    label: t("name"),
+    label: "Nama",
     value: (value) => value.name,
   },
   {
-    label: t("role"),
-    value: (value) => t(value.role) || "-",
+    label: "Role",
+    value: (value) => utils.typesLabel(value.role),
     align: "center",
     head: {
       align: "center",
-      sx: {
-        width: "10%",
-      },
+    },
+  },
+
+  {
+    label: "Periode",
+    value: (value) => `${utils.getMonth(value.month - 1)}/${value.year}`,
+    align: "center",
+    head: {
+      align: "center",
+    },
+  },
+
+  {
+    label: "Total Gaji",
+    value: (value) => utils.formatCurrency(value.total),
+    head: {
+      align: "center",
+      padding: "checkbox",
     },
   },
   {
-    label: 'Potongan',
-    value: (value) => 'Rp.0',
-  },
-  {
-    label: 'Tunjangan',
-    value: (value) => 'Rp.0',
-  },
-  {
-    label: 'Total Gaji',
-    value: (value) => 'Rp.0',
-  },
-  {
-    label: "Aksi",
+    label: "",
     value: (value) => (
-      <IconButton title="Kalkulasi" size="small">
-        <Edit fontSize="small" />
-      </IconButton>
+      <BASE.BasicDropdown
+        type="icon"
+        size="small"
+        label={<MoreVert fontSize="inherit" />}
+        menu={[
+          { text: "Hapus" },
+          {
+            text: "Unduh",
+            onClick: () => {
+              var printWindow = window.open(
+                `/payrol/${value.id}`,
+                "print",
+                `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
+               width=0,height=0,left=-1000,top=-1000`
+              );
+            },
+          },
+        ]}
+      />
     ),
     align: "center",
+    head: {
+      noWrap: true,
+      align: "center",
+      padding: "checkbox",
+    },
   },
 ];
 
 export default () => {
-  const { t, r } = FRHooks.useLang();
-  const navigate = useNavigate()
-  const { enqueueSnackbar } = useSnackbar();
-  const [trigger, setTrigger] = React.useState({
-    form: false,
-  });
+  const navigate = useNavigate();
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().user("index").link(), {
+  const table = FRHooks.useTable(apiRoute.payrol.index, {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
-
-  const mutation = FRHooks.useMutation({
-    defaultValue: Dummy.user,
-    isNewRecord: (data) => data.id === 0,
-    schema: (y) =>
-      y.object().shape({
-        email: y.string().required().min(3),
-      }),
-  });
-
-  const onOpen = () => {
-    setTrigger((state) => ({ ...state, form: !state.form }));
-    mutation.clearData();
-    mutation.clearError();
-  };
-
-  const onUpdate = (id) => async () => {
-    mutation.get(FRHooks.apiRoute().user("detail", { id }).link(), {
-      onBeforeSend: () => {
-        onOpen();
-      },
-      onSuccess: (resp) => {
-        mutation.setData(resp.data);
-      },
-    });
-  };
 
   return (
     <MainTemplate
@@ -109,7 +102,11 @@ export default () => {
       subtitle={`Daftar semua data penggajian karyawan`}
       headRight={{
         children: (
-          <Button disableElevation startIcon={<Add />} onClick={() => navigate('/payrol/add')}>
+          <Button
+            disableElevation
+            startIcon={<Add />}
+            onClick={() => navigate("/payrol/add")}
+          >
             Tambah Penggajian
           </Button>
         ),
@@ -119,42 +116,46 @@ export default () => {
       <Box display="flex" gap={2} sx={{ mb: 2 }}>
         <BASE.Select
           label="Bulan"
-          value={3}
+          value={table.query("month", +moment().format("M"))}
           menu={[
-            { text: 'Januari', value: 1 },
-            { text: 'Februari', value: 2 },
-            { text: 'Maret', value: 3 },
-            { text: 'April', value: 4 },
-            { text: 'Mei', value: 5 },
-            { text: 'Juni', value: 6 },
-            { text: 'Juli', value: 7 },
-            { text: 'Agustus', value: 8 },
-            { text: 'September', value: 9 },
-            { text: 'Oktober', value: 10 },
-            { text: 'November', value: 11 },
-            { text: 'Desember', value: 12 },
+            { text: "Januari", value: 1 },
+            { text: "Februari", value: 2 },
+            { text: "Maret", value: 3 },
+            { text: "April", value: 4 },
+            { text: "Mei", value: 5 },
+            { text: "Juni", value: 6 },
+            { text: "Juli", value: 7 },
+            { text: "Agustus", value: 8 },
+            { text: "September", value: 9 },
+            { text: "Oktober", value: 10 },
+            { text: "November", value: 11 },
+            { text: "Desember", value: 12 },
           ]}
+          onChange={(e) => {
+            table.setQuery({ month: +e.target.value });
+          }}
         />
         <BASE.Select
           label="Tahun"
-          value={2023}
+          value={table.query("year", +moment().format("Y"))}
           menu={[
-            { text: '2022', value: 2022 },
-            { text: '2023', value: 2023 },
+            { text: "2022", value: 2022 },
+            { text: "2023", value: 2023 },
           ]}
+          onChange={(e) => {
+            table.setQuery({ year: +e.target.value });
+          }}
         />
       </Box>
 
       <Paper elevation={0} variant="outlined">
         <DataTable
-          data={[]}
+          data={table.data}
           loading={table.loading}
-          column={columns(table, t)}
+          column={columns(table)}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
-
-      {/* Modal to open calculation */}
     </MainTemplate>
   );
 };

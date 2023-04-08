@@ -15,6 +15,7 @@ import AbsentList from "./absent/List";
 
 import PayrolList from "./payrol/List";
 import PayrolAdd from "./payrol/Add";
+import PayrolHtmlPdf from "./payrol/HtmlPdf";
 
 import WeeklyList from "./weekly/List";
 
@@ -44,6 +45,7 @@ export {
   AbsentList,
   PayrolList,
   PayrolAdd,
+  PayrolHtmlPdf,
   WeeklyList,
   MapTracking,
   MasterInventoryList,

@@ -35,6 +35,8 @@ const router = createBrowserRouter([
       { path: "/inventory/report", element: <Page.ReportInventoryList /> },
     ],
   },
+
+  { path: "/payrol/:id", element: <Page.PayrolHtmlPdf /> },
 ]);
 
 export default router;

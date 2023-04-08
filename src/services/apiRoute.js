@@ -33,7 +33,9 @@ const apiRoute = {
   payrol: {
     employee: "/payrol/:id/employee",
     employeeAll: "/payrol/employee/all",
-    addMulti: "/payrol/multi"
+    addMulti: "/payrol/multi",
+    index: "/payrol",
+    detail: "/payrol/:id",
   },
   project: {
     index: "/project",
