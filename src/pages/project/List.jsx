@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Paper } from "@mui/material";
 import { LinearProgress, BasicDropdown } from "@components/base";
 import { useSnackbar } from "notistack";
-import { MoreVert } from "@mui/icons-material";
+import { MoreVert, Refresh } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
 import { Link } from "react-router-dom";
 
@@ -16,6 +16,7 @@ import MainTemplate from "@components/templates/MainTemplate";
 import * as FORM from "./form";
 import moment from "moment";
 import apiRoute from "@services/apiRoute";
+import { LoadingButton } from "@mui/lab";
 
 const columns = (table, onUpdate, onDelete) => [
   {
@@ -43,7 +44,7 @@ const columns = (table, onUpdate, onDelete) => [
     ),
   },
   {
-    label: "Perusahaan",
+    label: "Team",
     value: (value) => value.companyName,
     head: {
       noWrap: true,
@@ -51,11 +52,13 @@ const columns = (table, onUpdate, onDelete) => [
         width: "15%",
       },
     },
+    sx: { whiteSpace: "nowrap" },
   },
   {
     label: "Status",
     value: (value) => value.status,
     head: {
+      noWrap: true,
       sx: {
         width: "10%",
       },
@@ -140,13 +143,14 @@ export default () => {
       y.object().shape({
         name: y.string().required(),
         companyName: y.string().required(),
-        noSpk: y.string().nullable(),
+        noSpk: y.string().required(),
         contact: y.string().nullable(),
         location: y.string().nullable(),
         latitude: y.number().nullable(),
         longitude: y.number().nullable(),
         startAt: y.date().nullable(),
         finishAt: y.date().nullable(),
+        targetDate: y.date().nullable(),
         status: y.string().required(),
         duration: y.number().nullable(),
       }),
@@ -229,9 +233,20 @@ export default () => {
       subtitle="Manampilkan semua daftar proyek yang terbuat."
       headRight={{
         children: (
-          <Button disableElevation startIcon={<Add />} onClick={onOpen}>
-            Tambah Proyek
-          </Button>
+          <>
+            <Button disableElevation startIcon={<Add />} onClick={onOpen}>
+              Tambah Proyek
+            </Button>
+            <LoadingButton
+              loading={table.loading}
+              disabled={table.loading}
+              onClick={() => table.reload()}
+              color="primary"
+              startIcon={<Refresh />}
+            >
+              Muat Ulang
+            </LoadingButton>
+          </>
         ),
       }}
     >

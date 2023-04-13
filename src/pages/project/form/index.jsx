@@ -13,6 +13,10 @@ import {
   ListItem,
   ListItemText,
   Skeleton,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
 } from "@mui/material";
 import {
   Add,
@@ -199,13 +203,28 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
                 type="date"
                 value={mutation.data.finishAt || ""}
                 onChange={(e) => mutation.setData({ finishAt: e.target.value })}
+                inputProps={{ min: mutation.data.startAt }}
+              />
+
+              <TextField
+                disabled={mutation.loading || mutation.processing}
+                label="Tanggal Target"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                type="date"
+                value={mutation.data.targetDate || ""}
+                inputProps={{ min: mutation.data.startAt }}
+                onChange={(e) =>
+                  mutation.setData({ targetDate: e.target.value })
+                }
               />
 
               <TextField
                 disabled
                 label="Duration"
                 type="number"
-                sx={{ width: "25%" }}
+                sx={{ width: "40%" }}
                 value={duration}
                 inputProps={{ style: { textAlign: "center" } }}
               />
@@ -495,13 +514,13 @@ export const EventCreate = ({
               ))}
             </FieldSet>
 
-            {type === "full" ? (
+            {false ? (
               <FieldSet
                 label="Deskripsi"
                 stackProps={{ direction: "column", spacing: 2 }}
               >
                 <div id="description"></div>
-                {/* <TextField
+                <TextField
                   id="description"
                   multiline
                   rows={2}
@@ -513,7 +532,7 @@ export const EventCreate = ({
                   }
                   placeholder="Tulis deskripsi disini"
                   sx={{ width: "100%" }}
-                /> */}
+                />
               </FieldSet>
             ) : null}
           </Stack>
@@ -767,6 +786,194 @@ export const ProgresUpdate = ({
             </Button>
             <LoadingButton
               loading={loading}
+              disableElevation
+              variant="contained"
+              color="primary"
+              onClick={onSubmit}
+            >
+              Simpan Perubahan
+            </LoadingButton>
+          </>
+        ),
+      }}
+    />
+  );
+};
+
+export const UpdateOvertime = ({ open, mutation, onOpen, data, onSubmit }) => {
+  return (
+    <DialogForm
+      open={open}
+      onClose={onOpen}
+      title="Ubah Lembur"
+      maxWidth="md"
+      content={{
+        sx: { p: 0 },
+        children: (
+          <Stack spacing={0} direction="row">
+            {data.type === "TEAM" ? (
+              <SimpleList
+                dense
+                sx={{ height: 480, overflow: "scroll", width: "25%" }}
+                loading={false}
+                data={((data && data.employees) || []).map((v, i) => ({
+                  primary: v.name,
+                  secondary: utils.typesLabel(v.role),
+                  itemProps: {
+                    divider: ((data && data.employees) || []).length - 1 !== i,
+                    sx: { py: 0, px: 1 },
+                  },
+                }))}
+              />
+            ) : null}
+
+            {data.type === "TEAM" ? (
+              <Divider flexItem orientation="vertical" />
+            ) : null}
+
+            <Stack direction="column" flexGrow={1}>
+              <List dense>
+                {data.type === "TEAM" ? null : (
+                  <ListItem divider sx={{ py: 0, px: 1 }}>
+                    <ListItemText
+                      primary="Nama"
+                      secondary={`${
+                        data.employeeName || "-"
+                      } - ${utils.typesLabel(data.employeeRole)}`}
+                    />
+                  </ListItem>
+                )}
+
+                <ListItem divider sx={{ py: 0, px: 1 }}>
+                  <ListItemText
+                    primary="Tanggal"
+                    secondary={
+                      data.absentAt
+                        ? moment(data.absentAt).format("DD-MM-yyyy")
+                        : "-"
+                    }
+                  />
+                </ListItem>
+
+                <ListItem divider sx={{ py: 0, px: 1 }}>
+                  <ListItemText
+                    primary="Durasi"
+                    secondary={`${
+                      data.durationOvertime === 0
+                        ? 0
+                        : data.overtimeDuration / 60
+                    } Jam`}
+                  />
+                </ListItem>
+
+                <ListItem divider sx={{ py: 0, px: 1 }}>
+                  <ListItemText
+                    primary="Biaya"
+                    secondary={`${
+                      data.durationOvertime === 0
+                        ? 0
+                        : data.overtimeDuration / 60
+                    } Jam X ${utils.formatCurrency(
+                      data.overtimePrice || 0
+                    )} = ${utils.formatCurrency(data.totalEarn)}`}
+                  />
+                </ListItem>
+
+                <ListItem divider sx={{ py: 0, px: 1 }}>
+                  <ListItemText
+                    primary="Dajukan Oleh"
+                    secondary={`${data.requestName || "-"} - ${utils.typesLabel(
+                      data.requestRole
+                    )}`}
+                  />
+                </ListItem>
+
+                <ListItem divider sx={{ py: 0, px: 1 }}>
+                  <ListItemText
+                    primary="Dikonfirmasi Oleh"
+                    secondary={`${data.actionEmployee?.name || "-"} - ${
+                      data.actionEmployee
+                        ? utils.typesLabel(data.actionEmployee?.role)
+                        : ""
+                    }`}
+                  />
+                </ListItem>
+              </List>
+
+              <Box p={0.5}>
+                <Table size="small">
+                  <TableBody>
+                    <TableRow>
+                      <TableCell sx={{ borderBottom: 0 }} align="right">
+                        <Select
+                          fullWidth
+                          variant="standard"
+                          name="duration"
+                          label="Durasi"
+                          menu={[
+                            { text: "1 Jam", value: 60 },
+                            { text: "2 Jam", value: 120 },
+                            { text: "3 Jam", value: 180 },
+                            { text: "4 Jam", value: 240 },
+                            { text: "5 Jam", value: 300 },
+                          ]}
+                          value={mutation.data.duration}
+                          setValue={mutation.setData}
+                        />
+                      </TableCell>
+                      <TableCell
+                        sx={{ borderBottom: 0 }}
+                        align="center"
+                        padding="checkbox"
+                      >
+                        X
+                      </TableCell>
+
+                      <TableCell sx={{ borderBottom: 0 }} align="left">
+                        <TextField
+                          disabled
+                          label="Biaya"
+                          variant="standard"
+                          value={utils.formatCurrency(data.overtimePrice || 0)}
+                        />
+                      </TableCell>
+                      <TableCell
+                        sx={{ borderBottom: 0 }}
+                        align="center"
+                        padding="checkbox"
+                      >
+                        =
+                      </TableCell>
+
+                      <TableCell
+                        sx={{ borderBottom: 0 }}
+                        align="center"
+                        padding="checkbox"
+                      >
+                        <Typography variant="subtitle1">
+                          {utils.formatCurrency(
+                            (mutation.data.duration / 60) *
+                              (data.overtimePrice || 0)
+                          )}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </Box>
+            </Stack>
+          </Stack>
+        ),
+      }}
+      actions={{
+        children: (
+          <>
+            <Button variant="outlined" onClick={onOpen}>
+              Batal
+            </Button>
+            <LoadingButton
+              loading={mutation.processing}
+              disabled={mutation.processing || mutation.loading}
               disableElevation
               variant="contained"
               color="primary"

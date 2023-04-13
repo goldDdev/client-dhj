@@ -21,13 +21,14 @@ import {
   Box,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { KeyboardArrowRight } from "@mui/icons-material";
+import { KeyboardArrowRight, Refresh } from "@mui/icons-material";
 import { Select } from "@components/base";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import FRHooks from "frhooks";
 import * as utils from "@utils";
 import _ from "lodash";
 import moment from "moment";
+import { LoadingButton } from "@mui/lab";
 
 export default () => {
   const { id } = useParams();
@@ -196,9 +197,7 @@ export default () => {
                 name="month"
                 value={absents.getQuery("month", moment().month() + 1)}
                 menu={utils.monthID.map((v, i) => ({ text: v, value: i + 1 }))}
-                onChange={(e) =>
-                  absents.setQuery({ month: +e.target.value })
-                }
+                onChange={(e) => absents.setQuery({ month: +e.target.value })}
               />
               <TextField
                 value={absents.getQuery("year", moment().year())}
@@ -207,7 +206,9 @@ export default () => {
             </Stack>
 
             <Typography>{`${utils.getMonth(
-              absents.getQuery("month") ? absents.getQuery('month') - 1 : moment().month()
+              absents.getQuery("month")
+                ? absents.getQuery("month") - 1
+                : moment().month()
             )} - ${absents.getQuery("year", moment().year())}`}</Typography>
           </Stack>
         </Grid>

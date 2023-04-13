@@ -56,8 +56,10 @@ const apiRoute = {
     listKomDetail: "/project/:id/kom",
     listBoqDetail: "/project/:id/boq",
     overtimeDetail: "/project/:id/overtime",
+    overtime:"/project/overtime/:id",
     deleteWorker: "/project/:id/worker",
     detilAbsent: "/project/:id/:parent/absent",
+    updateOvertime:"/project/overtime"
   },
   tracking: {
     index: "/tracking",

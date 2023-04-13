@@ -4,11 +4,13 @@ import DataTable from "../../components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
 import apiRoute from "@services/apiRoute";
+import { UpdateOvertime } from "./form";
+import { LoadingButton } from "@mui/lab";
 import { Stack, TextField, Paper, ListItemText } from "@mui/material";
 import { BasicDropdown, Select } from "@components/base";
 import { useSnackbar } from "notistack";
 import { useParams } from "react-router-dom";
-import { MoreVert, Search } from "@mui/icons-material";
+import { MoreVert, Search, Refresh } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
 import {
   formatCurrency,
@@ -17,7 +19,7 @@ import {
   typesLabel,
 } from "@utils/index";
 
-const columns = (onDelete, onAction) => [
+const columns = (onDelete, onAction, onUpdate) => [
   {
     label: "No",
     value: (_, idx) => {
@@ -25,6 +27,7 @@ const columns = (onDelete, onAction) => [
     },
     head: {
       align: "center",
+      padding: "checkbox",
     },
     align: "center",
     size: "small",
@@ -33,24 +36,18 @@ const columns = (onDelete, onAction) => [
     label: "Nama",
     value: (value) => (
       <ListItemText
-        primary={value.requestName}
+        primary={value.employeeName}
         primaryTypographyProps={{ variant: "body2" }}
         secondaryTypographyProps={{ variant: "body2" }}
-        secondary={typesLabel(value.role)}
+        secondary={typesLabel(value.employeeRole)}
       />
     ),
     size: "small",
   },
+
   {
     label: "Tanggal",
-    value: (value) => (
-      <ListItemText
-        primary={moment(value.absentAt).format("DD-MM-yyyy")}
-        primaryTypographyProps={{ variant: "body2" }}
-        secondaryTypographyProps={{ variant: "body2" }}
-        secondary={`${value.comeAt} - ${value.closeAt}`}
-      />
-    ),
+    value: (value) => moment(value.absentAt).format("DD-MM-yyyy"),
     align: "center",
     head: {
       align: "center",
@@ -75,7 +72,7 @@ const columns = (onDelete, onAction) => [
   },
   {
     label: "Durasi",
-    value: (value) => `${value.overtimeDuration} Menit`,
+    value: (value) => `${value.overtimeDuration / 60} Jam`,
     align: "center",
     head: {
       align: "center",
@@ -88,8 +85,6 @@ const columns = (onDelete, onAction) => [
       <ListItemText
         primary={formatCurrency(value.totalEarn)}
         primaryTypographyProps={{ variant: "body2" }}
-        secondaryTypographyProps={{ variant: "body2" }}
-        secondary={`${formatCurrency(value.overtimePrice)}/Menit`}
       />
     ),
     align: "center",
@@ -109,6 +104,18 @@ const columns = (onDelete, onAction) => [
       align: "center",
       sx: { whiteSpace: "nowrap" },
     },
+    size: "small",
+  },
+  {
+    label: "Diajukan Oleh",
+    value: (value) => (
+      <ListItemText
+        primary={value.requestName}
+        primaryTypographyProps={{ variant: "body2" }}
+        secondaryTypographyProps={{ variant: "body2" }}
+        secondary={typesLabel(value.requestRole)}
+      />
+    ),
     size: "small",
   },
   {
@@ -142,6 +149,13 @@ const columns = (onDelete, onAction) => [
           id: "DELETE",
           divider: true,
         });
+
+        menu.push({
+          text: "Ubah",
+          onClick: onUpdate(value.id),
+          id: "UPDATE",
+          divider: true,
+        });
         menu.push({
           text: "Setujui",
           onClick: onAction(value.id, "CONFIRM"),
@@ -160,9 +174,14 @@ const columns = (onDelete, onAction) => [
           disabled={value.status !== "PENDING"}
           type="icon"
           menu={menu}
-          label={<MoreVert />}
+          size="small"
+          label={<MoreVert fontSize="inherit" />}
         />
       );
+    },
+    head: {
+      align: "center",
+      padding: "checkbox",
     },
     padding: "checkbox",
     align: "center",
@@ -175,8 +194,17 @@ export default () => {
   const alert = useAlert();
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
-    form: false,
-    postLoading: [],
+    open: false,
+    current: {
+      id: 0,
+      employeeId: 0,
+      projectId: 0,
+      type: "TEAM",
+    },
+  });
+
+  const mutation = FRHooks.useMutation({
+    defaultValue: { id: 0, duration: 60 },
   });
 
   const table = FRHooks.useTable([apiRoute.project.listOvertimes, { id }], {
@@ -262,10 +290,46 @@ export default () => {
     });
   };
 
+  const onUpdate = (id) => async () => {
+    setTrigger((state) => ({ ...state, open: true }));
+    mutation.get([apiRoute.project.overtime, { id }], {
+      onSuccess: ({ data }) => {
+        setTrigger((state) => ({ ...state, current: data }));
+        mutation.setData({ id, duration: data.overtimeDuration || 0 });
+      },
+    });
+  };
+
+  const onSubmit = () => {
+    mutation.put(apiRoute.project.updateOvertime, {
+      onSuccess: () => {
+        table.reload();
+        enqueueSnackbar("Permintaan Lembur Berhasil diubah")
+        
+      },
+      onAlways: () => {
+        setTrigger((state) => ({ ...state, open: false }));
+      }
+    });
+  };
+
   return (
     <ProjectTemplate
       title="Daftar Lembur"
       subtitle="Menampilkan daftar permintaan lembur"
+      headRight={{
+        children: (
+          <LoadingButton
+            loading={table.loading}
+            disabled={table.loading}
+            onClick={() => table.reload()}
+            color="primary"
+            startIcon={<Refresh />}
+          >
+            Muat Ulang
+          </LoadingButton>
+        ),
+      }}
     >
       <Stack direction="row" spacing={1} mb={2} alignItems="center">
         <TextField
@@ -273,6 +337,14 @@ export default () => {
           value={table.query("name", "")}
           onChange={(e) => table.setQuery({ name: e.target.value })}
           InputProps={{ startAdornment: <Search color="disabled" /> }}
+        />
+        <TextField
+          label="Tanggal"
+          type="date"
+          value={table.query("absentAt", "")}
+          onChange={(e) => table.setQuery({ absentAt: e.target.value })}
+          InputLabelProps={{ shrink: true }}
+          sx={{ width: "25%" }}
         />
         <Select
           label="Status"
@@ -303,10 +375,18 @@ export default () => {
           tableProps={{ size: "small" }}
           data={table.data}
           loading={table.loading}
-          column={columns(onDelete, onAction)}
+          column={columns(onDelete, onAction, onUpdate)}
           row={{ sx: { backgroundColor: "white" } }}
         />
       </Paper>
+
+      <UpdateOvertime
+        open={trigger.open}
+        onOpen={() => setTrigger((state) => ({ ...state, open: !state.open }))}
+        mutation={mutation}
+        data={trigger.current}
+        onSubmit={onSubmit}
+      />
     </ProjectTemplate>
   );
 };

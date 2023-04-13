@@ -21,8 +21,10 @@ import {
   ArrowDownward,
   Block,
   Schedule,
+  Refresh,
 } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
+import { LoadingButton } from "@mui/lab";
 
 const columns = (onDelete, onUpdate) => [
   {
@@ -120,16 +122,16 @@ const columns = (onDelete, onUpdate) => [
       borderColor: "divider",
     },
   },
-  {
-    value: (value) => (
-      <IconButton title="Lihat Detail">
-        <Notes />
-      </IconButton>
-    ),
-    align: "center",
-    padding: "checkbox",
-    sx: { borderTop: 1, borderColor: "divider" },
-  },
+  // {
+  //   value: (value) => (
+  //     <IconButton title="Lihat Detail">
+  //       <Notes />
+  //     </IconButton>
+  //   ),
+  //   align: "center",
+  //   padding: "checkbox",
+  //   sx: { borderTop: 1, borderColor: "divider" },
+  // },
 
   {
     value: (value) => (
@@ -250,9 +252,20 @@ export default () => {
       subtitle="Menampilkan daftar agenda proyek"
       headRight={{
         children: (
-          <Button disableElevation startIcon={<Add />} onClick={onOpen}>
-            Tambah Agenda
-          </Button>
+          <>
+            <Button disableElevation startIcon={<Add />} onClick={onOpen}>
+              Tambah Event
+            </Button>
+            <LoadingButton
+              loading={table.loading}
+              disabled={table.loading}
+              onClick={() => table.reload()}
+              color="primary"
+              startIcon={<Refresh />}
+            >
+              Muat Ulang
+            </LoadingButton>
+          </>
         ),
       }}
     >

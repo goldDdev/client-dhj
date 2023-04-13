@@ -48,13 +48,14 @@ export default () => {
       y.object().shape({
         name: y.string().required(),
         companyName: y.string().required(),
-        noSpk: y.string().nullable(),
+        noSpk: y.string().required(),
         contact: y.string().nullable(),
         location: y.string().nullable(),
         latitude: y.number().nullable(),
         longitude: y.number().nullable(),
         startAt: y.date().nullable(),
         finishAt: y.date().nullable(),
+        targetDate: y.date().nullable(),
         status: y.string().required(),
         duration: y.number().nullable(),
       }),
@@ -196,6 +197,15 @@ export default () => {
     });
   }, [id]);
 
+  const dateProject = `${mutation.data.duration} Hari | ${moment(
+    mutation.data.startAt
+  ).format("DD-MM-yyyy")} - ${moment(mutation.data.finishAt).format(
+    "DD-MM-yyyy"
+  )} ${
+    mutation.data.targetDate
+      ? `-> ${moment(mutation.data.targetDate).format("DD-MM-yyyy")}`
+      : ""
+  }`;
   return (
     <ProjectTemplate
       container={"container"}
@@ -240,11 +250,7 @@ export default () => {
               <ListItem divider>
                 <ListItemText
                   primary="Lama Pengerjaan"
-                  secondary={`${mutation.data.duration} Hari | ${moment(
-                    mutation.data.startAt
-                  ).format("DD-MM-yyyy")} - ${moment(
-                    mutation.data.finishAt
-                  ).format("DD-MM-yyyy")}`}
+                  secondary={dateProject}
                   primaryTypographyProps={{
                     variant: "subtitle1",
                     fontWeight: 500,
@@ -404,7 +410,7 @@ export default () => {
               </Typography>
 
               <Button
-              disabled={resources.parentId === null}
+                disabled={resources.parentId === null}
                 variant="text"
                 startIcon={trigger.openWorker ? <Close /> : <PersonAddAlt />}
                 disableElevation

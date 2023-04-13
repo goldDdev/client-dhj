@@ -31,9 +31,11 @@ import {
   Check,
   Clear,
   RefreshOutlined,
+  Refresh,
 } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
 import apiRoute from "@services/apiRoute";
+import { LoadingButton } from "@mui/lab";
 
 const columns = (
   onDelete,
@@ -348,9 +350,20 @@ export default () => {
       subtitle="Menampilkan daftar BOQ proyek yang sudah dibuat"
       headRight={{
         children: (
-          <Button disableElevation startIcon={<Add />} onClick={onOpen}>
-            Tambah BOQ
-          </Button>
+          <>
+            <Button disableElevation startIcon={<Add />} onClick={onOpen}>
+              Tambah BOQ
+            </Button>
+            <LoadingButton
+              loading={table.loading}
+              disabled={table.loading}
+              onClick={() => table.reload()}
+              color="primary"
+              startIcon={<Refresh />}
+            >
+              Muat Ulang
+            </LoadingButton>
+          </>
         ),
       }}
     >
@@ -414,7 +427,9 @@ export default () => {
               </Typography>
             ) : null}
 
-            <Box sx={{ height: "480px", maxHeight: '420px', overflow: "scroll" }}>
+            <Box
+              sx={{ height: "480px", maxHeight: "420px", overflow: "scroll" }}
+            >
               <Timeline
                 data={progres.data}
                 value={(v, i) => {
