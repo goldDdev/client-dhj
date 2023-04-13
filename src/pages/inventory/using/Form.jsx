@@ -189,7 +189,7 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
                 variant="text"
                 startIcon={<Add />}
                 disableElevation
-              // onClick={onOpenAddWorker("lead")}
+              // onClick={onAddItem()}
               >
                 Tambahkan Item
               </Button>

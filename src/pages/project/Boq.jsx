@@ -347,7 +347,7 @@ export default () => {
   return (
     <ProjectTemplate
       title="BOQ"
-      subtitle="Menampilkan daftar BOQ proyek yang sudah dibuat"
+      subtitle="Menampilkan daftar Item Pekerjaan (BOQ) dalam proyek"
       headRight={{
         children: (
           <>

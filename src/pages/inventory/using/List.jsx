@@ -15,20 +15,8 @@ const columns = () => [
     value: (value) => '',
   },
   {
-    label: "Nama",
-    value: (value) => value.name,
-  },
-  {
-    label: "Satuan",
-    value: (value) => "-",
-    align: "center",
-    head: {
-      align: "center",
-      sx: {
-        width: "10%",
-        whiteSpace: "nowrap",
-      },
-    },
+    label: 'Project',
+    value: (value) => '',
   },
   {
     label: "Jumlah",
@@ -43,11 +31,11 @@ const columns = () => [
     },
   },
   {
-    label: 'Project',
+    label: 'Oleh',
     value: (value) => '',
   },
   {
-    label: 'Oleh',
+    label: 'Status',
     value: (value) => '',
   },
 ]
@@ -98,8 +86,8 @@ export default () => {
 
   return (
     <MainTemplate
-      title="Penggunaan Inventori"
-      subtitle={`Daftar penggunaan inventori dalam proyek`}
+      title="Permintaan Penggunaan Inventori"
+      subtitle={`Daftar penggunaan inventori dalam proyek oleh mandor`}
       headRight={{
         children: (
           <Button startIcon={<Add />} onClick={onOpen}>

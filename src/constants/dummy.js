@@ -68,3 +68,10 @@ export const inventory = {
   type: 'MATERIAL',
   projectId: 0
 };
+
+export const usingInventory = {
+  date: '',
+  projectId: 0,
+  userId: 0,
+  items: []
+}

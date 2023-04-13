@@ -49,22 +49,6 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
       content={{
         children: (
           <Stack spacing={2.5} direction="column">
-            <TextField
-              disabled={mutation.loading || mutation.processing}
-              label="Nama Proyek"
-              value={mutation.data.name || ""}
-              onChange={(e) => mutation.setData({ name: e.target.value })}
-              onBlur={async () => mutation.validate("name")}
-              error={mutation.error("name")}
-              helperText={mutation.message("name")}
-              InputProps={{
-                endAdornment:
-                  mutation.loading || mutation.processing ? (
-                    <CircularProgress size={20} />
-                  ) : null,
-              }}
-            />
-
             <FieldSet disabledDivider>
               <TextField
                 disabled={mutation.loading || mutation.processing}
@@ -80,28 +64,24 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
                       <CircularProgress size={20} />
                     ) : null,
                 }}
-                sx={{ width: "75%" }}
+                sx={{ width: "35%" }}
               />
-
-              <Box width="25%">
-                <Select
-                  fullWidth
-                  name="status"
-                  label="Status"
-                  menu={[
-                    ...Object.entries(utils.projectStatus).map(([k, v]) => ({
-                      text: v,
-                      value: k,
-                    })),
-                  ]}
-                  sx={{ width: "100%" }}
-                  value={mutation.data.status || "DRAFT"}
-                  setValue={mutation.setData}
-                  onBlur={async () => mutation.validate("status")}
-                  error={mutation.error("status")}
-                  message={mutation.message("status")}
-                />
-              </Box>
+              <TextField
+                disabled={mutation.loading || mutation.processing}
+                label="Nama Proyek"
+                value={mutation.data.name || ""}
+                onChange={(e) => mutation.setData({ name: e.target.value })}
+                onBlur={async () => mutation.validate("name")}
+                error={mutation.error("name")}
+                helperText={mutation.message("name")}
+                InputProps={{
+                  endAdornment:
+                    mutation.loading || mutation.processing ? (
+                      <CircularProgress size={20} />
+                    ) : null,
+                }}
+                sx={{ width: "65%" }}
+              />
             </FieldSet>
 
             <FieldSet disabledDivider>
@@ -122,6 +102,25 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
                 }}
                 sx={{ width: "75%" }}
               />
+              <Box width="25%">
+                <Select
+                  fullWidth
+                  name="status"
+                  label="Status"
+                  menu={[
+                    ...Object.entries(utils.projectStatus).map(([k, v]) => ({
+                      text: v,
+                      value: k,
+                    })),
+                  ]}
+                  sx={{ width: "100%" }}
+                  value={mutation.data.status || "DRAFT"}
+                  setValue={mutation.setData}
+                  onBlur={async () => mutation.validate("status")}
+                  error={mutation.error("status")}
+                  message={mutation.message("status")}
+                />
+              </Box>
             </FieldSet>
 
             <FieldSet
@@ -363,15 +362,15 @@ export const ListWorker = ({
             iconProps:
               v.role === "MANDOR"
                 ? {
-                    sx: {
-                      justifyContent: "center",
-                    },
-                    children: (
-                      <IconButton size="small">
-                        <ExpandMore />
-                      </IconButton>
-                    ),
-                  }
+                  sx: {
+                    justifyContent: "center",
+                  },
+                  children: (
+                    <IconButton size="small">
+                      <ExpandMore />
+                    </IconButton>
+                  ),
+                }
                 : undefined,
             itemProps: {
               disableGutters: v.role === "MANDOR",
@@ -630,53 +629,53 @@ export const BOQCreate = ({
             ) : null}
             {!table.loading && !table.isEmpty
               ? table.data.map((v, index) => (
-                  <ListItem
-                    key={index}
-                    divider
-                    secondaryAction={
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          const id = v.id;
-                          mutation.merge({ boqId: id });
-                          mutation.post(apiRoute.project.boq, {
-                            except: ["id"],
-                            onBeforeSend: () => {
-                              table.destroy((_v) => _v.id === id);
-                              setTrigger((state) => ({
-                                ...state,
-                                postLoading: state.postLoading.concat([v.id]),
-                              }));
-                              list.add({
-                                id: list.length === 0 ? 0 : list.length - 1,
-                                name: "loading",
-                                boqId: id,
-                                typeUnit: "loading",
-                                unit: 0,
-                                updateAt: new Date().toLocaleString(),
-                              });
-                            },
-                            onSuccess: ({ data }) => {
-                              list.update((_v) => _v.boqId === id, data);
-                            },
-                            onAlways: () => {
-                              setTrigger((state) => ({
-                                ...state,
-                                postLoading: state.postLoading.filter(
-                                  (_v) => _v !== id
-                                ),
-                              }));
-                            },
-                          });
-                        }}
-                      >
-                        <Add fontSize="inherit" />
-                      </IconButton>
-                    }
-                  >
-                    <ListItemText primary={v.name} secondary={v.typeUnit} />
-                  </ListItem>
-                ))
+                <ListItem
+                  key={index}
+                  divider
+                  secondaryAction={
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        const id = v.id;
+                        mutation.merge({ boqId: id });
+                        mutation.post(apiRoute.project.boq, {
+                          except: ["id"],
+                          onBeforeSend: () => {
+                            table.destroy((_v) => _v.id === id);
+                            setTrigger((state) => ({
+                              ...state,
+                              postLoading: state.postLoading.concat([v.id]),
+                            }));
+                            list.add({
+                              id: list.length === 0 ? 0 : list.length - 1,
+                              name: "loading",
+                              boqId: id,
+                              typeUnit: "loading",
+                              unit: 0,
+                              updateAt: new Date().toLocaleString(),
+                            });
+                          },
+                          onSuccess: ({ data }) => {
+                            list.update((_v) => _v.boqId === id, data);
+                          },
+                          onAlways: () => {
+                            setTrigger((state) => ({
+                              ...state,
+                              postLoading: state.postLoading.filter(
+                                (_v) => _v !== id
+                              ),
+                            }));
+                          },
+                        });
+                      }}
+                    >
+                      <Add fontSize="inherit" />
+                    </IconButton>
+                  }
+                >
+                  <ListItemText primary={v.name} secondary={v.typeUnit} />
+                </ListItem>
+              ))
               : null}
 
             {!table.loading && table.isEmpty ? (
@@ -728,21 +727,21 @@ export const WorkerCreate = ({
 
             {!searchWorkers.loading && !searchWorkers.isEmpty
               ? searchWorkers.data.map((v, index) => (
-                  <ListItem
-                    key={index}
-                    divider
-                    secondaryAction={
-                      <IconButton size="small" onClick={onAddMember(v)}>
-                        <Add fontSize="inherit" />
-                      </IconButton>
-                    }
-                  >
-                    <ListItemText
-                      primary={v.name}
-                      secondary={utils.typesLabel(v.role)}
-                    />
-                  </ListItem>
-                ))
+                <ListItem
+                  key={index}
+                  divider
+                  secondaryAction={
+                    <IconButton size="small" onClick={onAddMember(v)}>
+                      <Add fontSize="inherit" />
+                    </IconButton>
+                  }
+                >
+                  <ListItemText
+                    primary={v.name}
+                    secondary={utils.typesLabel(v.role)}
+                  />
+                </ListItem>
+              ))
               : null}
 
             {!searchWorkers.loading && searchWorkers.isEmpty ? (
@@ -857,9 +856,8 @@ export const UpdateOvertime = ({ open, mutation, onOpen, data, onSubmit }) => {
                   <ListItem divider sx={{ py: 0, px: 1 }}>
                     <ListItemText
                       primary="Nama"
-                      secondary={`${
-                        data.employeeName || "-"
-                      } - ${utils.typesLabel(data.employeeRole)}`}
+                      secondary={`${data.employeeName || "-"
+                        } - ${utils.typesLabel(data.employeeRole)}`}
                     />
                   </ListItem>
                 )}
@@ -878,24 +876,22 @@ export const UpdateOvertime = ({ open, mutation, onOpen, data, onSubmit }) => {
                 <ListItem divider sx={{ py: 0, px: 1 }}>
                   <ListItemText
                     primary="Durasi"
-                    secondary={`${
-                      data.durationOvertime === 0
+                    secondary={`${data.durationOvertime === 0
                         ? 0
                         : data.overtimeDuration / 60
-                    } Jam`}
+                      } Jam`}
                   />
                 </ListItem>
 
                 <ListItem divider sx={{ py: 0, px: 1 }}>
                   <ListItemText
                     primary="Biaya"
-                    secondary={`${
-                      data.durationOvertime === 0
+                    secondary={`${data.durationOvertime === 0
                         ? 0
                         : data.overtimeDuration / 60
-                    } Jam X ${utils.formatCurrency(
-                      data.overtimePrice || 0
-                    )} = ${utils.formatCurrency(data.totalEarn)}`}
+                      } Jam X ${utils.formatCurrency(
+                        data.overtimePrice || 0
+                      )} = ${utils.formatCurrency(data.totalEarn)}`}
                   />
                 </ListItem>
 
@@ -911,11 +907,10 @@ export const UpdateOvertime = ({ open, mutation, onOpen, data, onSubmit }) => {
                 <ListItem divider sx={{ py: 0, px: 1 }}>
                   <ListItemText
                     primary="Dikonfirmasi Oleh"
-                    secondary={`${data.actionEmployee?.name || "-"} - ${
-                      data.actionEmployee
+                    secondary={`${data.actionEmployee?.name || "-"} - ${data.actionEmployee
                         ? utils.typesLabel(data.actionEmployee?.role)
                         : ""
-                    }`}
+                      }`}
                   />
                 </ListItem>
               </List>
@@ -973,7 +968,7 @@ export const UpdateOvertime = ({ open, mutation, onOpen, data, onSubmit }) => {
                         <Typography variant="subtitle1">
                           {utils.formatCurrency(
                             (mutation.data.duration / 60) *
-                              (data.overtimePrice || 0)
+                            (data.overtimePrice || 0)
                           )}
                         </Typography>
                       </TableCell>
