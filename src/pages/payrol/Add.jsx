@@ -20,13 +20,15 @@ import {
   Checkbox,
   FormControlLabel,
   Skeleton,
- IconButton 
+  IconButton,
 } from "@mui/material";
 import { Select } from "@components/base";
 import { useSnackbar } from "notistack";
 import { ListForm, SimpleList } from "@components/base/list";
 import { LoadingButton } from "@mui/lab";
 import { useAlert } from "@contexts/AlertContext";
+import { Add, Clear, Money } from "@mui/icons-material";
+import { OtherForm } from "./form";
 
 const ListItemText = styled(MuiListItemText)(({ theme }) => ({
   padding: 0,
@@ -39,6 +41,16 @@ export default () => {
   const [form, setForm] = React.useState({
     month: +moment().format("M"),
     year: moment().year(),
+  });
+
+  const [other, setOther] = React.useState({
+    index: -1,
+    name: "",
+    role: "",
+    otherCut: 0,
+    otherAdditional: 0,
+    noteOtherCut: "",
+    noteOtherAdditional: "",
   });
 
   const payrols = FRHooks.useFetch(apiRoute.payrol.employeeAll, {
@@ -59,7 +71,15 @@ export default () => {
     mutation.setData({
       items: mutation.data.items.some((v) => v.id === value.id)
         ? mutation.data.items.filter((v) => v.id !== value.id)
-        : mutation.data.items.concat([{ id: value.id }]),
+        : mutation.data.items.concat([
+            {
+              id: value.id,
+              otherCut: 0,
+              otherAdditional: 0,
+              noteOtherCut: "",
+              noteOtherAdditional: "",
+            },
+          ]),
     });
   };
 
@@ -105,10 +125,55 @@ export default () => {
     });
   };
 
+  const onOther = (value) => () => {
+    let otherCut = 0;
+    let noteOtherCut = "";
+    let otherAdditional = 0;
+    let noteOtherAdditional = 0;
+
+    const index = mutation.data.items.findIndex((v) => v.id === value.id);
+    if (index > -1) {
+      otherCut = mutation.data.items[index].otherCut;
+      noteOtherCut = mutation.data.items[index].noteOtherCut;
+      otherAdditional = mutation.data.items[index].otherAdditional;
+      noteOtherAdditional = mutation.data.items[index].noteOtherAdditional;
+    }
+
+    setOther({
+      index: value.id,
+      name: value.name,
+      role: utils.typesLabel(value.role),
+      otherCut,
+      otherAdditional,
+      noteOtherCut,
+      noteOtherAdditional,
+    });
+  };
+
+  const onRemoveCut = (index) => () => {
+    mutation.data.items[index].otherCut = 0;
+    mutation.data.items[index].noteOtherCut = "";
+
+    mutation.setData({
+      ...mutation.data,
+    });
+  };
+
+  const onRemoveAdditional = (index) => () => {
+    mutation.data.items[index].otherAdditional = 0;
+    mutation.data.items[index].noteOtherAdditional = "";
+
+    mutation.setData({
+      ...mutation.data,
+    });
+  };
+
+  console.log(mutation.data);
+
   return (
     <SettingTemplate
       title={"Penggajian"}
-      subtitle={"Halaman pembayan gaji perorang"}
+      subtitle={"Halaman pembayaran gaji berdasarkan role karyawan"}
     >
       <Grid container spacing={2}>
         <Grid item xs={3}>
@@ -239,6 +304,7 @@ export default () => {
                 color="primary"
                 disabled={mutation.data.items.length === 0}
                 onClick={onSubmit}
+                startIcon={<Money />}
               >
                 Bayar
               </LoadingButton>
@@ -255,170 +321,341 @@ export default () => {
           ) : null}
 
           {!payrols.loading && payrols.data.length > 0
-            ? payrols.data.map((value, i) => (
-                <Paper key={i} sx={{ mb: 1 }} variant="outlined">
-                  <Table size="small">
-                    <TableBody>
-                      <TableRow>
-                        <TableCell size="small">
-                          <Stack
-                            direction="row"
-                            spacing={1}
-                            alignItems="center"
-                          >
-                            <div>
-                              <Checkbox
-                                size="small"
-                                value={value.id}
-                                checked={mutation.data.items.some(
-                                  (v) => v.id === value.id
-                                )}
-                                onChange={onSelectEmployee(value)}
+            ? payrols.data.map((value, i) => {
+                let otherCut = 0;
+                let noteOtherCut = "";
+                let otherAdditional = 0;
+                let noteOtherAdditional = 0;
+
+                const index = mutation.data.items.findIndex(
+                  (v) => v.id === value.id
+                );
+
+                if (index > -1) {
+                  otherCut = mutation.data.items[index].otherCut;
+                  noteOtherCut = mutation.data.items[index].noteOtherCut;
+                  otherAdditional = mutation.data.items[index].otherAdditional;
+                  noteOtherAdditional =
+                    mutation.data.items[index].noteOtherAdditional;
+                }
+
+                const total =
+                  (value.salary || 0) +
+                  (value.totalEarn || 0) +
+                  otherAdditional -
+                  ((value.totalLatePrice || 0) + otherCut);
+                return (
+                  <Paper key={i} sx={{ mb: 1 }} variant="outlined">
+                    <Table size="small">
+                      <TableBody>
+                        <TableRow>
+                          <TableCell size="small">
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              alignItems="center"
+                            >
+                              <div>
+                                <Checkbox
+                                  size="small"
+                                  value={value.id}
+                                  checked={mutation.data.items.some(
+                                    (v) => v.id === value.id
+                                  )}
+                                  onChange={onSelectEmployee(value)}
+                                />
+                              </div>
+                              <ListItemText
+                                primary={value.name}
+                                primaryTypographyProps={{
+                                  variant: "subtitle1",
+                                  fontWeight: 500,
+                                }}
+                                secondary={utils.typesLabel(value.role)}
+                                secondaryTypographyProps={{ variant: "body2" }}
                               />
-                            </div>
+                            </Stack>
+                          </TableCell>
+                          <TableCell align="right" size="small"></TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                          <TableCell size="small">
                             <ListItemText
-                              primary={value.name}
+                              primary="Gaji Pokok"
+                              primaryTypographyProps={{ variant: "body2" }}
+                              secondary="Gaji Pokok yang diterima saat ini"
+                              secondaryTypographyProps={{ variant: "caption" }}
+                            />
+                          </TableCell>
+                          <TableCell align="right" size="small">
+                            <Typography variant="subtitle1">
+                              {utils.formatCurrency(value.salary || 0)}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                          <TableCell>
+                            <ListItemText
+                              primary="Absensi"
+                              primaryTypographyProps={{ variant: "body2" }}
+                              secondary={`Jumlah Kehadiran Periode ${moment(
+                                value.start
+                              ).format("DD-MM-Y")} s/d ${moment(
+                                value.end
+                              ).format("DD-MM-Y")}`}
+                              secondaryTypographyProps={{ variant: "caption" }}
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <Typography variant="subtitle1">
+                              {value.totalPresent || 0}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                          <TableCell>
+                            <ListItemText
+                              primary="Keterlambatan"
+                              primaryTypographyProps={{ variant: "body2" }}
+                              secondary={`Denda keterlambatan Rp 250,00/Menit`}
+                              secondaryTypographyProps={{ variant: "caption" }}
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <ListItemText
+                              primary={utils.toHoursAndMinutes(
+                                value.totalLateDuration
+                              )}
+                              primaryTypographyProps={{
+                                variant: "body2",
+                                whiteSpace: "nowrap",
+                                textAlign: "right",
+                              }}
+                              secondary={`(-) ${utils.formatCurrency(
+                                value.totalLatePrice
+                              )}`}
+                              secondaryTypographyProps={{
+                                variant: "body2",
+                                whiteSpace: "nowrap",
+                                textAlign: "right",
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                          <TableCell>
+                            <ListItemText
+                              primary="Lembur"
+                              primaryTypographyProps={{ variant: "body2" }}
+                              secondaryTypographyProps={{ variant: "caption" }}
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <ListItemText
+                              primary={utils.toHoursAndMinutes(
+                                value.totalOvertimeDuration || 0
+                              )}
+                              primaryTypographyProps={{
+                                variant: "body2",
+                                whiteSpace: "nowrap",
+                                textAlign: "right",
+                              }}
+                              secondary={utils.formatCurrency(
+                                value.totalEarn || 0
+                              )}
+                              secondaryTypographyProps={{
+                                variant: "body2",
+                                whiteSpace: "nowrap",
+                                textAlign: "right",
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                          <TableCell>
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              alignItems="center"
+                            >
+                              <div>
+                                <IconButton
+                                  disabled={
+                                    !mutation.data.items.some(
+                                      (_v) => _v.id === value.id
+                                    )
+                                  }
+                                  size="small"
+                                  onClick={onOther(value)}
+                                >
+                                  <Add fontSize="inherit" />
+                                </IconButton>
+                              </div>
+                              <ListItemText
+                                primary="Potongan Lainya"
+                                primaryTypographyProps={{ variant: "body2" }}
+                                secondary={noteOtherCut || "-"}
+                                secondaryTypographyProps={{
+                                  variant: "caption",
+                                }}
+                              />
+                            </Stack>
+                          </TableCell>
+                          <TableCell align="right">
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              justifyContent="flex-end"
+                              alignItems="center"
+                            >
+                              <div>
+                                <Typography variant="subtitle1">
+                                  {utils.formatCurrency(otherCut)}
+                                </Typography>{" "}
+                              </div>
+                              {otherCut > 0 ? (
+                                <div>
+                                  <IconButton
+                                    size="small"
+                                    onClick={onRemoveCut(index)}
+                                  >
+                                    <Clear fontSize="inherit" />
+                                  </IconButton>
+                                </div>
+                              ) : null}
+                            </Stack>
+                          </TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                          <TableCell>
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              alignItems="center"
+                            >
+                              <div>
+                                <IconButton
+                                  disabled={
+                                    !mutation.data.items.some(
+                                      (_v) => _v.id === value.id
+                                    )
+                                  }
+                                  size="small"
+                                  onClick={onOther(value)}
+                                >
+                                  <Add fontSize="inherit" />
+                                </IconButton>
+                              </div>
+                              <ListItemText
+                                primary="Tambahan Lainya"
+                                primaryTypographyProps={{ variant: "body2" }}
+                                secondary={noteOtherAdditional || "-"}
+                                secondaryTypographyProps={{
+                                  variant: "caption",
+                                }}
+                              />
+                            </Stack>
+                          </TableCell>
+                          <TableCell align="right">
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              justifyContent="flex-end"
+                              alignItems="center"
+                            >
+                              <div>
+                                <Typography variant="subtitle1">
+                                  {utils.formatCurrency(otherAdditional)}
+                                </Typography>{" "}
+                              </div>
+                              {otherAdditional > 0 ? (
+                                <div>
+                                  <IconButton
+                                    size="small"
+                                    onClick={onRemoveAdditional(index)}
+                                  >
+                                    <Clear fontSize="inherit" />
+                                  </IconButton>
+                                </div>
+                              ) : null}
+                            </Stack>
+                          </TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                          <TableCell>
+                            <ListItemText
+                              primary="Total"
+                              primaryTypographyProps={{ variant: "body2" }}
+                              secondary={`Penghasilan Gaji Pokok + Lembur - Keterlambatan`}
+                              secondaryTypographyProps={{ variant: "caption" }}
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <ListItemText
+                              primary={utils.formatCurrency(total)}
                               primaryTypographyProps={{
                                 variant: "subtitle1",
-                                fontWeight: 500,
+                                whiteSpace: "nowrap",
+                                textAlign: "right",
                               }}
-                              secondary={utils.typesLabel(value.role)}
-                              secondaryTypographyProps={{ variant: "body2" }}
                             />
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="right" size="small"></TableCell>
-                      </TableRow>
-
-                      <TableRow>
-                        <TableCell size="small">
-                          <ListItemText
-                            primary="Gaji Pokok"
-                            primaryTypographyProps={{ variant: "body2" }}
-                            secondary="Gaji Pokok yang diterima saat ini"
-                            secondaryTypographyProps={{ variant: "caption" }}
-                          />
-                        </TableCell>
-                        <TableCell align="right" size="small">
-                          <Typography variant="subtitle1">
-                            {utils.formatCurrency(value.salary || 0)}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-
-                      <TableRow>
-                        <TableCell>
-                          <ListItemText
-                            primary="Absensi"
-                            primaryTypographyProps={{ variant: "body2" }}
-                            secondary={`Jumlah Kehadiran Periode ${moment(
-                              value.start
-                            ).format("DD-MM-Y")} s/d ${moment(value.end).format(
-                              "DD-MM-Y"
-                            )}`}
-                            secondaryTypographyProps={{ variant: "caption" }}
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <Typography variant="subtitle1">
-                            {value.totalPresent || 0}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-
-                      <TableRow>
-                        <TableCell>
-                          <ListItemText
-                            primary="Keterlambatan"
-                            primaryTypographyProps={{ variant: "body2" }}
-                            secondary={`Denda keterlambatan Rp 250,00/Menit`}
-                            secondaryTypographyProps={{ variant: "caption" }}
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <ListItemText
-                            primary={utils.toHoursAndMinutes(
-                              value.totalLateDuration
-                            )}
-                            primaryTypographyProps={{
-                              variant: "body2",
-                              whiteSpace: "nowrap",
-                              textAlign: "right",
-                            }}
-                            secondary={`(-) ${utils.formatCurrency(
-                              value.totalLatePrice
-                            )}`}
-                            secondaryTypographyProps={{
-                              variant: "body2",
-                              whiteSpace: "nowrap",
-                              textAlign: "right",
-                            }}
-                          />
-                        </TableCell>
-                      </TableRow>
-
-                      <TableRow>
-                        <TableCell>
-                          <ListItemText
-                            primary="Lembur"
-                            primaryTypographyProps={{ variant: "body2" }}
-                            secondary={`Denda keterlambatan Rp 250,00/Menit`}
-                            secondaryTypographyProps={{ variant: "caption" }}
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <ListItemText
-                            primary={utils.toHoursAndMinutes(
-                              value.totalOvertimeDuration || 0
-                            )}
-                            primaryTypographyProps={{
-                              variant: "body2",
-                              whiteSpace: "nowrap",
-                              textAlign: "right",
-                            }}
-                            secondary={utils.formatCurrency(
-                              value.totalEarn || 0
-                            )}
-                            secondaryTypographyProps={{
-                              variant: "body2",
-                              whiteSpace: "nowrap",
-                              textAlign: "right",
-                            }}
-                          />
-                        </TableCell>
-                      </TableRow>
-
-                      <TableRow>
-                        <TableCell>
-                          <ListItemText
-                            primary="Total"
-                            primaryTypographyProps={{ variant: "body2" }}
-                            secondary={`Penghasilan Gaji Pokok + Lembur - Keterlambatan`}
-                            secondaryTypographyProps={{ variant: "caption" }}
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <ListItemText
-                            primary={utils.formatCurrency(
-                              (value.salary || 0) +
-                                (value.totalEarn || 0) -
-                                (value.totalLatePrice || 0)
-                            )}
-                            primaryTypographyProps={{
-                              variant: "subtitle1",
-                              whiteSpace: "nowrap",
-                              textAlign: "right",
-                            }}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </Paper>
-              ))
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </Paper>
+                );
+              })
             : null}
         </Grid>
       </Grid>
+
+      <OtherForm
+        open={other.index !== -1}
+        onOpen={() => {
+          setOther({
+            index: -1,
+            name: "",
+            role: "",
+            otherCut: 0,
+            otherAdditional: 0,
+            noteOtherCut: "",
+            noteOtherAdditional: "",
+          });
+        }}
+        mutation={mutation}
+        other={other}
+        setOther={setOther}
+        onSubmit={() => {
+          const index = mutation.data.items.findIndex(
+            (v) => v.id === other.index
+          );
+
+          if (index > -1) {
+            mutation.data.items[index].otherCut = other.otherCut;
+            mutation.data.items[index].otherAdditional = other.otherAdditional;
+            mutation.data.items[index].noteOtherCut = other.noteOtherCut;
+            mutation.data.items[index].noteOtherAdditional =
+              other.noteOtherAdditional;
+            setOther({
+              index: -1,
+              name: "",
+              role: "",
+              otherCut: 0,
+              otherAdditional: 0,
+              noteOtherCut: "",
+              noteOtherAdditional: "",
+            });
+          }
+        }}
+      />
     </SettingTemplate>
   );
 };

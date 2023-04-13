@@ -55,9 +55,7 @@ export default () => {
             <TableCell align="center" padding="checkbox">
               :
             </TableCell>
-            <TableCell>
-              {utils.typesLabel(data.role) || "-"}
-            </TableCell>
+            <TableCell>{utils.typesLabel(data.role) || "-"}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -96,9 +94,23 @@ export default () => {
             <TableCell align="center" padding="checkbox">
               :
             </TableCell>
-            <TableCell  align="right">
+            <TableCell align="right">
               {utils.formatCurrency(data.totalOvertimePrice || 0)}
             </TableCell>
+          </TableRow>
+
+          <TableRow>
+            <TableLable padding="checkbox">
+              <ListItemText
+                primary="Tambahan Lainya"
+                secondary={data.noteOtherAdditional || "-"}
+                primaryTypographyProps={{ variant: "body2" }}
+              />
+            </TableLable>
+            <TableCell align="center" padding="checkbox">
+              :
+            </TableCell>
+            <TableCell align="right">{utils.formatCurrency(data.otherAdditional || 0)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -129,18 +141,18 @@ export default () => {
             <TableLable padding="checkbox">
               <ListItemText
                 primary="Potongan Lainya"
-                secondary="-"
+                secondary={data.noteOtherCut || "-"}
                 primaryTypographyProps={{ variant: "body2" }}
               />
             </TableLable>
             <TableCell align="center" padding="checkbox">
               :
             </TableCell>
-            <TableCell align="right">{utils.formatCurrency(0)}</TableCell>
+            <TableCell align="right">{utils.formatCurrency(data.otherCut || 0)}</TableCell>
           </TableRow>
 
           <TableRow>
-            <TableLable colSpan={3} padding="checkbox" sx={{border: 'none'}}>
+            <TableLable colSpan={3} padding="checkbox" sx={{ border: "none" }}>
               &nbsp;
             </TableLable>
           </TableRow>

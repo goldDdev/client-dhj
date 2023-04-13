@@ -56,24 +56,12 @@ export default () => {
   });
 
   const mutation = FRHooks.useMutation({
-    defaultValue: Dummy.employee,
-    isNewRecord: (data) => data.id === 0,
+    defaultValue: { id: 0, salary: 0 },
     schema: (y) =>
       y.object().shape({
-        name: y.string().required().min(3),
-        cardID: y.string().required(),
-        phoneNumber: y.string().required().min(10).max(12),
-        email: y.string().when("role", {
-          is: (role) => {
-            return role !== "WORKER";
-          },
-          then: y.string().required(),
-        }),
-        role: y.string().required(),
+        id: y.number(),
+        salary: y.number(),
       }),
-    format: {
-      phoneNumber: (value) => String(value),
-    },
   });
 
   const handleChange = (event, newValue) => {
@@ -85,7 +73,7 @@ export default () => {
     mutation.get([apiRoute.employee.detail, { id }], {
       onSuccess: ({ data }) => {
         setEmployee(data);
-        mutation.setData({ ...data, email: data.user.email });
+        mutation.setData({ id, salary: data.salary });
       },
     });
   }, [id]);
@@ -151,26 +139,27 @@ export default () => {
                   <IconButton
                     size="small"
                     onClick={() => {
-                      {
-                        trigger.editSalary
-                          ? mutation.put(apiRoute.employee.optional, {
-                              only: ["id", "salary"],
-                              onSuccess: ({ data }) => {
-                                enqueueSnackbar("Gaji berhasil diperbaharui");
-                                setEmployee((state) => ({
-                                  ...state,
-                                  salary: mutation.data.salary,
-                                }));
-                                setTrigger((state) => ({
-                                  ...state,
-                                  editSalary: false,
-                                }));
-                              },
-                            })
-                          : setTrigger((state) => ({
+                      if (trigger.editSalary) {
+                        mutation.put(apiRoute.employee.optional, {
+                          only: ["salary", "id"],
+
+                          onSuccess: ({ data }) => {
+                            enqueueSnackbar("Gaji berhasil diperbaharui");
+                            setEmployee((state) => ({
                               ...state,
-                              editSalary: !state.editSalary,
+                              salary: mutation.data.salary,
                             }));
+                            setTrigger((state) => ({
+                              ...state,
+                              editSalary: false,
+                            }));
+                          },
+                        });
+                      } else {
+                        setTrigger((state) => ({
+                          ...state,
+                          editSalary: !state.editSalary,
+                        }));
                       }
                     }}
                   >
@@ -186,7 +175,9 @@ export default () => {
                   <TextField
                     value={mutation.data.salary}
                     onChange={(e) => {
-                      mutation.setData({ salary: +e.target.value });
+                      if (Number.isInteger(+e.target.value)) {
+                        mutation.setData({ salary: +e.target.value });
+                      }
                     }}
                     InputProps={{
                       inputProps: { style: { textAlign: "right" } },
