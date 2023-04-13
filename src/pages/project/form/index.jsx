@@ -104,6 +104,26 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
               </Box>
             </FieldSet>
 
+            <FieldSet disabledDivider>
+              <TextField
+                disabled={mutation.loading || mutation.processing}
+                label="Nilai Proyek"
+                value={mutation.data.price || 0}
+                onChange={(e) =>
+                  mutation.setData({
+                    price: Number(e.target.value),
+                  })
+                }
+                InputProps={{
+                  endAdornment:
+                    mutation.loading || mutation.processing ? (
+                      <CircularProgress size={20} />
+                    ) : null,
+                }}
+                sx={{ width: "75%" }}
+              />
+            </FieldSet>
+
             <FieldSet
               label="Informasi Pemberi Proyek"
               stackProps={{ direction: "column", spacing: 2 }}

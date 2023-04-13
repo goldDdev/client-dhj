@@ -44,6 +44,17 @@ const columns = (table, onUpdate, onDelete) => [
     ),
   },
   {
+    label: "Nilai Proyek",
+    value: (value) => utils.formatCurrency(value.price),
+    head: {
+      noWrap: true,
+      sx: {
+        width: "15%",
+      },
+    },
+    sx: { whiteSpace: "nowrap" },
+  },
+  {
     label: "Team",
     value: (value) => value.companyName,
     head: {

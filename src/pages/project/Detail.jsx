@@ -10,7 +10,13 @@ import apiRoute from "@services/apiRoute";
 import { useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { SimpleList } from "@components/base/list";
-import { Edit, Close, MoreVert, PersonAddAlt } from "@mui/icons-material";
+import {
+  Edit,
+  Close,
+  MoreVert,
+  PersonAddAlt,
+  Refresh,
+} from "@mui/icons-material";
 import { BasicDropdown, IconButton } from "@components/base";
 import {
   Button,
@@ -24,6 +30,7 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 export default () => {
   const { id } = useParams();
@@ -189,6 +196,14 @@ export default () => {
     });
   };
 
+  const onRefresh = () => {
+    mutation.get([apiRoute.project.detail, { id }], {
+      onSuccess: ({ data }) => {
+        mutation.setData(data);
+      },
+    });
+  };
+
   React.useEffect(() => {
     mutation.get([apiRoute.project.detail, { id }], {
       onSuccess: ({ data }) => {
@@ -211,6 +226,19 @@ export default () => {
       container={"container"}
       title="Proyek"
       subtitle={"Detail Proyek"}
+      headRight={{
+        children: (
+          <LoadingButton
+            loading={mutation.loading}
+            disabled={mutation.loading}
+            onClick={onRefresh}
+            color="primary"
+            startIcon={<Refresh />}
+          >
+            Muat Ulang
+          </LoadingButton>
+        ),
+      }}
     >
       <Grid container spacing={2} justifyContent="space-between">
         <Grid item xs={9}>
@@ -239,6 +267,18 @@ export default () => {
                 <ListItemText
                   primary="Nomor SPK"
                   secondary={mutation.data.noSpk}
+                  primaryTypographyProps={{
+                    variant: "subtitle1",
+                    fontWeight: 500,
+                  }}
+                  secondaryTypographyProps={{ variant: "body1" }}
+                />
+              </ListItem>
+
+              <ListItem divider>
+                <ListItemText
+                  primary="Nilai Proyek"
+                  secondary={utils.formatCurrency(mutation.data.price)}
                   primaryTypographyProps={{
                     variant: "subtitle1",
                     fontWeight: 500,
