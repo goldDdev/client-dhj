@@ -104,7 +104,7 @@ export default () => {
         <ListItem component="div">
           <ListItemText
             primary="Lembur"
-            secondary="Upan Lembur untuk setiap menit."
+            secondary="Upan Lembur untuk setiap Jam."
           />
         </ListItem>
         <Stack direction="row" spacing={1} width={"80%"}>
@@ -113,12 +113,12 @@ export default () => {
             InputLabelProps={{ shrink: true }}
             placeholder="Masukan tunjangan lembur disini."
             InputProps={{
-              startAdornment: "Rp.",
+              startAdornment: "Rp ",
               endAdornment: table.loading ? <CircularProgress size={20} /> : null,
             }}
-            value={mutation.data.OVERTIME_PRICE_PER_MINUTE || ""}
+            value={mutation.data.OVERTIME_PRICE_PER_HOUR || ""}
             onChange={(e) => {
-              mutation.setData({ OVERTIME_PRICE_PER_MINUTE: e.target.value });
+              mutation.setData({ OVERTIME_PRICE_PER_HOUR: e.target.value });
             }}
             disabled={table.loading || mutation.processing}
           />
@@ -146,12 +146,46 @@ export default () => {
             InputLabelProps={{ shrink: true }}
             placeholder="Masukan denda keterlambatan disini."
             InputProps={{
-              startAdornment: "Rp.",
+              startAdornment: "Rp ",
               endAdornment: table.loading ? <CircularProgress size={20} /> : null,
             }}
             value={mutation.data.LATETIME_PRICE_PER_MINUTE || ""}
             onChange={(e) => {
               mutation.setData({ LATETIME_PRICE_PER_MINUTE: e.target.value });
+            }}
+            disabled={table.loading || mutation.processing}
+          />
+        </Stack>
+      </Stack>
+
+
+
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        pr={2}
+        component={Paper}
+        variant="outlined"
+        mt={2}
+      >
+        <ListItem component="div">
+          <ListItemText
+            primary="Batas Keterlambatan"
+            secondary="Dihitung mulai dari setelah jam kerja"
+          />
+        </ListItem>
+        <Stack direction="row" spacing={1} width={"80%"}>
+          <TextField
+            type="text"
+            InputLabelProps={{ shrink: true }}
+            placeholder="Masukan batas keterlambatan disini"
+            InputProps={{
+              endAdornment: table.loading ? <CircularProgress size={20} /> : null,
+            }}
+            value={mutation.data.LATE_TRESHOLD || ""}
+            onChange={(e) => {
+              mutation.setData({ LATE_TRESHOLD: e.target.value });
             }}
             disabled={table.loading || mutation.processing}
           />
