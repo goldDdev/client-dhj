@@ -73,9 +73,7 @@ export default () => {
         {`Periode ${utils.getMonth(data.month)} ${data.year}`}
       </Typography>
 
-      <Typography variant="body1" gutterBottom mt={2}>
-        Potongan Karyawan
-      </Typography>
+     
 
       <Table size="small">
         <TableBody>
