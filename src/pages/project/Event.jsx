@@ -248,8 +248,8 @@ export default () => {
 
   return (
     <ProjectTemplate
-      title="Agenda"
-      subtitle="Menampilkan daftar agenda proyek"
+      title="Event"
+      subtitle="Menampilkan daftar event/agenda proyek"
       headRight={{
         children: (
           <>

@@ -13,18 +13,8 @@ import { People, ListAlt, Close } from "@mui/icons-material";
 
 const path = (id) => [
   {
-    label: "Overview",
+    label: "Informasi Proyek",
     link: `/project/${id}/detail`,
-    startIcon: <ListAlt />,
-  },
-  {
-    label: "BOQ",
-    link: `/project/${id}/boq`,
-    startIcon: <ListAlt />,
-  },
-  {
-    label: "Absen",
-    link: `/project/${id}/absent`,
     startIcon: <ListAlt />,
   },
   {
@@ -33,13 +23,23 @@ const path = (id) => [
     startIcon: <ListAlt />,
   },
   {
-    label: "Lembur",
-    link: `/project/${id}/overtime`,
+    label: "BOQ",
+    link: `/project/${id}/boq`,
     startIcon: <ListAlt />,
   },
   {
     label: "Activity",
     link: `/project/${id}/progres`,
+    startIcon: <ListAlt />,
+  },
+  {
+    label: "Absen",
+    link: `/project/${id}/absent`,
+    startIcon: <ListAlt />,
+  },
+  {
+    label: "Lembur",
+    link: `/project/${id}/overtime`,
     startIcon: <ListAlt />,
   },
 ];

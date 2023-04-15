@@ -212,9 +212,9 @@ export default () => {
     });
   }, [id]);
 
-  const dateProject = `${mutation.data.duration} Hari | ${moment(
+  const dateProject = `${moment(
     mutation.data.startAt
-  ).format("DD-MM-yyyy")} - ${moment(mutation.data.finishAt).format(
+  ).format("DD-MM-yyyy")} s/d ${moment(mutation.data.finishAt).format(
     "DD-MM-yyyy"
   )} ${
     mutation.data.targetDate
@@ -241,7 +241,7 @@ export default () => {
       }}
     >
       <Grid container spacing={2} justifyContent="space-between">
-        <Grid item xs={9}>
+        <Grid item xs={6}>
           <Paper elevation={0} variant="outlined">
             <List dense>
               <ListItem
@@ -253,8 +253,8 @@ export default () => {
                 }
               >
                 <ListItemText
-                  primary="Nama Proyek"
-                  secondary={mutation.data.name}
+                  primary="Nomor SPK"
+                  secondary={mutation.data.noSpk}
                   primaryTypographyProps={{
                     variant: "subtitle1",
                     fontWeight: 500,
@@ -265,8 +265,8 @@ export default () => {
 
               <ListItem divider>
                 <ListItemText
-                  primary="Nomor SPK"
-                  secondary={mutation.data.noSpk}
+                  primary="Nama Proyek"
+                  secondary={mutation.data.name}
                   primaryTypographyProps={{
                     variant: "subtitle1",
                     fontWeight: 500,
@@ -287,9 +287,9 @@ export default () => {
                 />
               </ListItem>
 
-              <ListItem divider>
+              <ListItem>
                 <ListItemText
-                  primary="Lama Pengerjaan"
+                  primary={`Durasi Proyek : ${mutation.data.duration} Hari`}
                   secondary={dateProject}
                   primaryTypographyProps={{
                     variant: "subtitle1",
@@ -298,8 +298,12 @@ export default () => {
                   secondaryTypographyProps={{ variant: "body1" }}
                 />
               </ListItem>
-
-              {/* Perusahaan */}
+            </List>
+          </Paper>
+        </Grid>
+        <Grid item xs={6}>
+          <Paper elevation={0} variant="outlined">
+            <List dense>
               <ListItem divider>
                 <ListItemText
                   primary="Informasi Pemberi Proyek"
@@ -312,7 +316,7 @@ export default () => {
 
               <ListItem dense>
                 <ListItemText
-                  primary="Perusahaan"
+                  primary="Perusahaan/Team"
                   secondary={mutation.data.companyName}
                   primaryTypographyProps={{
                     variant: "subtitle1",
@@ -340,7 +344,7 @@ export default () => {
               {/* Lokasi */}
               <ListItem divider>
                 <ListItemText
-                  primary="Lokasi Proyek"
+                  primary={`Lokasi Proyek : ${mutation.data.location || "-"}`}
                   primaryTypographyProps={{
                     variant: "subtitle1",
                     fontWeight: 500,
@@ -350,7 +354,7 @@ export default () => {
 
               <ListItem dense>
                 <ListItemText
-                  primary={mutation.data.location || "-"}
+                  primary="Koordinat"
                   secondary={`Lat: ${mutation.data.latitude || "-"} | Long: ${
                     mutation.data.longitude || "-"
                   }`}
@@ -364,7 +368,7 @@ export default () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={4}>
+        <Grid item xs={6}>
           <Paper variant="outlined">
             <Stack
               p={1.5}
@@ -437,7 +441,7 @@ export default () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={8}>
+        <Grid item xs={6}>
           <Paper variant="outlined">
             <Stack
               p={1.5}

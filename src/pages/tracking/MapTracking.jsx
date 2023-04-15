@@ -21,8 +21,8 @@ const columns = (t) => [
     value: (value) => value.name,
   },
   {
-    label: 'Status',
-    value: (value) => '',
+    label: 'Waktu',
+    value: (value) => moment(value.createdAt).format("DD-MM-yyyy HH:mm"),
   },
 ];
 
