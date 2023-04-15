@@ -11,6 +11,12 @@ import {
   Popper,
   ListItemButton,
   List,
+  TableHead,
+  TableRow,
+  Table,
+  TableCell,
+  TableContainer,
+  TableBody,
 } from "@mui/material";
 import moment from "moment";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
@@ -94,6 +100,8 @@ const columns = (progres, handleClick) => {
 export default () => {
   const { id } = useParams();
   const alert = useAlert();
+  let currentPlanId = 0;
+  let colSpan = 0;
   const { enqueueSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [currentProgres, setCurrentProgres] = React.useState({});
@@ -294,24 +302,198 @@ export default () => {
 
       <Stack
         direction="row"
+
+        spacing={1}
+        justifyContent="flex-end"
+        alignItems="center"
+      >
+        
+        <Square color="warning" />
+        <div>Progres Belum Dikonfirmasi</div>
+      </Stack>
+
+      <Stack
+        direction="row"
         mb={2}
         spacing={1}
         justifyContent="flex-end"
         alignItems="center"
       >
-        <div>Catatan:</div>
-        <Square color="warning" />
-
-        <div>Progres Belum Dikonfirmasi</div>
+        
+        <Square sx={{color:'gainsboro'}} />
+        <div>Plan SPV</div>
       </Stack>
 
+
       <Paper elevation={0} variant="outlined">
-        <DataTable
+        {/* <DataTable
           tableProps={{ size: "small" }}
           data={progres.data}
           loading={progres.loading}
           column={columns(progres, handleClick)}
-        />
+        /> */}
+
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell component="th">Nama</TableCell>
+                {...utils
+                  .getDaysInMonthUTC(
+                    progres.getQuery("month", moment().format("M")),
+                    progres.getQuery("year", moment().format("Y"))
+                  )
+                  .map((d) => (
+                    <TableCell
+                      component="th"
+                      key={d}
+                      align="center"
+                      sx={{
+                        borderRight: 1,
+                        borderLeft: 1,
+                        borderColor: "divider",
+                      }}
+                    >
+                      {moment(d).format("DD")}
+                    </TableCell>
+                  ))}
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {progres.data.map((value, i) => {
+                return (
+                  <React.Fragment key={i}>
+                    <TableRow>
+                      <TableCell rowSpan={2} sx={{ whiteSpace: "nowrap" }}>
+                        <ListItemText
+                          primary={value.name}
+                          secondary={value.typeUnit}
+                          sx={{ m: 0 }}
+                        />
+                      </TableCell>
+                      {utils
+                        .getDaysInMonthUTC(
+                          progres.getQuery("month", moment().format("M")),
+                          progres.getQuery("year", moment().format("Y"))
+                        )
+                        .map((d) => {
+                          const find = value.data.find(
+                            (_v) => _v.day === +moment(d).format("D")
+                          );
+                          return (
+                            <TableCell
+                              key={d}
+                              sx={{
+                                borderRight: 1,
+                                borderLeft: 1,
+                                borderColor: "divider",
+                              }}
+                              padding="none"
+                              align="center"
+                            >
+                              {find ? (
+                                <Box
+                                  sx={{
+                                    backgroundColor: find.aproveName
+                                      ? "inherit"
+                                      : "warning.main",
+                                  }}
+                                >
+                                  <IconButton
+                                    aria-describedby={`row-${i}-col-${moment(
+                                      d
+                                    ).format("D")}`}
+                                    size="small"
+                                    onClick={handleClick(find)}
+                                  >
+                                    {find.progres}
+                                  </IconButton>
+                                </Box>
+                              ) : (
+                                <>&nbsp;</>
+                              )}
+                            </TableCell>
+                          );
+                        })}
+                    </TableRow>
+
+                    <TableRow key={i}>
+                      {utils
+                        .getDaysInMonthUTC(
+                          progres.getQuery("month", moment().format("M")),
+                          progres.getQuery("year", moment().format("Y"))
+                        )
+                        .map((d) => {
+                          const progress = 0;
+                          const tmp = currentPlanId;
+                          const find = value.plans.find(
+                            (_v) => _v.day === +moment(d).format("D")
+                          );
+
+                          if (find) {
+                            currentPlanId =
+                              currentPlanId === find.id
+                                ? currentPlanId
+                                : find.id;
+                            colSpan = value.plans.filter(
+                              (f) => f.id === find.id
+                            ).length;
+                          } else {
+                            currentPlanId = 0;
+                            colSpan = 0;
+                          }
+
+                          return find ? (
+                            find.id === tmp ? null : (
+                              <TableCell
+                                key={d}
+                                colSpan={colSpan}
+                                sx={{
+                                  borderRight: 1,
+                                  borderLeft: 1,
+                                  borderColor: "divider",
+                                  backgroundColor: "whitesmoke",
+                                  fontWeight: 700,
+                                }}
+                                padding="none"
+                              >
+                                {find ? (
+                                  <div
+                                    style={{
+                                      flexGrow: 1,
+                                      backgroundColor: "gainsboro",
+                                      textAlign: "right",
+                                      padding: "4px",
+                                    }}
+                                  >
+                                    {colSpan === 1 ? "" : "Plan "}
+                                    {find.progress}
+                                  </div>
+                                ) : null}
+                              </TableCell>
+                            )
+                          ) : (
+                            <TableCell
+                              key={d}
+                              sx={{
+                                borderRight: 1,
+                                borderLeft: 1,
+                                borderColor: "divider",
+                                backgroundColor: "whitesmoke",
+                              }}
+                            >
+                              &nbsp;
+                            </TableCell>
+                          );
+                        })}
+                    </TableRow>
+                  </React.Fragment>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Paper>
 
       <Popper id={"simple-popper"} open={Boolean(anchorEl)} anchorEl={anchorEl}>

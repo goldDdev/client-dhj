@@ -74,7 +74,7 @@ const DataTable = ({
                     selected={selected ? selected(_data) : undefined}
                     {...row}
                   >
-                    {column.map(({ value, sortKey, ...col }, j) => (
+                    {column.map(({ value, sortKey, head, label, ...col }, j) => (
                       <TableCell key={`row-${i}-cell-${j}`} {...col}>
                         {value(_data, i)}
                       </TableCell>

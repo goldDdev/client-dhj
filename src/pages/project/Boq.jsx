@@ -12,6 +12,7 @@ import {
   Typography,
   Divider,
   Badge,
+  ListItemText,
 } from "@mui/material";
 import { BasicDropdown, Timeline } from "@components/base";
 import { useSnackbar } from "notistack";
@@ -32,6 +33,8 @@ import {
   Clear,
   RefreshOutlined,
   Refresh,
+  NotificationImportant,
+  ErrorOutline,
 } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
 import apiRoute from "@services/apiRoute";
@@ -48,193 +51,244 @@ const columns = (
   postLoading,
   snackbar,
   navigate
-) => [
-  {
-    label: "No",
-    value: (_, idx) => {
-      return idx + 1;
+) => {
+  const borderPlan = { borderRight: 1, borderLeft: 1, borderColor: "divider" };
+  return [
+    {
+      label: "Nama",
+      sortKey: "name",
+      value: (value) =>
+        postLoading.some((v) => v === value.boqId) ? (
+          <Skeleton width="100%" />
+        ) : (
+          <ListItemText
+            sx={{ mx: 1, my: 0 }}
+            primary={value.name || "-"}
+            primaryTypographyProps={{ variant: "body2" }}
+            secondary={value.typeUnit || "-"}
+            secondaryTypographyProps={{ variant: "body2" }}
+          />
+        ),
+      padding: "none",
     },
-    head: {
+
+    {
+      label: "Jumlah",
+      value: (value) => (
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          spacing={1}
+        >
+          <Box>
+            {currentId === value.id ? (
+              <TextField
+                size="small"
+                value={mutation.data.unit}
+                onChange={(e) => mutation.setData({ unit: +e.target.value })}
+                variant="standard"
+                error={mutation.error("unit")}
+                helperText={mutation.message("unit")}
+                InputProps={{
+                  inputProps: {
+                    style: { textAlign: "center" },
+                    maxLength: 5,
+                  },
+                  startAdornment: (
+                    <IconButton
+                      disabled={mutation.processing}
+                      onClick={onUpdate(value)}
+                      size="small"
+                    >
+                      <Close fontSize="inherit" />
+                    </IconButton>
+                  ),
+                  endAdornment: (
+                    <IconButton
+                      disabled={mutation.processing}
+                      onClick={() => {
+                        mutation.put(url, {
+                          onSuccess: ({ data }) => {
+                            snackbar("BOQ proyek berhasil diperbaharui", {
+                              variant: "success",
+                            });
+                            value.unit = data.unit;
+                            value.updatedAt = data.updatedAt;
+                            onUpdate(data)();
+                          },
+                        });
+                      }}
+                      size="small"
+                    >
+                      {mutation.processing ? (
+                        <CircularProgress size={20} />
+                      ) : (
+                        <Check fontSize="inherit" />
+                      )}
+                    </IconButton>
+                  ),
+                }}
+                sx={{ minWidth: "150px" }}
+              />
+            ) : (
+              value.unit
+            )}
+          </Box>
+
+          {currentId === value.id ? null : (
+            <Box display="flex" flexDirection="row" gap={1}>
+              <IconButton onClick={onUpdate(value)} size="small">
+                <Edit fontSize="inherit" />
+              </IconButton>
+            </Box>
+          )}
+        </Stack>
+      ),
+      align: "center",
+      padding: "checkbox",
+      head: {
+        align: "center",
+      },
+      sx: {
+        ...borderPlan,
+      },
+    },
+    {
+      label: "Progres",
+      value: (value) =>
+        postLoading.some((v) => v === value.boqId) ? (
+          <Skeleton width="100%" />
+        ) : (
+          value.totalProgres
+        ),
+      align: "center",
+      padding: "checkbox",
+      head: {
+        align: "center",
+      },
+      sx: {
+        whiteSpace: "noWrap",
+        ...borderPlan,
+        fontWeight: 700,
+        fontSize: "16px",
+        minWidth: "80px",
+      },
+    },
+    {
+      label: "Plan",
+      value: (value) =>
+        postLoading.some((v) => v === value.boqId) ? (
+          <Skeleton width="100%" />
+        ) : (
+          value.planProgres
+        ),
+      align: "center",
+      padding: "checkbox",
+      head: {
+        align: "center",
+      },
+      sx: {
+        whiteSpace: "noWrap",
+        fontWeight: 700,
+        fontSize: "16px",
+        minWidth: "80px",
+      },
+    },
+    {
+      label: "Tanggal Progres",
+      sortKey: "updated_at",
+      value: (value) => (
+        <ListItemText
+          sx={{ m: 0 }}
+          primary={value.progresBy || "-"}
+          primaryTypographyProps={{ variant: "body2" }}
+          secondary={value.lastProgresAt || "-"}
+          secondaryTypographyProps={{ variant: "body2" }}
+        />
+      ),
+      align: "center",
+      padding: "checkbox",
+      head: {
+        align: "center",
+        sx: {
+          whiteSpace: "nowrap",
+        },
+      },
+      sx: {
+        ...borderPlan,
+      },
+    },
+    {
+      label: "Tanggal Plan",
+      value: (value) =>
+        postLoading.some((v) => v === value.boqId) ? (
+          <Skeleton width="100%" />
+        ) : (
+          <ListItemText
+            sx={{ m: 0 }}
+            secondary={`${value.planStart || ""} - ${value.planEnd || ""}`}
+            primaryTypographyProps={{ variant: "body2" }}
+            primary={value.planBy || "-"}
+            secondaryTypographyProps={{ variant: "body2" }}
+          />
+        ),
+      align: "center",
+      head: {
+        align: "center",
+        sx: {
+          whiteSpace: "nowrap",
+        },
+      },
+      padding: "checkbox",
+      sx: {
+        whiteSpace: "noWrap",
+        padding: 0.4,
+        ...borderPlan,
+      },
+    },
+
+    {
+      value: (value) => (
+        <Badge
+          badgeContent={value.totalPending || 0}
+          color="error"
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+        >
+          <BasicDropdown
+            type="icon"
+            size="small"
+            menu={[
+              {
+                text: `${
+                  value.totalPending > 0 ? `(${value.totalPending})` : ""
+                } Menunggu Konfirmasi`,
+                onClick: navigate,
+                disabled: value.totalPending === 0,
+                divider: true,
+              },
+              {
+                text: "Riwayat",
+                onClick: onHistory(value),
+                divider: true,
+              },
+              { text: "Hapus", onClick: onDelete(value.id) },
+            ]}
+            label={<MoreVert fontSize="inherit" />}
+          />
+        </Badge>
+      ),
+      head: {
+        padding: "checkbox",
+      },
       align: "center",
       padding: "checkbox",
     },
-    align: "center",
-    padding: "checkbox",
-  },
-  {
-    label: "Nama",
-    sortKey: "name",
-    value: (value) =>
-      postLoading.some((v) => v === value.boqId) ? (
-        <Skeleton width="100%" />
-      ) : (
-        value.name
-      ),
-  },
-  {
-    label: "Satuan",
-    sortKey: "unit",
-    value: (value) =>
-      postLoading.some((v) => v === value.boqId) ? (
-        <Skeleton width="100%" />
-      ) : (
-        value.typeUnit
-      ),
-    align: "center",
-    padding: "checkbox",
-    head: {
-      align: "center",
-    },
-    sx: {
-      whiteSpace: "noWrap",
-    },
-  },
-  {
-    label: "Jumlah",
-    value: (value) => (
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="center"
-        spacing={1}
-      >
-        <Box>
-          {currentId === value.id ? (
-            <TextField
-              size="small"
-              value={mutation.data.unit}
-              onChange={(e) => mutation.setData({ unit: +e.target.value })}
-              variant="standard"
-              error={mutation.error("unit")}
-              helperText={mutation.message("unit")}
-              InputProps={{
-                inputProps: {
-                  style: { textAlign: "center" },
-                  maxLength: 5,
-                },
-                startAdornment: (
-                  <IconButton
-                    disabled={mutation.processing}
-                    onClick={onUpdate(value)}
-                    size="small"
-                  >
-                    <Close fontSize="inherit" />
-                  </IconButton>
-                ),
-                endAdornment: (
-                  <IconButton
-                    disabled={mutation.processing}
-                    onClick={() => {
-                      mutation.put(url, {
-                        onSuccess: ({ data }) => {
-                          snackbar("BOQ proyek berhasil diperbaharui", {
-                            variant: "success",
-                          });
-                          value.unit = data.unit;
-                          value.updatedAt = data.updatedAt;
-                          onUpdate(data)();
-                        },
-                      });
-                    }}
-                    size="small"
-                  >
-                    {mutation.processing ? (
-                      <CircularProgress size={20} />
-                    ) : (
-                      <Check fontSize="inherit" />
-                    )}
-                  </IconButton>
-                ),
-              }}
-              sx={{ minWidth: "150px" }}
-            />
-          ) : (
-            value.unit
-          )}
-        </Box>
-
-        {currentId === value.id ? null : (
-          <Box display="flex" flexDirection="row" gap={1}>
-            <IconButton onClick={onUpdate(value)} size="small">
-              <Edit fontSize="inherit" />
-            </IconButton>
-          </Box>
-        )}
-      </Stack>
-    ),
-    align: "center",
-    padding: "checkbox",
-    head: {
-      align: "center",
-    },
-  },
-  {
-    label: "Progres",
-    value: (value) =>
-      postLoading.some((v) => v === value.boqId) ? (
-        <Skeleton width="100%" />
-      ) : (
-        value.totalProgres
-      ),
-    align: "center",
-    padding: "checkbox",
-    head: {
-      align: "center",
-    },
-    sx: {
-      whiteSpace: "noWrap",
-    },
-  },
-
-  {
-    label: "Perbaharui Pada",
-    sortKey: "updated_at",
-    value: (value) => moment(value.updatedAt).fromNow(),
-    align: "center",
-    padding: "checkbox",
-    head: {
-      align: "center",
-      sx: { whiteSpace: "nowrap" },
-    },
-  },
-
-  {
-    value: (value) => (
-      <Badge
-        badgeContent={value.totalPending || 0}
-        color="error"
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-      >
-        <BasicDropdown
-          type="icon"
-          size="small"
-          menu={[
-            {
-              text: `${
-                value.totalPending > 0 ? `(${value.totalPending})` : ""
-              } Menunggu Konfirmasi`,
-              onClick: navigate,
-              disabled: value.totalPending === 0,
-              divider: true,
-            },
-            {
-              text: "Riwayat",
-              onClick: onHistory(value),
-              divider: true,
-            },
-            { text: "Hapus", onClick: onDelete(value.id) },
-          ]}
-          label={<MoreVert fontSize="inherit" />}
-        />
-      </Badge>
-    ),
-    align: "center",
-    padding: "checkbox",
-  },
-];
+  ];
+};
 
 export default () => {
   const alert = useAlert();
@@ -381,6 +435,7 @@ export default () => {
         <Grid item xs={9}>
           <Paper variant="outlined">
             <DataTable
+              tableProps={{ size: "small" }}
               data={table.data}
               loading={table.loading}
               column={columns(
