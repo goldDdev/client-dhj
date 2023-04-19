@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import FRHooks from "frhooks";
+import moment from "moment";
 import { useSnackbar } from "notistack";
 import { Paper, Stack, Button } from "@mui/material";
 import { Add, ListAlt } from "@mui/icons-material";
@@ -12,31 +13,35 @@ import DataTable from "../../../components/base/table/DataTable";
 const columns = () => [
   {
     label: 'Tangal',
-    value: (value) => '',
+    value: (value) => `${moment(value.startDate).format("DD-MM-yyyy")} s/d ${moment(value.endDate).format("DD-MM-yyyy") }`,
   },
   {
-    label: 'Project',
-    value: (value) => '',
+    label: 'Proyek',
+    value: (value) => value.projectName,
   },
   {
     label: "Jumlah",
-    value: (value) => "-",
+    value: (value) => `MT: ${value.total_material}, EQ:  ${value.total_equipment}`,
     align: "center",
     head: {
       align: "center",
       sx: {
-        width: "10%",
+        width: "20%",
         whiteSpace: "nowrap",
       },
     },
   },
   {
     label: 'Oleh',
-    value: (value) => '',
+    value: (value) => value.name,
   },
   {
     label: 'Status',
-    value: (value) => '',
+    value: (value) => utils.ucword(value.status),
+  },
+  {
+    label: 'Aksi',
+    value: (value) => '-',
   },
 ]
 
@@ -47,10 +52,9 @@ export default () => {
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().inventory("index").link(), {
+  const table = FRHooks.useTable(FRHooks.apiRoute().inventoryUsing("index").link(), {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
-    disabledOnDidMount: true
   });
 
   const mutation = FRHooks.useMutation({
@@ -87,13 +91,13 @@ export default () => {
   return (
     <MainTemplate
       title="Permintaan Penggunaan Inventori"
-      subtitle={`Daftar penggunaan inventori dalam proyek oleh mandor`}
+      subtitle={`Daftar penggunaan inventori dalam proyek`}
       headRight={{
-        children: (
-          <Button startIcon={<Add />} onClick={onOpen}>
-            Tambah Penggunaan Inventori
-          </Button>
-        ),
+        // children: (
+        //   <Button startIcon={<Add />} onClick={onOpen}>
+        //     Tambah Penggunaan Inventori
+        //   </Button>
+        // ),
       }}
     >
       <Stack
@@ -105,41 +109,52 @@ export default () => {
         <div>
           <Button
             disableElevation
-            variant={!table.query("type") ? "contained" : "outlined"}
-            color={!table.query("type") ? "primary" : "inherit"}
+            variant={!table.query("status") ? "contained" : "outlined"}
+            color={!table.query("status") ? "primary" : "inherit"}
             startIcon={<ListAlt />}
-            onClick={() => table.setQuery({ type: '' })}
+            onClick={() => table.setQuery({ status: '' })}
           >
-            Semua Inventori
+            Semua Status
           </Button>
         </div>
         <div>
           <Button
             disableElevation
-            variant={table.query("type") == 'MATERIAL' ? "contained" : "outlined"}
-            color={table.query("type") == 'MATERIAL' ? "primary" : "inherit"}
+            variant={table.query("status") == 'PENDING' ? "contained" : "outlined"}
+            color={table.query("status") == 'PENDING' ? "primary" : "inherit"}
             startIcon={<ListAlt />}
-            onClick={() => table.setQuery({ type: 'MATERIAL' })}
+            onClick={() => table.setQuery({ status: 'PENDING' })}
           >
-            Material
+            Pending
           </Button>
         </div>
         <div>
           <Button
             disableElevation
-            variant={table.query("type") == 'EQUIPMENT' ? "contained" : "outlined"}
-            color={table.query("type") == 'EQUIPMENT' ? "primary" : "inherit"}
+            variant={table.query("status") == 'APPROVED' ? "contained" : "outlined"}
+            color={table.query("status") == 'APPROVED' ? "primary" : "inherit"}
             startIcon={<ListAlt />}
-            onClick={() => table.setQuery({ type: 'EQUIPMENT' })}
+            onClick={() => table.setQuery({ status: 'APPROVED' })}
           >
-            Equipment
+            Selesai
+          </Button>
+        </div>
+        <div>
+          <Button
+            disableElevation
+            variant={table.query("status") == 'REJECTED' ? "contained" : "outlined"}
+            color={table.query("status") == 'REJECTED' ? "primary" : "inherit"}
+            startIcon={<ListAlt />}
+            onClick={() => table.setQuery({ status: 'REJECTED' })}
+          >
+            Ditolak
           </Button>
         </div>
       </Stack>
 
       <Paper elevation={0} variant="outlined">
         <DataTable
-          data={[]}
+          data={table.data}
           loading={table.loading}
           column={columns()}
           pagination={utils.pagination(table.pagination)}

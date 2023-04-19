@@ -71,6 +71,10 @@ const apiRoute = {
     index: "/inventory",
     detail: "/inventory/:id",
   },
+  inventoryUsing: {
+    index: "/use-inventory",
+    items: "/use-inventory/:id/items",
+  },
 };
 
 export default apiRoute;

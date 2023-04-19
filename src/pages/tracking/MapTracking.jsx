@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FRHooks from "frhooks";
 import moment from "moment";
 import { useSnackbar } from "notistack";
@@ -7,8 +7,8 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import MainTemplate from "@components/templates/MainTemplate";
 import DataTable from "../../components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
+import * as utils from "@utils";
 
-// import 'leaflet/dist/leaflet.css';
 import '../../assets/leaflet.scss';
 
 const columns = (t) => [
@@ -18,11 +18,11 @@ const columns = (t) => [
   },
   {
     label: t("role"),
-    value: (value) => value.name,
+    value: (value) => utils.typesLabel(value.role),
   },
   {
     label: 'Waktu',
-    value: (value) => moment(value.createdAt).format("DD-MM-yyyy HH:mm"),
+    value: (value) => moment(value.created_at).format("DD-MM-yyyy HH:mm"),
   },
 ];
 
@@ -48,16 +48,15 @@ const MapTracking = () => {
     defaultValue: [],
     disabledOnDidMount: false,
     selector: (resp) => resp.data,
-    getData: (resp) => {
-      console.log('resp>',resp.length);
-    }
   });
 
-  // NOTE : interval 3 min to refetch data trackings
-  setInterval(() => {
-    console.log('Refetching...', new Date())
-    tracks.refresh()
-  }, 3*60000); // 1m=60s=60000ms
+  useEffect(() => {
+    // NOTE : interval 3 min to refetch data trackings
+    setInterval(() => {
+      console.log('Refetching...', new Date())
+      tracks.refresh()
+    }, 3*60000); // 1m=60s=60000ms
+  },[])
 
   return (
     <MainTemplate
@@ -154,7 +153,7 @@ const MapTracking = () => {
               </Box>
             ) : (
               <Typography variant="h6" textAlign="center" sx={{ m: 2 }}>
-                Maaf data tidak tersedia, silahkan coba ubah pencarian.
+                Data tidak tersedia, silahkan coba ubah pencarian.
               </Typography>
             )}
           </>
