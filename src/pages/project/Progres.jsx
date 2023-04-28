@@ -17,6 +17,7 @@ import {
   TableCell,
   TableContainer,
   TableBody,
+  Tooltip,
 } from "@mui/material";
 import moment from "moment";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
@@ -24,79 +25,13 @@ import * as utils from "@utils/";
 import * as BASE from "@components/base";
 import * as FORM from "./form";
 import apiRoute from "@services/apiRoute";
-import DataTable from "../../components/base/table/DataTable";
+
 import { Refresh, Square } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { useAlert } from "@contexts/AlertContext";
 import _ from "lodash";
 
-const columns = (progres, handleClick) => {
-  return [
-    {
-      label: "No",
-      align: "center",
-      padding: "checkbox",
-      value: (value, i) => i + 1,
-    },
-    {
-      label: "Nama",
-      value: (value) => <ListItemText primary={value.name} />,
-      sx: {
-        borderRight: 1,
-        borderColor: "divider",
-        whiteSpace: "nowrap",
-        px: 0.5,
-        py: 0.5,
-      },
-    },
-
-    ...utils
-      .getDaysInMonthUTC(
-        progres.getQuery("month", moment().format("M")),
-        progres.getQuery("year", moment().format("Y"))
-      )
-      .map((v) => {
-        return {
-          label: moment(v).format("DD"),
-          value: (value, i) => {
-            const find = value.data.find(
-              (_v) => _v.day === +moment(v).format("D")
-            );
-            if (find) {
-              return (
-                <Box
-                  sx={{
-                    bgcolor: !!find.aproveName ? "inherit" : "warning.main",
-                  }}
-                >
-                  <IconButton
-                    aria-describedby={`row-${i}-col-${moment(v).format("D")}`}
-                    size="small"
-                    onClick={handleClick(find)}
-                  >
-                    {find.progres}
-                  </IconButton>
-                </Box>
-              );
-            } else {
-              return "-";
-            }
-          },
-          align: "center",
-          head: {
-            align: "center",
-          },
-          sx: {
-            borderRight: 1,
-            borderColor: "divider",
-            whiteSpace: "nowrap",
-            padding: "6px",
-          },
-        };
-      }),
-  ];
-};
 export default () => {
   const { id } = useParams();
   const alert = useAlert();
@@ -109,6 +44,7 @@ export default () => {
   const [trigger, setTrigger] = React.useState({
     open: false,
     loading: false,
+    tooltip: undefined,
   });
 
   const progres = FRHooks.useFetch([apiRoute.progres.all, { id }], {
@@ -119,6 +55,7 @@ export default () => {
   const handleClick = (value) => (event) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
     setCurrentProgres(value);
+    setTrigger((state) => ({ ...state }));
     const find = progres.data.find((v) => v.id === value.projectBoqId);
     if (find) {
       setBoq(_.omit(find, ["data"]));
@@ -302,12 +239,10 @@ export default () => {
 
       <Stack
         direction="row"
-
         spacing={1}
         justifyContent="flex-end"
         alignItems="center"
       >
-        
         <Square color="warning" />
         <div>Progres Belum Dikonfirmasi</div>
       </Stack>
@@ -319,20 +254,11 @@ export default () => {
         justifyContent="flex-end"
         alignItems="center"
       >
-        
-        <Square sx={{color:'gainsboro'}} />
+        <Square sx={{ color: "gainsboro" }} />
         <div>Plan SPV</div>
       </Stack>
 
-
       <Paper elevation={0} variant="outlined">
-        {/* <DataTable
-          tableProps={{ size: "small" }}
-          data={progres.data}
-          loading={progres.loading}
-          column={columns(progres, handleClick)}
-        /> */}
-
         <TableContainer>
           <Table size="small">
             <TableHead>
@@ -400,15 +326,38 @@ export default () => {
                                       : "warning.main",
                                   }}
                                 >
-                                  <IconButton
-                                    aria-describedby={`row-${i}-col-${moment(
-                                      d
-                                    ).format("D")}`}
-                                    size="small"
-                                    onClick={handleClick(find)}
+                                  <Tooltip
+                                  placement="top-end"
+                                  open={trigger.tooltip}
+                                    arrow
+                                    title={
+                                      <ListItemText
+                                        primary={`Ditambahkan Oleh: ${
+                                          find.submitedName || "-"
+                                        }`}
+                                        primaryTypographyProps={{
+                                          variant: "body2",
+                                        }}
+                                        secondary={`Disetujui Oleh: ${
+                                          find.approveName || "-"
+                                        }`}
+                                        secondaryTypographyProps={{
+                                          variant: "body2",
+                                          color: "white",
+                                        }}
+                                      />
+                                    }
                                   >
-                                    {find.progres}
-                                  </IconButton>
+                                    <IconButton
+                                      aria-describedby={`row-${i}-col-${moment(
+                                        d
+                                      ).format("D")}`}
+                                      size="small"
+                                      onClick={handleClick(find)}
+                                    >
+                                      {find.progres}
+                                    </IconButton>
+                                  </Tooltip>
                                 </Box>
                               ) : (
                                 <>&nbsp;</>
@@ -458,19 +407,42 @@ export default () => {
                                 }}
                                 padding="none"
                               >
-                                {find ? (
-                                  <div
-                                    style={{
-                                      flexGrow: 1,
-                                      backgroundColor: "gainsboro",
-                                      textAlign: "right",
-                                      padding: "4px",
-                                    }}
-                                  >
-                                    {colSpan === 1 ? "" : "Plan "}
-                                    {find.progress}
-                                  </div>
-                                ) : null}
+                                <Tooltip
+                                  arrow
+                                  title={
+                                    <ListItemText
+                                      primary={`${moment(find.startDate).format(
+                                        "DD/MM/yyyy"
+                                      )} - ${moment(find.endDate).format(
+                                        "DD/MM/yyyy"
+                                      )}`}
+                                      secondary={`Dibuat Oleh: ${
+                                        find.planBy || "-"
+                                      }`}
+                                      primaryTypographyProps={{
+                                        variant: "body2",
+                                      }}
+                                      secondaryTypographyProps={{
+                                        variant: "body2",
+                                        color: "white",
+                                      }}
+                                    />
+                                  }
+                                >
+                                  {find ? (
+                                    <div
+                                      style={{
+                                        flexGrow: 1,
+                                        backgroundColor: "gainsboro",
+                                        textAlign: "right",
+                                        padding: "4px",
+                                      }}
+                                    >
+                                      {colSpan === 1 ? "" : "Plan "}
+                                      {find.progress}
+                                    </div>
+                                  ) : null}
+                                </Tooltip>
                               </TableCell>
                             )
                           ) : (

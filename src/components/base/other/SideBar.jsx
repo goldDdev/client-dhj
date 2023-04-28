@@ -22,12 +22,7 @@ import logo from "@assets/png/logo-dhj.png";
 import logoSmall from "@assets/png/logo-small.png";
 
 const menu = [
-  {
-    canAccess: [],
-    text: "Beranda",
-    link: "",
-    icon: icon.Dashboard,
-  },
+  
   {
     canAccess: [],
     text: "Proyek",

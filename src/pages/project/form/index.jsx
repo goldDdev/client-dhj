@@ -417,7 +417,7 @@ export const EventCreate = ({
     <DialogForm
       open={open}
       onClose={onOpen}
-      title="Form Agenda"
+      title="Form Event"
       maxWidth="md"
       content={{
         children: (
@@ -425,7 +425,7 @@ export const EventCreate = ({
             {type === "full" ? (
               <TextField
                 disabled={mutation.loading || mutation.processing}
-                label="Nama Agenda"
+                label="Nama Event"
                 value={mutation.data.title || ""}
                 onChange={(e) => mutation.setData({ title: e.target.value })}
                 onBlur={async () => mutation.validate("title")}
@@ -509,7 +509,7 @@ export const EventCreate = ({
             </FieldSet>
 
             <FieldSet
-              label="Status Agenda"
+              label="Status Event"
               stackProps={{
                 direction: "row",
                 spacing: 1,
@@ -575,7 +575,7 @@ export const EventCreate = ({
                   except: [].concat(mutation.isNewRecord ? ["id"] : []),
                   validation: true,
                   onSuccess: ({ data }) => {
-                    snackbar(`Agenda Berhasil Ditambahkan`);
+                    snackbar(`Event Berhasil Ditambahkan`);
                     onOpen();
                     if (table && mutation.isNewRecord) {
                       table.add(data, "start");

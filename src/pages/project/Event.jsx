@@ -139,7 +139,7 @@ const columns = (onDelete, onUpdate) => [
         type="icon"
         menu={[
           {
-            text: "Agenda Ulang",
+            text: "Event Ulang",
             divider: true,
             onClick: onUpdate(value.id, "actual"),
           },
@@ -148,7 +148,7 @@ const columns = (onDelete, onUpdate) => [
             divider: true,
             onClick: onUpdate(value.id, "full"),
           },
-          { text: "Hapus Agenda", onClick: onDelete(value.id) },
+          { text: "Hapus Event", onClick: onDelete(value.id) },
         ]}
         label={<MoreVert />}
       />
@@ -216,7 +216,7 @@ export default () => {
     alert.set({
       open: true,
       title: "Mohon Perhatian",
-      message: "Anda akan menghapus agenda ini dari daftar, apakah anda yakin?",
+      message: "Anda akan menghapus Event ini dari daftar, apakah anda yakin?",
       type: "warning",
       loading: false,
       close: {
@@ -249,7 +249,7 @@ export default () => {
   return (
     <ProjectTemplate
       title="Event"
-      subtitle="Menampilkan daftar event/agenda proyek"
+      subtitle="Menampilkan daftar event/Event proyek"
       headRight={{
         children: (
           <>
