@@ -75,6 +75,12 @@ const apiRoute = {
     index: "/use-inventory",
     items: "/use-inventory/:id/items",
   },
+  weeklyPlan: {
+    index: '/weekly-plan',
+    project: '/weekly-plan/project',
+    employee: '/weekly-plan/employee',
+    destroy: '/weekly-plan/:id'
+  }
 };
 
 export default apiRoute;

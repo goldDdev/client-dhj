@@ -56,22 +56,33 @@ export const kom = {
 export const projectBoq = {
   id: 0,
   boqId: 0,
-  projectId: 0
+  projectId: 0,
 };
 
 export const inventory = {
   id: 0,
-  name: '',
-  unit: '',
+  name: "",
+  unit: "",
   qty: 0,
   minQty: 0,
-  type: 'MATERIAL',
-  projectId: 0
+  type: "MATERIAL",
+  projectId: 0,
 };
 
 export const usingInventory = {
-  date: '',
+  date: "",
   projectId: 0,
   userId: 0,
-  items: []
-}
+  items: [],
+};
+
+export const weeklyPlan = {
+  id: 0,
+  projectId: 0,
+  employeeId: 0,
+  projectName: "",
+  name: "",
+  role: "",
+  startDate: moment().format("yyyy-MM-Dd"),
+  endDate: moment().format("yyyy-MM-Dd"),
+};

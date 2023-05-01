@@ -1,4 +1,5 @@
 import _ from "lodash";
+import moment from "moment";
 
 export const removeEmpty = (obj) => {
   return Object.entries(obj)
@@ -48,6 +49,16 @@ export const getDayName = (number) => {
   return ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][
     number
   ];
+};
+
+export const listYear = (value = 2022) => {
+  const year = moment().year();
+  const years = [];
+  for (let i = value; i <= year; i++) {
+    years.push(i)
+  }
+
+  return years;
 };
 
 export const getDaysInMonthUTC = (month, year) => {
