@@ -342,6 +342,7 @@ export default () => {
                           size="small"
                           sx={{
                             borderBottom: table.data.length - 1 === i ? 0 : 1,
+                            borderColor: "divider",
                           }}
                         >
                           {v.name || "-"}
@@ -350,8 +351,8 @@ export default () => {
                           size="small"
                           sx={{
                             borderRight: 1,
-                            borderColor: "divider",
                             borderBottom: table.data.length - 1 === i ? 0 : 1,
+                            borderColor: "divider",
                           }}
                         >
                           {utils.typesLabel(v.role) || "-"}
