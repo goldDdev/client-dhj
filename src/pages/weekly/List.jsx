@@ -96,6 +96,8 @@ export default () => {
     setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
+    projects.data = []
+    employees.data = []
   };
 
   const onSubmit = () => {
@@ -271,7 +273,7 @@ export default () => {
               ).length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={10} align="center">
-                    Plan Belum Tersdia
+                    Plan Belum Tersedia
                   </TableCell>
                 </TableRow>
               ) : null}
