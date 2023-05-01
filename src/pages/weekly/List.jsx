@@ -356,6 +356,7 @@ export default () => {
                           sx={{
                             borderBottom: table.data.length - 1 === i ? 0 : 1,
                             borderColor: "divider",
+                            whiteSpace:"nowrap"
                           }}
                         >
                           {v.name || "-"}
@@ -366,6 +367,7 @@ export default () => {
                             borderRight: 1,
                             borderBottom: table.data.length - 1 === i ? 0 : 1,
                             borderColor: "divider",
+                            whiteSpace:"nowrap"
                           }}
                         >
                           {utils.typesLabel(v.role) || "-"}
@@ -400,10 +402,11 @@ export default () => {
                               align="center"
                               size="small"
                               sx={{
-                                borderRight: _i === 5 ? 0 : 1,
+                                borderRight: _i === 6 ? 0 : 1,
                                 borderBottom:
                                   table.data.length - 1 === i ? 0 : 1,
                                 borderColor: "divider",
+                                whiteSpace:"nowrap"
                               }}
                             >
                               {_v.day === 0 ? (
