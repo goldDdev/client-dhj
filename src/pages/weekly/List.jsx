@@ -151,7 +151,7 @@ export default () => {
             },
             onSuccess: () => {
               enqueueSnackbar("Plan berhasil dihapus dari daftar");
-              table.refresh()
+              table.refresh();
               alert.reset();
               mutation.clearData();
               mutation.clearError();
@@ -338,10 +338,21 @@ export default () => {
                   .map((v, i) => {
                     return (
                       <TableRow key={`row-${i}`}>
-                        <TableCell size="small">{v.name || "-"}</TableCell>
                         <TableCell
                           size="small"
-                          sx={{ borderRight: 1, borderColor: "divider" }}
+                          sx={{
+                            borderBottom: table.data.length - 1 === i ? 0 : 1,
+                          }}
+                        >
+                          {v.name || "-"}
+                        </TableCell>
+                        <TableCell
+                          size="small"
+                          sx={{
+                            borderRight: 1,
+                            borderColor: "divider",
+                            borderBottom: table.data.length - 1 === i ? 0 : 1,
+                          }}
                         >
                           {utils.typesLabel(v.role) || "-"}
                         </TableCell>
@@ -371,7 +382,12 @@ export default () => {
                               colSpan={+_v.colSpan}
                               align="center"
                               size="small"
-                              sx={{ borderRight: 1, borderColor: "divider" }}
+                              sx={{
+                                borderRight: _i === 5 ? 0 : 1,
+                                borderBottom:
+                                  table.data.length - 1 === i ? 0 : 1,
+                                borderColor: "divider",
+                              }}
                             >
                               {_v.day === 0 ? (
                                 "-"
