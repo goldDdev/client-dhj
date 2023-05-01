@@ -44,19 +44,35 @@ export default () => {
     form: false,
   });
 
+  const validation = FRHooks.useServerValidation({
+    url: apiRoute.weeklyPlan.validation,
+    param: {
+      path: "field",
+      type: "rule",
+    },
+
+    selector: (resp) => {
+      return resp.error.messages.errors;
+    },
+    option: {
+      unique: (param) =>
+        "Karyawan ini sudah memiliki plan proyek pada range tanggal tersebut",
+    },
+  });
+
   const table = FRHooks.useFetch(apiRoute.weeklyPlan.index, {
     defaultValue: [],
     selector: (resp) => resp.data,
   });
 
   const projects = FRHooks.useFetch(apiRoute.weeklyPlan.project, {
-    defaultValue: [{ id: 0, name: "" }],
+    defaultValue: [],
     selector: (resp) => resp.data,
     disabledOnDidMount: true,
   });
 
   const employees = FRHooks.useFetch(apiRoute.weeklyPlan.employee, {
-    defaultValue: [{ id: 0, name: "", role: "" }],
+    defaultValue: [],
     selector: (resp) => resp.data,
     disabledOnDidMount: true,
   });
@@ -66,8 +82,8 @@ export default () => {
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
-        employeeId: y.number().required(),
-        projectId: y.number().required(),
+        employeeId: y.number().required().moreThan(0, "Tidak Boleh Kosong"),
+        projectId: y.number().required().moreThan(0, "Tidak Boleh Kosong"),
         startDate: y.string().required(),
         endDate: y.string().required(),
         projectName: y.string().nullable(),
@@ -80,15 +96,6 @@ export default () => {
     setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
-    projects.add({
-      id: 0,
-      name: "",
-    });
-    employees.add({
-      id: 0,
-      name: "",
-      role: "",
-    });
   };
 
   const onSubmit = () => {
@@ -98,6 +105,10 @@ export default () => {
       except: mutation.isNewRecord
         ? ["id", "projectName", "role", "name"]
         : ["projectName", "role", "name"],
+      serverValidation: {
+        serve: validation.serve,
+        method: "post",
+      },
       onSuccess: () => {
         enqueueSnackbar("Plan mingguan berhasil ditambahkan");
         table.refresh();
@@ -368,7 +379,10 @@ export default () => {
                                   p.push({ ...n, colSpan: 1 });
                                 } else if (last.day > 0 && n.day === 0) {
                                   p.push({ ...n, colSpan: 1 });
-                                } else if (last.projectId === n.projectId) {
+                                } else if (
+                                  last.id === n.id &&
+                                  last.projectId === n.projectId
+                                ) {
                                   last["colSpan"] = last["colSpan"] + 1;
                                 } else {
                                   p.push({ ...n, colSpan: 1 });

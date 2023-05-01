@@ -23,10 +23,10 @@ export const Create = ({
           <Stack spacing={2.5} direction="column">
             <Autocomplete
               loading={employees.loading}
-              options={employees.data}
+              options={employees.data.concat({ id: 0, name: "", role: "" })}
               getOptionLabel={(options) => options.name}
               isOptionEqualToValue={(options, value) => {
-                return options.id === value.id;
+                return options.name === value.name;
               }}
               value={{
                 id: mutation.data.employeeId,
@@ -36,6 +36,14 @@ export const Create = ({
               onInputChange={(e, v, r) => {
                 if (r === "input") {
                   employees.setQuery({ name: v });
+                }
+
+                if (r === "clear") {
+                  mutation.setData({
+                    employeeId: 0,
+                    name: "",
+                    role: "",
+                  });
                 }
               }}
               onChange={(e, v, r) => {
@@ -48,7 +56,12 @@ export const Create = ({
                 }
               }}
               renderInput={(params) => (
-                <TextField {...params} label="Karyawan" />
+                <TextField
+                  {...params}
+                  label="Karyawan"
+                  error={mutation.error("employeeId")}
+                  helperText={mutation.message("employeeId")}
+                />
               )}
               onOpen={() => {
                 employees.refresh();
@@ -57,7 +70,7 @@ export const Create = ({
 
             <Autocomplete
               loading={projects.loading}
-              options={projects.data}
+              options={projects.data.concat({ id: 0, name: "" })}
               getOptionLabel={(options) => options.name}
               isOptionEqualToValue={(options, value) => {
                 return options.id === value.id;
@@ -70,6 +83,13 @@ export const Create = ({
                 if (r === "input") {
                   projects.setQuery({ name: v });
                 }
+
+                if (r === "clear") {
+                  mutation.setData({
+                    projectId: 0,
+                    projectName: "",
+                  });
+                }
               }}
               onChange={(e, v, r) => {
                 if (r === "selectOption") {
@@ -79,7 +99,14 @@ export const Create = ({
                   });
                 }
               }}
-              renderInput={(params) => <TextField {...params} label="Proyek" />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Proyek"
+                  error={mutation.error("projectId")}
+                  helperText={mutation.message("projectId")}
+                />
+              )}
               onOpen={() => {
                 projects.refresh();
               }}
@@ -115,7 +142,14 @@ export const Create = ({
 
             {mutation.isNewRecord ? null : (
               <FieldSet label="Hapus Plan Mingguan">
-                <Button variant="outlined" color="error" startIcon={<Delete />} onClick={onDelete(mutation.data.id)}>Hapus</Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<Delete />}
+                  onClick={onDelete(mutation.data.id)}
+                >
+                  Hapus
+                </Button>
               </FieldSet>
             )}
           </Stack>

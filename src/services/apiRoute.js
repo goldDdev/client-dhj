@@ -56,10 +56,10 @@ const apiRoute = {
     listKomDetail: "/project/:id/kom",
     listBoqDetail: "/project/:id/boq",
     overtimeDetail: "/project/:id/overtime",
-    overtime:"/project/overtime/:id",
+    overtime: "/project/overtime/:id",
     deleteWorker: "/project/:id/worker",
     detilAbsent: "/project/:id/:parent/absent",
-    updateOvertime:"/project/overtime"
+    updateOvertime: "/project/overtime",
   },
   tracking: {
     index: "/tracking",
@@ -76,11 +76,12 @@ const apiRoute = {
     items: "/use-inventory/:id/items",
   },
   weeklyPlan: {
-    index: '/weekly-plan',
-    project: '/weekly-plan/project',
-    employee: '/weekly-plan/employee',
-    destroy: '/weekly-plan/:id'
-  }
+    index: "/weekly-plan",
+    project: "/weekly-plan/project",
+    employee: "/weekly-plan/employee",
+    destroy: "/weekly-plan/:id",
+    validation: "/weekly-plan/validation",
+  },
 };
 
 export default apiRoute;
