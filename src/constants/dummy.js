@@ -83,6 +83,6 @@ export const weeklyPlan = {
   projectName: "",
   name: "",
   role: "",
-  startDate: moment().format("yyyy-MM-Dd"),
-  endDate: moment().format("yyyy-MM-Dd"),
+  startDate: moment().format("yyyy-MM-DD"),
+  endDate: moment().format("yyyy-MM-DD"),
 };
