@@ -96,8 +96,8 @@ export default () => {
     setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
-    projects.data = []
-    employees.data = []
+    projects.data = [];
+    employees.data = [];
   };
 
   const onSubmit = () => {
@@ -165,7 +165,7 @@ export default () => {
             onSuccess: () => {
               enqueueSnackbar("Plan berhasil dihapus dari daftar");
               table.refresh();
-              alert.reset();
+              alert.set({ open: false, loading: false });
               mutation.clearData();
               mutation.clearError();
               setTrigger((state) => ({ ...state, form: false }));
@@ -356,7 +356,7 @@ export default () => {
                           sx={{
                             borderBottom: table.data.length - 1 === i ? 0 : 1,
                             borderColor: "divider",
-                            whiteSpace:"nowrap"
+                            whiteSpace: "nowrap",
                           }}
                         >
                           {v.name || "-"}
@@ -367,7 +367,7 @@ export default () => {
                             borderRight: 1,
                             borderBottom: table.data.length - 1 === i ? 0 : 1,
                             borderColor: "divider",
-                            whiteSpace:"nowrap"
+                            whiteSpace: "nowrap",
                           }}
                         >
                           {utils.typesLabel(v.role) || "-"}
@@ -406,7 +406,7 @@ export default () => {
                                 borderBottom:
                                   table.data.length - 1 === i ? 0 : 1,
                                 borderColor: "divider",
-                                whiteSpace:"nowrap"
+                                whiteSpace: "nowrap",
                               }}
                             >
                               {_v.day === 0 ? (
