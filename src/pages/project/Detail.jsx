@@ -233,6 +233,7 @@ export default () => {
             disabled={mutation.loading}
             onClick={onRefresh}
             color="primary"
+            variant="outlined"
             startIcon={<Refresh />}
           >
             Muat Ulang

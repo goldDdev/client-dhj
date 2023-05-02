@@ -23,7 +23,12 @@ export const Create = ({
           <Stack spacing={2.5} direction="column">
             <Autocomplete
               loading={employees.loading}
-              options={employees.data.concat({ id: 0, name: "", role: "" })}
+              options={employees.data
+                .concat({ id: 0, name: "", role: "" })
+                .filter(
+                  (value, index, self) =>
+                    index === self.findIndex((t) => t.id === value.id)
+                )}
               getOptionLabel={(options) => options.name}
               isOptionEqualToValue={(options, value) => {
                 return options.name === value.name;
@@ -70,7 +75,12 @@ export const Create = ({
 
             <Autocomplete
               loading={projects.loading}
-              options={projects.data.concat({ id: 0, name: "" })}
+              options={projects.data
+                .concat({ id: 0, name: "" })
+                .filter(
+                  (value, index, self) =>
+                    index === self.findIndex((t) => t.id === value.id)
+                )}
               getOptionLabel={(options) => options.name}
               isOptionEqualToValue={(options, value) => {
                 return options.id === value.id;

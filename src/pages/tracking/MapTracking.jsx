@@ -17,7 +17,7 @@ const columns = (t) => [
     value: (value) => value.name,
   },
   {
-    label: t("role"),
+    label: "Role",
     value: (value) => utils.typesLabel(value.role),
   },
   {

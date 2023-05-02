@@ -18,6 +18,7 @@ import {
   TableContainer,
   TableBody,
   Tooltip,
+  Button,
 } from "@mui/material";
 import moment from "moment";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
@@ -167,48 +168,44 @@ export default () => {
             justifyContent="flex-start"
             alignItems="center"
           >
-            <Paper elevation={0} sx={{ width: "80%" }}></Paper>
-
-            <Paper elevation={0}>
-              <BASE.Select
-                value={progres.getQuery("month", +moment().month() + 1)}
-                name="month"
-                menu={[
-                  { text: "Januari", value: 1 },
-                  { text: "Februari", value: 2 },
-                  { text: "Maret", value: 3 },
-                  { text: "April", value: 4 },
-                  { text: "Mei", value: 5 },
-                  { text: "Juni", value: 6 },
-                  { text: "Juli", value: 7 },
-                  { text: "Agustus", value: 8 },
-                  { text: "September", value: 9 },
-                  { text: "Oktober", value: 10 },
-                  { text: "November", value: 11 },
-                  { text: "Desember", value: 12 },
-                ]}
-                setValue={progres.setQuery}
-              />
-            </Paper>
-            <Paper elevation={0}>
-              <BASE.Select
-                value={progres.getQuery("year", +moment().year())}
-                name="year"
-                menu={[
-                  { text: "2022", value: 2022 },
-                  { text: "2023", value: 2023 },
-                ]}
-                setValue={progres.setQuery}
-              />
-            </Paper>
-            <IconButton
-              sx={{ border: 1, borderColor: "divider" }}
+            <BASE.Select
+              value={progres.getQuery("month", +moment().month() + 1)}
+              name="month"
+              menu={[
+                { text: "Januari", value: 1 },
+                { text: "Februari", value: 2 },
+                { text: "Maret", value: 3 },
+                { text: "April", value: 4 },
+                { text: "Mei", value: 5 },
+                { text: "Juni", value: 6 },
+                { text: "Juli", value: 7 },
+                { text: "Agustus", value: 8 },
+                { text: "September", value: 9 },
+                { text: "Oktober", value: 10 },
+                { text: "November", value: 11 },
+                { text: "Desember", value: 12 },
+              ]}
+              setValue={progres.setQuery}
+            />
+            <BASE.Select
+              value={progres.getQuery("year", +moment().year())}
+              name="year"
+              menu={[
+                { text: "2022", value: 2022 },
+                { text: "2023", value: 2023 },
+              ]}
+              setValue={progres.setQuery}
+            />
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<Refresh />}
               onClick={() => {
                 progres.clear();
               }}
             >
-              <Refresh />
-            </IconButton>
+              Muat Ulang
+            </Button>
           </Stack>
         ),
       }}
@@ -327,8 +324,8 @@ export default () => {
                                   }}
                                 >
                                   <Tooltip
-                                  placement="top-end"
-                                  open={trigger.tooltip}
+                                    placement="top-end"
+                                    open={trigger.tooltip}
                                     arrow
                                     title={
                                       <ListItemText

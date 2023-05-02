@@ -1,16 +1,15 @@
 import React from "react";
 import FRHooks from "frhooks";
-import { Box, Button, Paper } from "@mui/material";
-import { useSnackbar } from "notistack";
+import { Box, Button, ButtonGroup, Paper } from "@mui/material";
 import MainTemplate from "@components/templates/MainTemplate";
 import * as utils from "@utils/";
-import * as Dummy from "../../constants/dummy";
 import * as BASE from "@components/base";
-import { Add, MoreVert } from "@mui/icons-material";
+import { Add, MoreVert, Refresh } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import apiRoute from "@services/apiRoute";
 import DataTable from "../../components/base/table/DataTable";
 import moment from "moment";
+import { LoadingButton } from "@mui/lab";
 
 const columns = (table) => [
   {
@@ -54,7 +53,11 @@ const columns = (table) => [
     head: {
       align: "center",
       padding: "checkbox",
+      whiteSpace:"nowrap"
     },
+    sx:{
+      whiteSpace:"nowrap"
+    }
   },
   {
     label: "",
@@ -102,13 +105,26 @@ export default () => {
       subtitle={`Daftar semua data penggajian karyawan`}
       headRight={{
         children: (
-          <Button
-            disableElevation
-            startIcon={<Add />}
-            onClick={() => navigate("/payrol/add")}
-          >
-            Tambah Penggajian
-          </Button>
+          <ButtonGroup>
+            <Button
+              disableElevation
+              variant="contained"
+              startIcon={<Add />}
+              onClick={() => navigate("/payrol/add")}
+            >
+              Tambah Penggajian
+            </Button>
+            <LoadingButton
+              variant="outlined"
+              loading={table.loading}
+              disabled={table.loading}
+              onClick={table.reload}
+              color="primary"
+              startIcon={<Refresh />}
+            >
+              Muat Ulang
+            </LoadingButton>
+          </ButtonGroup>
         ),
       }}
     >

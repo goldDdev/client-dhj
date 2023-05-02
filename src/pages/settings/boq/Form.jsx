@@ -3,7 +3,7 @@ import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import _ from "lodash";
 
-export const BoqForm = ({ open, t, r, mutation, snackbar, table, onOpen, onSubmit }) => {
+export const BoqForm = ({ open, mutation, onOpen, onSubmit }) => {
   return (
     <BASE.DialogForm
       open={open}
@@ -15,7 +15,7 @@ export const BoqForm = ({ open, t, r, mutation, snackbar, table, onOpen, onSubmi
             <TextField
               id="empName"
               disabled={mutation.loading}
-              label={t("name")}
+              label="Nama"
               value={mutation.data.name || ""}
               onChange={(e) => mutation.setData({ name: e.target.value })}
               onBlur={async () => mutation.validate("name")}
@@ -30,7 +30,7 @@ export const BoqForm = ({ open, t, r, mutation, snackbar, table, onOpen, onSubmi
             <TextField
               id="empUnit"
               disabled={mutation.loading}
-              label={t("unit")}
+              label={"Unit"}
               value={mutation.data.typeUnit || ""}
               onChange={(e) => mutation.setData({ typeUnit: e.target.value })}
               onBlur={async () => mutation.validate("typeUnit")}
@@ -42,7 +42,6 @@ export const BoqForm = ({ open, t, r, mutation, snackbar, table, onOpen, onSubmi
                 ) : null,
               }}
             />
-
           </Stack>
         ),
       }}
@@ -50,7 +49,7 @@ export const BoqForm = ({ open, t, r, mutation, snackbar, table, onOpen, onSubmi
         children: (
           <>
             <Button variant="outlined" onClick={onOpen}>
-              {t("cancel")}
+              Batal
             </Button>
             <LoadingButton
               variant="contained"
@@ -59,7 +58,7 @@ export const BoqForm = ({ open, t, r, mutation, snackbar, table, onOpen, onSubmi
               disabled={mutation.processing}
               onClick={onSubmit}
             >
-              {t("save")}
+              Simpan Perubahan
             </LoadingButton>
           </>
         ),

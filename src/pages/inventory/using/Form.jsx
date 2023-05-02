@@ -2,22 +2,35 @@ import React from "react";
 import FRHooks from "frhooks";
 import _ from "lodash";
 import moment from "moment";
-import { Stack, TextField, Button, CircularProgress, Autocomplete, Typography } from "@mui/material";
-import { Add, ListAlt } from "@mui/icons-material";
+import {
+  Stack,
+  TextField,
+  Button,
+  CircularProgress,
+  Autocomplete,
+  Typography,
+} from "@mui/material";
+import { Add } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import apiRoute from "@services/apiRoute";
 import * as utils from "@utils/";
 
-export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
+export const InventoryForm = ({ open, mutation, onOpen }) => {
   const projects = FRHooks.useFetch(apiRoute.project.index, {
-    selector: (resp) => resp.data.map((v) => ({ id: v.id, name: `${v.name} (${v.location})` })),
+    selector: (resp) =>
+      resp.data.map((v) => ({ id: v.id, name: `${v.name} (${v.location})` })),
     defaultValue: [],
     disabledOnDidMount: false,
   });
- 
+
   const invetories = FRHooks.useFetch(apiRoute.inventory.index, {
-    selector: (resp) => resp.data.map((v) => ({ id: v.id, name: `${v.name} (${utils.ucword(v.type)})`, unit: v.unit })),
+    selector: (resp) =>
+      resp.data.map((v) => ({
+        id: v.id,
+        name: `${v.name} (${utils.ucword(v.type)})`,
+        unit: v.unit,
+      })),
     defaultValue: [],
     disabledOnDidMount: false,
   });
@@ -34,7 +47,7 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
               <TextField
                 type="date"
                 label="Tanggal Penggunaan"
-                sx={{ width: '35%' }}
+                sx={{ width: "35%" }}
                 value={moment().format("yyyy-MM-DD") || undefined}
                 // onChange={(e) => tracks.setQuery({ ...tracks.query, date: e.target.value })}
               />
@@ -144,11 +157,9 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
                 id="qty"
                 type="number"
                 disabled={mutation.loading}
-                label='Quantity'
+                label="Quantity"
                 value={mutation.data.qty || "0"}
-                onChange={(e) =>
-                  mutation.setData({ qty: e.target.value })
-                }
+                onChange={(e) => mutation.setData({ qty: e.target.value })}
                 onBlur={async () => mutation.validate("qty")}
                 error={mutation.error("qty")}
                 helperText={mutation.message("qty")}
@@ -160,7 +171,7 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
                 inputProps={{
                   maxLength: 12,
                 }}
-                sx={{ width: '30%' }}
+                sx={{ width: "30%" }}
               />
               <TextField
                 disabled
@@ -176,7 +187,7 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
                     <CircularProgress size={20} />
                   ) : null,
                 }}
-                sx={{ width: '30%' }}
+                sx={{ width: "30%" }}
               />
             </Stack>
             <Stack
@@ -189,13 +200,15 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
                 variant="text"
                 startIcon={<Add />}
                 disableElevation
-              // onClick={onAddItem()}
+                // onClick={onAddItem()}
               >
                 Tambahkan Item
               </Button>
             </Stack>
 
-            <Typography align="center" variant="subheading">Belum ada Item terpilih</Typography>
+            <Typography align="center" variant="subheading">
+              Belum ada Item terpilih
+            </Typography>
           </Stack>
         ),
       }}
@@ -203,7 +216,7 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
         children: (
           <>
             <Button variant="outlined" onClick={onOpen}>
-              {t("cancel")}
+              Batal
             </Button>
             <LoadingButton
               loading={mutation.processing}
@@ -233,9 +246,35 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
                 // });
               }}
             >
-              {t("save")}
+              Simpan Perubahan
             </LoadingButton>
           </>
+        ),
+      }}
+    />
+  );
+};
+
+export const InventoryItem = ({ open, items, loading, onOpen }) => {
+  return (
+    <BASE.DialogForm
+      open={open}
+      onClose={onOpen}
+      title={`Detil Item`}
+      content={{
+        sx: { p: 0 },
+        children: (
+          <BASE.DataTable
+          tableProps={{size:'small'}}
+            data={items}
+            loading={loading}
+            column={[
+              { label: "Tipe", value: (value) => value.type },
+              { label: "Nama", value: (value) => value.name },
+              { label: "Unit", value: (value) => value.unit },
+              { label: "Jumlah", value: (value) => value.qty },
+            ]}
+          />
         ),
       }}
     />

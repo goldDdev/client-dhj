@@ -16,7 +16,7 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
             <TextField
               id="empName"
               disabled={mutation.loading}
-              label={t("name")}
+              label="Nama"
               value={mutation.data.name || ""}
               onChange={(e) => mutation.setData({ name: e.target.value })}
               onBlur={async () => mutation.validate("name")}
@@ -49,7 +49,7 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
               id="empPN"
               type="number"
               disabled={mutation.loading}
-              label={t("phoneNumber")}
+              label={"No HP"}
               value={mutation.data.phoneNumber || ""}
               onChange={(e) =>
                 mutation.setData({ phoneNumber: e.target.value })
@@ -86,10 +86,10 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
 
             <BASE.Select
               id="empRole"
-              label={t("role")}
+              label={"Role"}
               name="role"
               menu={utils.workerMobileTypes.map((v) => ({
-                text: t(v),
+                text: utils.typesLabel(v),
                 value: v,
               }))}
               value={mutation.data.role === "" ? "WORKER" : mutation.data.role}

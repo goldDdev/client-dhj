@@ -1,6 +1,6 @@
 import React from "react";
 import FRHooks from "frhooks";
-import { Paper } from "@mui/material";
+import { ButtonGroup, Paper } from "@mui/material";
 import { IconButton, Button } from "@components/base";
 import { useSnackbar } from "notistack";
 import SettingTemplate from "@components/templates/SettingTemplate";
@@ -12,8 +12,10 @@ import * as utils from "@utils/";
 import * as FORM from "./Form";
 import * as Dummy from "../../../constants/dummy";
 import DataTable from "../../../components/base/table/DataTable";
+import { LoadingButton } from "@mui/lab";
+import { Refresh } from "@mui/icons-material";
 
-const columns = (table, t, onUpdate, onDelete) => [
+const columns = (table, onUpdate, onDelete) => [
   {
     label: "No",
     value: (_, idx) => {
@@ -28,11 +30,11 @@ const columns = (table, t, onUpdate, onDelete) => [
     size: "small",
   },
   {
-    label: t("name"),
+    label: "Nama",
     value: (value) => value.name,
   },
   {
-    label: t("unit"),
+    label: "Unit",
     value: (value) => value.typeUnit || "-",
     align: "center",
     head: {
@@ -49,11 +51,11 @@ const columns = (table, t, onUpdate, onDelete) => [
     label: "Aksi",
     value: (value) => (
       <>
-        <IconButton title={t("edit")} size="small" onClick={onUpdate(value.id)}>
-          <Edit fontSize="small" />
+        <IconButton title={"Ubah"} size="small" onClick={onUpdate(value.id)}>
+          <Edit fontSize="inherit" />
         </IconButton>
-        <IconButton title={t("delete")} size="small" onClick={onDelete(value.id)}>
-          <Delete fontSize="small" />
+        <IconButton title={"Hapus"} size="small" onClick={onDelete(value.id)}>
+          <Delete fontSize="inherit" />
         </IconButton>
       </>
     ),
@@ -68,7 +70,6 @@ const columns = (table, t, onUpdate, onDelete) => [
 ];
 
 export default () => {
-  const { t, r } = FRHooks.useLang();
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
@@ -107,48 +108,62 @@ export default () => {
   };
 
   const onDelete = (id) => async () => {
-    // TODO: confirm delete
     mutation.destroy(FRHooks.apiRoute().boq("detail", { id }).link(), {
       onSuccess: () => {
-        enqueueSnackbar(t("commonSuccessDelete"));
-        const idx = table.data.findIndex(d => d.id === id)
-        table.data.splice(idx, 1);
+        enqueueSnackbar("BOQ berhasil dihapus");
+        table.reload();
       },
     });
-  }
+  };
 
   const onSubmit = async () => {
     const isNew = mutation.isNewRecord;
     const editId = mutation.data.id;
-    const route = isNew ? FRHooks.apiRoute().boq("index") : FRHooks.apiRoute().boq("detail", { id: editId })
+    const route = isNew
+      ? FRHooks.apiRoute().boq("index")
+      : FRHooks.apiRoute().boq("detail", { id: editId });
     mutation.post(route.link(), {
       method: isNew ? "post" : "put",
       except: isNew ? ["id"] : [],
       validation: true,
       onSuccess: (resp) => {
-        enqueueSnackbar(t(isNew ? "commonSuccessCreate" : "commonSuccessUpdate"));
-        if (isNew) {
-          table.data.unshift(resp.data);
-        } else {
-          const idx = table.data.findIndex(d => d.id === editId)
-          table.data[idx] = resp.data;
-        }
+        enqueueSnackbar(
+          isNew ? "BOQ berhasil ditambahkan" : "BOQ berhasil diperbaharui"
+        );
+        table.reload();
         mutation.clearData();
         mutation.clearError();
         onOpen();
       },
     });
-  }
+  };
 
   return (
     <SettingTemplate
-      title={t("boq")}
+      title={"BOQ"}
       subtitle="Daftar semua master data Bill of Quantity"
       headRight={{
         children: (
-          <Button startIcon={<Add />} onClick={onOpen}>
-            {t(["add", "boq"])}
-          </Button>
+          <ButtonGroup>
+            <Button
+              disableElevation
+              variant="contained"
+              startIcon={<Add />}
+              onClick={onOpen}
+            >
+              Tambah BOQ
+            </Button>
+            <LoadingButton
+              variant="outlined"
+              loading={table.loading}
+              disabled={table.loading}
+              onClick={table.reload}
+              color="primary"
+              startIcon={<Refresh />}
+            >
+              Muat Ulang
+            </LoadingButton>
+          </ButtonGroup>
         ),
       }}
     >
@@ -158,18 +173,14 @@ export default () => {
         <DataTable
           data={table.data}
           loading={table.loading}
-          column={columns(table, t, onUpdate, onDelete)}
+          column={columns(table, onUpdate, onDelete)}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
 
       <FORM.BoqForm
         open={trigger.form}
-        t={t}
-        r={r}
         mutation={mutation}
-        snackbar={enqueueSnackbar}
-        table={table}
         onOpen={onOpen}
         onSubmit={onSubmit}
       />

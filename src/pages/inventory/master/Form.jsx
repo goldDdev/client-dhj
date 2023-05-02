@@ -19,7 +19,7 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
               <TextField
                 id="name"
                 disabled={mutation.loading}
-                label={t("name")}
+                label="Nama"
                 value={mutation.data.name || ""}
                 onChange={(e) => mutation.setData({ name: e.target.value })}
                 onBlur={async () => mutation.validate("name")}
@@ -100,7 +100,7 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
         children: (
           <>
             <Button variant="outlined" onClick={onOpen}>
-              {t("cancel")}
+              Batal
             </Button>
             <LoadingButton
               loading={mutation.processing}
@@ -130,7 +130,7 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
                 });
               }}
             >
-              {t("save")}
+              Simpan Perubahan
             </LoadingButton>
           </>
         ),

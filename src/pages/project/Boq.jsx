@@ -13,6 +13,7 @@ import {
   Divider,
   Badge,
   ListItemText,
+  ButtonGroup,
 } from "@mui/material";
 import { BasicDropdown, Timeline } from "@components/base";
 import { useSnackbar } from "notistack";
@@ -404,8 +405,8 @@ export default () => {
       subtitle="Menampilkan daftar Item Pekerjaan (BOQ) dalam proyek"
       headRight={{
         children: (
-          <>
-            <Button disableElevation startIcon={<Add />} onClick={onOpen}>
+          <ButtonGroup>
+            <Button disableElevation variant="contained" startIcon={<Add />} onClick={onOpen}>
               Tambah BOQ
             </Button>
             <LoadingButton
@@ -413,11 +414,12 @@ export default () => {
               disabled={table.loading}
               onClick={() => table.reload()}
               color="primary"
+              variant="outlined"
               startIcon={<Refresh />}
             >
               Muat Ulang
             </LoadingButton>
-          </>
+          </ButtonGroup>
         ),
       }}
     >

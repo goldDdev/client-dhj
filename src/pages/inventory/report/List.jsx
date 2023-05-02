@@ -14,7 +14,7 @@ import * as BASE from "@components/base";
 
 const columns = (table, t) => [
   {
-    label: t("name"),
+    label: "Nama",
     value: (value) => value.name,
   },
   {

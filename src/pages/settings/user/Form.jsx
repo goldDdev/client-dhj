@@ -5,19 +5,33 @@ import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
 
-export const UserForm = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
+export const UserForm = ({ open, mutation, snackbar, table, onOpen }) => {
   return (
     <BASE.DialogForm
       open={open}
       onClose={onOpen}
-      title={t(["form","user"])}
+      title={"Form Pengguna"}
       content={{
         children: (
           <Stack spacing={2}>
+            <BASE.Select
+              id="empRole"
+              label="Role"
+              name="role"
+              menu={utils.workerWebTypes.map((v) => ({
+                text: utils.typesLabel(v),
+                value: v,
+              }))}
+              value={mutation.data.role === "" ? "ADMIN" : mutation.data.role}
+              setValue={mutation.setData}
+              error={mutation.error("role")}
+              helperText={mutation.message("role")}
+            />
+            
             <TextField
               id="empName"
               disabled={mutation.loading}
-              label={t("name")}
+              label="Nama"
               value={mutation.data.name || ""}
               onChange={(e) => mutation.setData({ name: e.target.value })}
               onBlur={async () => mutation.validate("name")}
@@ -30,12 +44,11 @@ export const UserForm = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               }}
             />
 
-
             <TextField
               id="empPN"
               type="number"
               disabled={mutation.loading}
-              label={t("phoneNumber")}
+              label={"No HP"}
               value={mutation.data.phoneNumber || ""}
               onChange={(e) =>
                 mutation.setData({ phoneNumber: e.target.value })
@@ -70,16 +83,6 @@ export const UserForm = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               type="email"
             />
 
-            <BASE.Select
-              id="empRole"
-              label={t("role")}
-              name="role"
-              menu={utils.workerWebTypes.map((v) => ({ text: utils.typesLabel(v), value: v }))}
-              value={mutation.data.role === "" ? "ADMIN" : mutation.data.role}
-              setValue={mutation.setData}
-              error={mutation.error("role")}
-              helperText={mutation.message("role")}
-            />
             {/* <TextField
               type="password"
               id="password"
@@ -99,7 +102,7 @@ export const UserForm = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
         children: (
           <>
             <Button variant="outlined" onClick={onOpen}>
-              {t("cancel")}
+              Batal
             </Button>
             <LoadingButton
               loading={mutation.processing}
@@ -109,18 +112,19 @@ export const UserForm = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               onClick={() => {
                 const isNew = mutation.isNewRecord;
                 const editId = mutation.data.id;
-                const route = isNew ? FRHooks.apiRoute().user("index") : FRHooks.apiRoute().user("detail", { id: editId })
-                console.log(isNew, editId, route.link());
+                const route = isNew
+                  ? FRHooks.apiRoute().user("index")
+                  : FRHooks.apiRoute().user("detail", { id: editId });
                 mutation.post(route.link(), {
                   method: mutation.isNewRecord ? "post" : "put",
                   except: mutation.isNewRecord ? ["id"] : [],
                   validation: true,
                   onSuccess: (resp) => {
-                    snackbar(t("commonSuccessCreate"));
+                    snackbar("Pengguna berhasil ditambahkan");
                     if (isNew) {
                       table.data.unshift(resp.data);
                     } else {
-                      const idx = table.data.findIndex(d => d.id === editId)
+                      const idx = table.data.findIndex((d) => d.id === editId);
                       table.data[idx] = resp.data;
                     }
                     mutation.clearData();
@@ -130,7 +134,7 @@ export const UserForm = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
                 });
               }}
             >
-              {t("save")}
+              {mutation.isNewRecord ? "Tambah Pengguna" : "Simpan Perubahan"}
             </LoadingButton>
           </>
         ),

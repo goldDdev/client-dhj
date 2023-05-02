@@ -58,7 +58,7 @@ export const TableFilter = ({ t, table }) => {
 
       {Object.keys(table.queryParams).length === 0 ? null : (
         <Stack direction="row" mt={1} spacing={1} alignItems="center">
-          <Typography>{t("searchResult")} :</Typography>
+          <Typography>Hasil Pencarian :</Typography>
           <Box flexGrow={1}>
             {Object.entries(table.queryParams).map(([k, v]) => (
               <Chip

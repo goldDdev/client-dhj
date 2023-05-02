@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Paper } from "@mui/material";
+import { Button, ButtonGroup, Paper } from "@mui/material";
 import { LinearProgress, BasicDropdown } from "@components/base";
 import { useSnackbar } from "notistack";
 import { MoreVert, Refresh } from "@mui/icons-material";
@@ -244,20 +244,26 @@ export default () => {
       subtitle="Manampilkan semua daftar proyek yang terbuat."
       headRight={{
         children: (
-          <>
-            <Button disableElevation startIcon={<Add />} onClick={onOpen}>
+          <ButtonGroup>
+            <Button
+              disableElevation
+              variant="contained"
+              startIcon={<Add />}
+              onClick={onOpen}
+            >
               Tambah Proyek
             </Button>
             <LoadingButton
+              variant="outlined"
               loading={table.loading}
               disabled={table.loading}
-              onClick={() => table.reload()}
+              onClick={table.reload}
               color="primary"
               startIcon={<Refresh />}
             >
               Muat Ulang
             </LoadingButton>
-          </>
+          </ButtonGroup>
         ),
       }}
     >

@@ -73,7 +73,9 @@ const apiRoute = {
   },
   inventoryUsing: {
     index: "/use-inventory",
+    status: "/use-inventory/status",
     items: "/use-inventory/:id/items",
+    detail: "/use-inventory/:id",
   },
   weeklyPlan: {
     index: "/weekly-plan",

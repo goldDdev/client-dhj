@@ -19,9 +19,15 @@ import * as BASE from "@components/base";
 import apiRoute from "@services/apiRoute";
 import DataTable from "../../components/base/table/DataTable";
 import { Refresh } from "@mui/icons-material";
+import { LoadingButton } from "@mui/lab";
 
 const columns = (table) => [
-  {label: "No", align: "center", padding: "checkbox", value:(value, i) => i +1 },
+  {
+    label: "No",
+    align: "center",
+    padding: "checkbox",
+    value: (value, i) => i + 1,
+  },
   {
     label: "Nama",
     value: (value) => (
@@ -86,101 +92,94 @@ export default () => {
       title="Absensi"
       subtitle={`Daftar semua data absensi karyawan`}
       headRight={{
-        sx: { width: "50%" },
+        sx: { width: "60%" },
         children: (
           <Stack
-            spacing={2}
+            spacing={1}
             direction="row"
             mb={2}
             justifyContent="flex-start"
             alignItems="center"
           >
-            <Paper elevation={0} sx={{ width: "80%" }}>
-              <Autocomplete
-                id="asynchronous-demo"
-                freeSolo
-                fullWidth
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                getOptionLabel={(option) => option.name}
-                options={projects.data}
-                onOpen={() => {
-                  projects.clear();
-                }}
-                loading={false}
-                onChange={(e, v, r) => {
-                  if (r === "clear") {
-                    table.clearOnly(["id", "project"]);
-                  } else {
-                    table.setQuery({ id: v.id, project: v.name });
-                  }
-                }}
-                renderOption={(props, option) => (
-                  <li {...props} key={option.id} children={option.name} />
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Proyek"
-                    onChange={(e) =>
-                      projects.setQuery({ name: e.target.value })
-                    }
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <React.Fragment>
-                          {projects.loading ? (
-                            <CircularProgress color="inherit" size={20} />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </React.Fragment>
-                      ),
-                    }}
-                  />
-                )}
-              />
-            </Paper>
+            <Autocomplete
+              id="asynchronous-demo"
+              freeSolo
+              fullWidth
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              getOptionLabel={(option) => option.name}
+              options={projects.data}
+              onOpen={() => {
+                projects.clear();
+              }}
+              loading={false}
+              onChange={(e, v, r) => {
+                if (r === "clear") {
+                  table.clearOnly(["id", "project"]);
+                } else {
+                  table.setQuery({ id: v.id, project: v.name });
+                }
+              }}
+              renderOption={(props, option) => (
+                <li {...props} key={option.id} children={option.name} />
+              )}
+              sx={{ flexGrow: 1, minWidth: "40%" }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Proyek"
+                  onChange={(e) => projects.setQuery({ name: e.target.value })}
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <React.Fragment>
+                        {projects.loading ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </React.Fragment>
+                    ),
+                  }}
+                />
+              )}
+            />
 
-            <Paper elevation={0}>
-              <BASE.Select
-                value={table.query("month", +moment().month() + 1)}
-                name="month"
-                menu={[
-                  { text: "Januari", value: 1 },
-                  { text: "Februari", value: 2 },
-                  { text: "Maret", value: 3 },
-                  { text: "April", value: 4 },
-                  { text: "Mei", value: 5 },
-                  { text: "Juni", value: 6 },
-                  { text: "Juli", value: 7 },
-                  { text: "Agustus", value: 8 },
-                  { text: "September", value: 9 },
-                  { text: "Oktober", value: 10 },
-                  { text: "November", value: 11 },
-                  { text: "Desember", value: 12 },
-                ]}
-                setValue={table.setQuery}
-              />
-            </Paper>
-            <Paper elevation={0}>
-              <BASE.Select
-                value={table.query("year", +moment().year())}
-                name="year"
-                menu={[
-                  { text: "2022", value: 2022 },
-                  { text: "2023", value: 2023 },
-                ]}
-                setValue={table.setQuery}
-              />
-            </Paper>
-            <IconButton
-              sx={{ border: 1, borderColor: "divider" }}
+            <BASE.Select
+              value={table.query("month", +moment().month() + 1)}
+              name="month"
+              menu={[
+                { text: "Januari", value: 1 },
+                { text: "Februari", value: 2 },
+                { text: "Maret", value: 3 },
+                { text: "April", value: 4 },
+                { text: "Mei", value: 5 },
+                { text: "Juni", value: 6 },
+                { text: "Juli", value: 7 },
+                { text: "Agustus", value: 8 },
+                { text: "September", value: 9 },
+                { text: "Oktober", value: 10 },
+                { text: "November", value: 11 },
+                { text: "Desember", value: 12 },
+              ]}
+              setValue={table.setQuery}
+            />
+
+            <BASE.Select
+              value={table.query("year", +moment().year())}
+              name="year"
+              menu={utils.listYear().map((v) => ({ text: v, value: v }))}
+              setValue={table.setQuery}
+            />
+            <LoadingButton
+              fullWidth
               onClick={() => {
                 table.clear();
                 table.reload();
               }}
+              variant="outlined"
+              startIcon={<Refresh />}
             >
-              <Refresh />
-            </IconButton>
+              Muat Ulang
+            </LoadingButton>
           </Stack>
         ),
       }}

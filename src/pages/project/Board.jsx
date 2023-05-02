@@ -41,12 +41,12 @@ export default () => {
         onClick: () => {},
       },
       {
-        text: t("edit"),
+        text: "Ubah",
         divider: true,
         onClick: () => {},
       },
       {
-        text: t("delete"),
+        text: "Hapus",
         onClick: () => {},
       },
     ],

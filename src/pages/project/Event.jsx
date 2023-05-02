@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Stack, Box, Typography, TextField } from "@mui/material";
+import { Button, Stack, Box, Typography, TextField, ButtonGroup } from "@mui/material";
 import { BasicDropdown, IconButton, Select } from "@components/base";
 import { useSnackbar } from "notistack";
 import * as utils from "@utils/";
@@ -252,20 +252,21 @@ export default () => {
       subtitle="Menampilkan daftar event/Event proyek"
       headRight={{
         children: (
-          <>
-            <Button disableElevation startIcon={<Add />} onClick={onOpen}>
+          <ButtonGroup>
+            <Button disableElevation  variant="contained" startIcon={<Add />} onClick={onOpen}>
               Tambah Event
             </Button>
             <LoadingButton
               loading={table.loading}
               disabled={table.loading}
-              onClick={() => table.reload()}
+              onClick={table.reload}
               color="primary"
               startIcon={<Refresh />}
+              variant="outlined"
             >
               Muat Ulang
             </LoadingButton>
-          </>
+          </ButtonGroup>
         ),
       }}
     >

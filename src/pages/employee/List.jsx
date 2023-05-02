@@ -9,13 +9,14 @@ import * as Dummy from "../../constants/dummy";
 import DataTable from "../../components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
 import { Link } from "react-router-dom";
-import { MoreVert } from "@mui/icons-material";
+import { MoreVert, Refresh } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
-import { Paper } from "@mui/material";
+import { ButtonGroup, Paper } from "@mui/material";
 import { Button, BasicDropdown } from "@components/base";
 import { useSnackbar } from "notistack";
+import { LoadingButton } from "@mui/lab";
 
-const columns = (table, t, utils, onUpdate, onDelete) => [
+const columns = (table, utils, onUpdate, onDelete) => [
   {
     label: "No",
     value: (_, idx) => {
@@ -44,12 +45,12 @@ const columns = (table, t, utils, onUpdate, onDelete) => [
     size: "small",
   },
   {
-    label: t("name"),
+    label: "Nama",
     value: (value) => value.name,
   },
 
   {
-    label: t("phoneNumber"),
+    label: "No HP",
     value: (value) => utils.ccFormat(value.phoneNumber) || "-",
     align: "center",
     head: {
@@ -75,8 +76,8 @@ const columns = (table, t, utils, onUpdate, onDelete) => [
     },
   },
   {
-    label: t("role"),
-    value: (value) => t(value.role) || "-",
+    label: "Role",
+    value: (value) => utils.typesLabel(value.role),
     align: "center",
     head: {
       align: "center",
@@ -111,7 +112,6 @@ const columns = (table, t, utils, onUpdate, onDelete) => [
 ];
 
 export default () => {
-  const { t } = FRHooks.useLang();
   const alert = useAlert();
   const { serve } = FRHooks.useServerValidation({
     url: apiRoute.employee.validation,
@@ -121,7 +121,7 @@ export default () => {
     },
     withErrorResponse: (resp) => resp.response.data.error.messages.errors,
     option: {
-      unique: (param) => `${t(param.field)} sudah digunakan`,
+      unique: (param) => `Data ini sudah digunakan`,
     },
   });
 
@@ -235,26 +235,37 @@ export default () => {
       subtitle={"Daftar semua karyawan karyawan"}
       headRight={{
         children: (
-          <Button startIcon={<PersonAdd />} onClick={onOpen}>
-            Tambah Karyawan
-          </Button>
+          <ButtonGroup>
+            <Button variant="contained" disableElevation startIcon={<PersonAdd />} onClick={onOpen}>
+              Tambah Karyawan
+            </Button>
+            <LoadingButton
+              variant="outlined"
+              loading={table.loading}
+              disabled={table.loading}
+              onClick={table.reload}
+              color="primary"
+              startIcon={<Refresh />}
+            >
+              Muat Ulang
+            </LoadingButton>
+          </ButtonGroup>
         ),
       }}
     >
-      <Filter.TableFilter t={t} table={table} />
+      <Filter.TableFilter table={table} />
 
       <Paper elevation={0} variant="outlined">
         <DataTable
           data={table.data}
           loading={table.loading}
-          column={columns(table, t, utils, onUpdate, onDelete)}
+          column={columns(table, utils, onUpdate, onDelete)}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
 
       <FORM.Create
         open={trigger.form}
-        t={t}
         mutation={mutation}
         onSubmit={onSubmit}
         onOpen={onOpen}

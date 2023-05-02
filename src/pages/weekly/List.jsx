@@ -268,8 +268,10 @@ export default () => {
 
             <TableBody>
               {!table.loading &&
-              table.data.filter((vl) =>
-                vl.plans.some((fl) => days[filter.week].includes(fl.day))
+              table.data.filter((fl) =>
+                fl.projects.filter((_fl) =>
+                  _fl.plans.some((d) => days[filter.week].includes(d.day))
+                )
               ).length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={10} align="center">
@@ -310,71 +312,61 @@ export default () => {
                 </TableRow>
               ) : (
                 table.data
-                  .filter((vl) =>
-                    vl.plans.some((fl) => days[filter.week].includes(fl.day))
+                  .filter((fl) =>
+                    fl.projects.filter((_fl) =>
+                      _fl.plans.some((d) => days[filter.week].includes(d.day))
+                    )
                   )
-                  .map((vl) => {
-                    const plans = [];
-                    for (const dd of days[filter.week]) {
-                      if (vl.plans.map((v) => v.day).includes(dd)) {
-                        const find = vl.plans.find((fn) => fn.day === dd);
-                        if (find) {
-                          plans.push(find);
+                  .map((value) => {
+                    return {
+                      ...value,
+                      projects: value.projects.map((vl) => {
+                        const plans = [];
+                        for (const dd of days[filter.week]) {
+                          if (vl.plans.map((v) => v.day).includes(dd)) {
+                            const find = vl.plans.find((fn) => fn.day === dd);
+                            if (find) {
+                              plans.push(find);
+                            }
+                          } else {
+                            plans.push({
+                              startDate: null,
+                              endDate: null,
+                              projectId: null,
+                              day: 0,
+                            });
+                          }
                         }
-                      } else {
-                        plans.push({
-                          startDate: null,
-                          endDate: null,
-                          projectId: null,
-                          day: 0,
-                        });
-                      }
-                    }
 
-                    return { ...vl, plans };
+                        return { ...vl, plans };
+                      }),
+                    };
                   })
-                  .map((vl) => {
-                    const check = vl.plans.some((fl) =>
-                      days[filter.week].includes(fl.day)
-                    );
-                    if (!check) {
-                      return {
-                        startDate: "-",
-                        endDate: "-",
-                        projectId: 0,
-                        day: 0,
-                      };
-                    } else {
-                      return vl;
-                    }
-                  })
-                  .map((v, i) => {
-                    return (
-                      <TableRow key={`row-${i}`}>
-                        <TableCell
-                          size="small"
-                          sx={{
-                            borderBottom: table.data.length - 1 === i ? 0 : 1,
-                            borderColor: "divider",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {v.name || "-"}
-                        </TableCell>
-                        <TableCell
-                          size="small"
-                          sx={{
-                            borderRight: 1,
-                            borderBottom: table.data.length - 1 === i ? 0 : 1,
-                            borderColor: "divider",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {utils.typesLabel(v.role) || "-"}
-                        </TableCell>
-                        {v.plans
+                  .map((value) =>
+                    value.projects.map((val, idx) => (
+                      <TableRow key={idx}>
+                        {idx === 0 ? (
+                          <>
+                            <TableCell rowSpan={value.projects.length}>
+                              {value.name}
+                            </TableCell>
+                            <TableCell
+                              rowSpan={value.projects.length}
+                              sx={{
+                                borderRight: 1,
+
+                                borderColor: "divider",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {utils.typesLabel(value.role)}
+                            </TableCell>
+                          </>
+                        ) : null}
+
+                        {val.plans
                           .reduce((p, n) => {
-                            if (v.plans.length > 0) {
+                            if (val.plans.length > 0) {
                               if (p.length === 0) {
                                 p.push({ ...n, colSpan: 1 });
                               } else {
@@ -403,8 +395,7 @@ export default () => {
                               size="small"
                               sx={{
                                 borderRight: _i === 6 ? 0 : 1,
-                                borderBottom:
-                                  table.data.length - 1 === i ? 0 : 1,
+
                                 borderColor: "divider",
                                 whiteSpace: "nowrap",
                               }}
@@ -417,7 +408,7 @@ export default () => {
                                     <IconButton
                                       size="small"
                                       onClick={() => {
-                                        const find = v.data.find(
+                                        const find = value.data.find(
                                           (fn) => fn.id === _v.id
                                         );
                                         if (find) {
@@ -448,8 +439,8 @@ export default () => {
                             </TableCell>
                           ))}
                       </TableRow>
-                    );
-                  })
+                    ))
+                  )
               )}
             </TableBody>
           </Table>

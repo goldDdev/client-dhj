@@ -324,6 +324,7 @@ export default () => {
             disabled={table.loading}
             onClick={() => table.reload()}
             color="primary"
+            variant="outlined"
             startIcon={<Refresh />}
           >
             Muat Ulang

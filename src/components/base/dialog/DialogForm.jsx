@@ -3,14 +3,14 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton
+  IconButton,
 } from "@mui/material";
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from "@mui/icons-material/Close";
 
 const DialogForm = ({ title, content, actions, ...props }) => {
   return (
     <Dialog scroll="paper" fullWidth {...props}>
-      <DialogTitle variant="h6">
+      <DialogTitle variant="h6" sx={{ py: 1.25 }}>
         {title}
         {props.onClose ? (
           <IconButton
