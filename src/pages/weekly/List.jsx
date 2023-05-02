@@ -344,6 +344,7 @@ export default () => {
                         {idx === 0 ? (
                           <>
                             <TableCell
+                              size="small"
                               rowSpan={value.projects.length}
                               sx={{
                                 borderRight: 1,
