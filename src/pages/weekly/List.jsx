@@ -257,7 +257,6 @@ export default () => {
             <TableHead>
               <TableRow>
                 <TableCell component="th">Nama</TableCell>
-                <TableCell component="th">Role</TableCell>
                 {days[filter.week].map((v, i) => (
                   <TableCell key={i} align="center">
                     {v > 0 ? v : "-"}
@@ -282,9 +281,6 @@ export default () => {
 
               {table.loading ? (
                 <TableRow>
-                  <TableCell align="center">
-                    <Skeleton width={"100%"} />
-                  </TableCell>
                   <TableCell align="center">
                     <Skeleton width={"100%"} />
                   </TableCell>
@@ -347,19 +343,19 @@ export default () => {
                       <TableRow key={idx}>
                         {idx === 0 ? (
                           <>
-                            <TableCell rowSpan={value.projects.length}>
-                              {value.name}
-                            </TableCell>
                             <TableCell
                               rowSpan={value.projects.length}
                               sx={{
                                 borderRight: 1,
-
                                 borderColor: "divider",
                                 whiteSpace: "nowrap",
                               }}
                             >
-                              {utils.typesLabel(value.role)}
+                              <ListItemText
+                                sx={{ p: 0, m: 0 }}
+                                primary={value.name || "-"}
+                                secondary={utils.typesLabel(value.role)}
+                              />
                             </TableCell>
                           </>
                         ) : null}
