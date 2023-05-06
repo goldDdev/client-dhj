@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FRHooks from "frhooks";
 import { Box, Chip, Paper, Stack, Button } from "@mui/material";
 import { People, ListAlt, Close } from "@mui/icons-material";
@@ -12,14 +12,14 @@ import * as Dummy from "../../../constants/dummy";
 import DataTable from "../../../components/base/table/DataTable";
 import * as BASE from "@components/base";
 
-const columns = (table, t) => [
+const columns = () => [
   {
     label: "Nama",
     value: (value) => value.name,
   },
   {
     label: "Satuan",
-    value: (value) => "-",
+    value: (value) => value.unit,
     align: "center",
     head: {
       align: "center",
@@ -31,7 +31,7 @@ const columns = (table, t) => [
   },
   {
     label: "Jumlah",
-    value: (value) => "-",
+    value: (value) => value.qty,
     align: "center",
     head: {
       align: "center",
@@ -40,6 +40,14 @@ const columns = (table, t) => [
         whiteSpace: "nowrap",
       },
     },
+  },
+  {
+    label: "Proyek",
+    value: (value) => value.projectName,
+  },
+  {
+    label: "Oleh",
+    value: (value) => value.creator,
   },
 ]
 
@@ -50,7 +58,7 @@ export default () => {
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().inventory("index").link(), {
+  const table = FRHooks.useTable(FRHooks.apiRoute().inventoryUsing("report").link(), {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
@@ -70,16 +78,9 @@ export default () => {
     mutation.clearError();
   };
 
-  const onUpdate = (id) => async () => {
-    mutation.get(FRHooks.apiRoute().inventory("detail", { id }).link(), {
-      onBeforeSend: () => {
-        onOpen();
-      },
-      onSuccess: (resp) => {
-        mutation.setData(resp.data);
-      },
-    });
-  };
+  useEffect(() => {
+    table.setQuery({ type: 'MATERIAL' });
+  }, [])
 
   return (
     <MainTemplate
@@ -118,9 +119,9 @@ export default () => {
 
       <Paper elevation={0} variant="outlined">
         <DataTable
-          data={[]}
+          data={table.data}
           loading={table.loading}
-          column={columns(table, t)}
+          column={columns()}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>

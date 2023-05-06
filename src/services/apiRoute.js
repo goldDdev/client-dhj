@@ -74,6 +74,7 @@ const apiRoute = {
   inventoryUsing: {
     index: "/use-inventory",
     status: "/use-inventory/status",
+    report: "/use-inventory/report",
     items: "/use-inventory/:id/items",
     detail: "/use-inventory/:id",
   },
