@@ -150,6 +150,7 @@ export default () => {
           then: y.string().required(),
         }),
         role: y.string().required(),
+        password: y.string().optional(),
       }),
     format: {
       phoneNumber: (value) => String(value),
