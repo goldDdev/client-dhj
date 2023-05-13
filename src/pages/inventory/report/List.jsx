@@ -16,9 +16,7 @@ const columns = () => [
   {
     label: "Tangal",
     value: (value) =>
-      `${moment(value.startDate).format("DD-MM-yyyy")} s/d ${moment(
-        value.endDate
-      ).format("DD-MM-yyyy")}`,
+      `${moment(value.startDate).format("DD-MM-yyyy")}`,
   },
   {
     label: "Nama",
