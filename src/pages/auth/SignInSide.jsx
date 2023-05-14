@@ -41,7 +41,7 @@ export default () => {
       onSuccess: ({ data }) => {
         localStorage.setItem("token", data.token);
         dispatch("user", data.user);
-        navigate("/");
+        navigate("/projects/list");
       },
       onError: (e) => {
         if (e.response?.status === 400) {
@@ -56,7 +56,7 @@ export default () => {
 
     enqueueSnackbar("Kamu Sudah Login Loh");
     timer = setTimeout(() => {
-      navigate("/");
+      navigate("/projects/list");
       clearTimeout(timer);
     }, 1000);
 
