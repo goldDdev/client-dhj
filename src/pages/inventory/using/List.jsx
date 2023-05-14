@@ -19,10 +19,16 @@ const columns = (onDetail, onConfirm) => [
       `${moment(value.startDate).format("DD-MM-yyyy")} s/d ${moment(
         value.endDate
       ).format("DD-MM-yyyy")}`,
+      sx:{
+        whiteSpace: "nowrap"
+      }
   },
   {
     label: "Proyek",
     value: (value) => value.projectName,
+    sx:{
+      whiteSpace: "nowrap"
+    }
   },
   {
     label: "Jumlah",
@@ -44,10 +50,16 @@ const columns = (onDetail, onConfirm) => [
         whiteSpace: "nowrap",
       },
     },
+    sx:{
+      whiteSpace: "nowrap"
+    }
   },
   {
     label: "Oleh",
     value: (value) => value.name,
+    sx:{
+      whiteSpace: "nowrap"
+    }
   },
   {
     label: "Status",
@@ -179,6 +191,13 @@ export default () => {
         sx={{ mt: { xs: 2 }, mb: 2 }}
         spacing={1}
         alignItems="center"
+        overflow={{
+          xs: "scroll",
+          sm: "scroll",
+          md: "scroll",
+          lg: "unset",
+          xl: "unset",
+        }}
       >
         <div>
           <Button
@@ -187,6 +206,7 @@ export default () => {
             color={!table.query("status") ? "primary" : "inherit"}
             startIcon={<ListAlt />}
             onClick={() => table.setQuery({ status: "" })}
+            sx={{whiteSpace: "nowrap"}}
           >
             Semua Status
           </Button>

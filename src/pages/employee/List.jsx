@@ -47,6 +47,9 @@ const columns = (table, utils, onUpdate, onDelete) => [
   {
     label: "Nama",
     value: (value) => value.name,
+    sx:{
+      whiteSpace: "nowrap"
+    }
   },
 
   {

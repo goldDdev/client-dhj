@@ -22,7 +22,8 @@ const Header = (props) => {
     <AppBar position="fixed" open={props.open} elevation={0} color="inherit">
       <Toolbar
         sx={{
-          pr: 24,
+          display: "flex",
+          justifyContent: "space-between",
         }}
       >
         <IconButton
@@ -70,12 +71,6 @@ const Header = (props) => {
           noWrap
           sx={{ flexGrow: 1 }}
         ></Typography>
-
-        <IconButton color="inherit" onClick={props.onToggleDrawer}>
-          <Badge badgeContent={4} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
 
         <Box sx={{ flexGrow: 0, ml: 2 }}>
           <BasicDropdown

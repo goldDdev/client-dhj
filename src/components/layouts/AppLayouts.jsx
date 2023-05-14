@@ -98,7 +98,7 @@ const App = () => {
               [theme.breakpoints.between("xs", "md")]: {
                 pl: 1,
                 pr: 1,
-                mt: 0,
+                mt: 1,
                 mb: 0,
               },
             })}

@@ -66,6 +66,9 @@ const columns = (table, onUpdate, onDelete) => [
         width: "10%",
       },
     },
+    sx:{
+      whiteSpace: "nowrap"
+    }
   },
 ];
 

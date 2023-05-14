@@ -53,11 +53,13 @@ const columns = (table) => [
     head: {
       align: "center",
       padding: "checkbox",
-      whiteSpace:"nowrap"
+      sx: {
+        whiteSpace: "nowrap",
+      },
     },
-    sx:{
-      whiteSpace:"nowrap"
-    }
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
   {
     label: "",
@@ -154,10 +156,7 @@ export default () => {
         <BASE.Select
           label="Tahun"
           value={table.query("year", +moment().format("Y"))}
-          menu={[
-            { text: "2022", value: 2022 },
-            { text: "2023", value: 2023 },
-          ]}
+          menu={utils.listYear().map((v) => ({ text: v, value: v }))}
           onChange={(e) => {
             table.setQuery({ year: +e.target.value });
           }}

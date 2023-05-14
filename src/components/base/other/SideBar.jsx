@@ -84,11 +84,14 @@ const SideBar = (props) => {
   const container =
     window !== undefined ? () => window().document.body : undefined;
 
-  const onClick = (value, index) => () => {
+  const onClick = (value, index, mobile) => () => {
     if (value.children && value.children.length > 0) {
       setOpenParent((state) => (state === index ? -1 : index));
     } else {
       navigate(value.link);
+      if (mobile) {
+        props.onToggleMobileDrawer();
+      }
     }
   };
 
@@ -136,7 +139,7 @@ const SideBar = (props) => {
           {menu.length > 0 &&
             menu.map((val, index) => (
               <li key={index}>
-                <ListItemButton onClick={onClick(val, index)}>
+                <ListItemButton onClick={onClick(val, index, true)}>
                   <ListItemIcon>
                     <Tooltip title={val.text}>
                       <SvgIcon component={val.icon} />
@@ -167,7 +170,7 @@ const SideBar = (props) => {
                         <List component="div" disablePadding>
                           <ListItemButton
                             sx={{ pl: 6 }}
-                            onClick={onClick(_val, j)}
+                            onClick={onClick(_val, j, true)}
                           >
                             {_val.icon ? (
                               <ListItemIcon>
@@ -225,7 +228,7 @@ const SideBar = (props) => {
           {menu.length > 0 &&
             menu.map((val, index) => (
               <li key={index}>
-                <ListItemButton onClick={onClick(val, index)}>
+                <ListItemButton onClick={onClick(val, index, false)}>
                   <ListItemIcon>
                     <Tooltip title={val.text}>
                       <SvgIcon component={val.icon} />
@@ -256,7 +259,7 @@ const SideBar = (props) => {
                         <List component="div" disablePadding>
                           <ListItemButton
                             sx={{ pl: 6 }}
-                            onClick={onClick(_val, j)}
+                            onClick={onClick(_val, j, false)}
                           >
                             {_val.icon ? (
                               <ListItemIcon>

@@ -32,7 +32,9 @@ const MainTemplate = ({ title, subtitle, breadcrumb, children, headRight }) => {
           {breadcrumb && <Breadcrumb />}
         </Box>
 
-        {headRight ? <Box {...headRight} /> : null}
+        {headRight ? (
+          <Box mt={{ xs: 1, sm: 1, md: 1, lg: 0, xl: 0 }} {...headRight} />
+        ) : null}
       </Stack>
 
       <Box sx={{ mt: "24px" }}>{children}</Box>

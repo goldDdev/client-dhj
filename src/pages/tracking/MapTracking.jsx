@@ -2,18 +2,26 @@ import React, { useEffect } from "react";
 import FRHooks from "frhooks";
 import moment from "moment";
 import { useSnackbar } from "notistack";
-import { Autocomplete, Stack, Paper, Box, Typography, TextField, CircularProgress } from "@mui/material";
+import {
+  Autocomplete,
+  Stack,
+  Paper,
+  Box,
+  Typography,
+  TextField,
+  CircularProgress,
+} from "@mui/material";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import MainTemplate from "@components/templates/MainTemplate";
 import DataTable from "../../components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
 import * as utils from "@utils";
 
-import '../../assets/leaflet.scss';
+import "../../assets/leaflet.scss";
 
 const columns = (t) => [
   {
-    label: 'Nama',
+    label: "Nama",
     value: (value) => value.name,
   },
   {
@@ -21,7 +29,7 @@ const columns = (t) => [
     value: (value) => utils.typesLabel(value.role),
   },
   {
-    label: 'Waktu',
+    label: "Waktu",
     value: (value) => moment(value.created_at).format("DD-MM-yyyy HH:mm"),
   },
 ];
@@ -34,16 +42,21 @@ const MapTracking = () => {
   });
 
   const projects = FRHooks.useFetch(apiRoute.project.index, {
-    selector: (resp) => resp.data.map((v) => ({ id: v.id, name: `${v.name} (${v.location})` })),
+    selector: (resp) =>
+      resp.data.map((v) => ({ id: v.id, name: `${v.name} (${v.location})` })),
     defaultValue: [],
     disabledOnDidMount: false,
     getData: (resp) => {
       if (!resp.length) return;
       const first = resp[0];
-      tracks.setQuery({ projectId: first.id, project: first.name, date: moment().format("yyyy-MM-DD") });
-    }
+      tracks.setQuery({
+        projectId: first.id,
+        project: first.name,
+        date: moment().format("yyyy-MM-DD"),
+      });
+    },
   });
-  
+
   const tracks = FRHooks.useFetch(apiRoute.tracking.index, {
     defaultValue: [],
     disabledOnDidMount: false,
@@ -53,23 +66,38 @@ const MapTracking = () => {
   useEffect(() => {
     // NOTE : interval 3 min to refetch data trackings
     setInterval(() => {
-      console.log('Refetching...', new Date())
-      tracks.refresh()
-    }, 3*60000); // 1m=60s=60000ms
-  },[])
+      console.log("Refetching...", new Date());
+      tracks.refresh();
+    }, 3 * 60000); // 1m=60s=60000ms
+  }, []);
 
   return (
-    <MainTemplate
-      title={t("project")}
-    >
+    <MainTemplate title={t("project")}>
       <Stack
         spacing={2}
-        direction="row"
+        direction={{
+          xs: "column",
+          sm: "column",
+          md: "column",
+          lg: "row",
+          xl: "row",
+        }}
         mb={2}
         justifyContent="flex-start"
         alignItems="center"
       >
-        <Paper elevation={0} sx={{ width: "50%" }}>
+        <Paper
+          elevation={0}
+          sx={{
+            width: {
+              xs: "100%",
+              sm: "100%",
+              md: "100%",
+              lg: "50%",
+              xl: "50%",
+            },
+          }}
+        >
           <Autocomplete
             id="asynchronous"
             freeSolo
@@ -86,7 +114,11 @@ const MapTracking = () => {
               if (r === "clear") {
                 tracks.clearOnly(["projectId", "project"]);
               } else {
-                tracks.setQuery({ ...tracks.query, projectId: v.id, project: v.name });
+                tracks.setQuery({
+                  ...tracks.query,
+                  projectId: v.id,
+                  project: v.name,
+                });
               }
             }}
             renderOption={(props, option) => (
@@ -115,25 +147,46 @@ const MapTracking = () => {
         </Paper>
         <TextField
           type="date"
-          sx={{ width: '20%' }}
+          sx={{
+            width: {
+              xs: "100%",
+              sm: "100%",
+              md: "100%",
+              lg: "20%",
+              xl: "20%",
+            },
+          }}
           value={tracks.query.date || undefined}
-          onChange={(e) => tracks.setQuery({ ...tracks.query, date: e.target.value })}
+          onChange={(e) =>
+            tracks.setQuery({ ...tracks.query, date: e.target.value })
+          }
         />
       </Stack>
 
-      <Paper elevation={0} variant="outlined" sx={{ minHeight: '500px' }}>
+      <Paper elevation={0} variant="outlined" sx={{ minHeight: "500px" }}>
         {tracks.query.projectId && tracks.query.date ? (
           <>
             {tracks.data.length > 0 ? (
               <Box>
-                <Box sx={{ height: '500px', width: '100%' }}>
-                  <MapContainer center={[tracks.data[0].project_latitude, tracks.data[0].project_longitude]} zoom={15} scrollWheelZoom={false} style={{ height: '500px', width: '100%' }}>
+                <Box sx={{ height: "500px", width: "100%" }}>
+                  <MapContainer
+                    center={[
+                      tracks.data[0].project_latitude,
+                      tracks.data[0].project_longitude,
+                    ]}
+                    zoom={15}
+                    scrollWheelZoom={false}
+                    style={{ height: "500px", width: "100%" }}
+                  >
                     <TileLayer
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
                     {tracks.data.map((track, i) => (
-                      <Marker key={i} position={[track.latitude, track.longitude]}>
+                      <Marker
+                        key={i}
+                        position={[track.latitude, track.longitude]}
+                      >
                         <Popup>
                           {track.name} {t(track.role)}
                         </Popup>
@@ -143,7 +196,9 @@ const MapTracking = () => {
                 </Box>
 
                 <Box sx={{ mt: 2 }}>
-                  <Typography sx={{ ml: 2 }}>Daftar Karyawan : {tracks.query.project}</Typography>
+                  <Typography sx={{ ml: 2 }}>
+                    Daftar Karyawan : {tracks.query.project}
+                  </Typography>
                   <DataTable
                     data={tracks.data}
                     loading={tracks.loading}

@@ -197,6 +197,7 @@ export default () => {
               }}
               variant="outlined"
               startIcon={<Refresh />}
+              sx={{whiteSpace: "nowrap"}}
             >
               Muat Ulang
             </LoadingButton>
