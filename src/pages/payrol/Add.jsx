@@ -176,7 +176,7 @@ export default () => {
       subtitle={"Halaman pembayaran gaji berdasarkan role karyawan"}
     >
       <Grid container spacing={2}>
-        <Grid item xs={3}>
+        <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
           <Paper variant="outlined" sx={{ mb: 2 }}>
             <Typography m={1} fontWeight={500}>
               Daftar Role
@@ -185,7 +185,18 @@ export default () => {
 
             <SimpleList
               type="button"
-              sx={{ paddingTop: 0 }}
+              sx={{
+                paddingTop: 0,
+                overflow: "scroll",
+                height: {
+                  xs: "320px",
+                  sm: "320px",
+                  md: "320px",
+                  lg: "100%",
+                  xl: "100%",
+                
+                },
+              }}
               data={utils.types.map((v, i) => ({
                 primary: utils.typesLabel(v),
                 primaryTypographyProps: { variant: "subtitle2" },
@@ -236,7 +247,7 @@ export default () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={9}>
+        <Grid item xs={12} sm={12} md={12} lg={9} xl={9}>
           <ListForm
             title="Pembayaran Gaji Periode"
             subtitle={"Bulan/Tahun"}

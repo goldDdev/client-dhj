@@ -22,8 +22,13 @@ const Header = (props) => {
     <AppBar position="fixed" open={props.open} elevation={0} color="inherit">
       <Toolbar
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
+          pr: {
+            xs: 0,
+            sm: 0,
+            md: 0,
+            lg: 0,
+            xl: 0,
+          },
         }}
       >
         <IconButton
@@ -72,7 +77,7 @@ const Header = (props) => {
           sx={{ flexGrow: 1 }}
         ></Typography>
 
-        <Box sx={{ flexGrow: 0, ml: 2 }}>
+        <Box sx={{ ml: 2 }}>
           <BasicDropdown
             type="icon"
             label={<Avatar alt={user?.employee?.name || "A"} />}

@@ -4,9 +4,11 @@ import MuiAppBar from "@mui/material/AppBar";
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
-  [theme.breakpoints.between("lg", "xl")]: {
-    width: `calc(100% - ${240 - 168}px)`,
+  width: `calc(100% - ${240 - 168}px)`,
+  [theme.breakpoints.between("xs", "md")]: {
+    width: `calc(100% - ${240 - 240}px)`,
   },
+
   borderBottom: `1px solid ${theme.palette.divider}`,
   [theme.breakpoints.up("lg")]: {
     zIndex: theme.zIndex.drawer,
