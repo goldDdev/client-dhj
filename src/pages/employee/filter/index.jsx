@@ -15,7 +15,6 @@ export const TableFilter = ({ table }) => {
   return (
     <Stack mb={2} direction="column" spacing={1}>
       <Stack
-        direction="row"
         direction={{
           xs: "column",
           sm: "column",
