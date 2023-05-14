@@ -613,7 +613,6 @@ export const EventCreate = ({
                   multiline
                   rows={2}
                   disabled={mutation.loading || mutation.processing}
-                  fullWidth
                   value={mutation.data.description || ""}
                   onChange={(e) =>
                     mutation.setData({ description: e.target.value })
