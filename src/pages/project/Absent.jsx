@@ -19,6 +19,7 @@ import {
   TableCell,
   TableBody,
   Box,
+  TableContainer,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { KeyboardArrowRight, Refresh } from "@mui/icons-material";
@@ -77,7 +78,15 @@ export default () => {
 
         drawerProps: {
           PaperProps: {
-            sx: { width: Object.keys(data).length === 0 ? "30%" : "80%" },
+            sx: {
+              width: {
+                xs: "100%",
+                sm: "100%",
+                md: "100%",
+                lg: Object.keys(data).length === 0 ? "30%" : "80%",
+                xl: Object.keys(data).length === 0 ? "30%" : "80%",
+              },
+            },
           },
         },
         content: (
@@ -100,54 +109,56 @@ export default () => {
                 }),
               })}
             >
-              <Table size="small" sx={{ width: "100%" }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell padding="checkbox">No</TableCell>
-                    <TableCell>Nama</TableCell>
-                    <TableCell align="center">Role</TableCell>
-                    <TableCell align="center">Tanggal</TableCell>
-                    <TableCell align="center">Datang</TableCell>
-                    <TableCell align="center">Pulang</TableCell>
-                    <TableCell align="center">Keterangan</TableCell>
-                  </TableRow>
-                </TableHead>
+              <TableContainer>
+                <Table size="small" sx={{ width: "100%" }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox">No</TableCell>
+                      <TableCell>Nama</TableCell>
+                      <TableCell align="center">Role</TableCell>
+                      <TableCell align="center">Tanggal</TableCell>
+                      <TableCell align="center">Datang</TableCell>
+                      <TableCell align="center">Pulang</TableCell>
+                      <TableCell align="center">Keterangan</TableCell>
+                    </TableRow>
+                  </TableHead>
 
-                <TableBody>
-                  {Object.keys(data).length > 0 && data.members ? (
-                    data.members.map((val, idx) => (
-                      <TableRow
-                        key={idx}
-                        selected={trigger.openTable === val.workerId}
-                      >
-                        <TableCell align="center">{idx + 1}</TableCell>
-                        <TableCell>{val.name}</TableCell>
-                        <TableCell align="center">
-                          {utils.typesLabel(val.role)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {moment(val.absentAt).format("DD-MM-yyyy")}
-                        </TableCell>
-                        <TableCell align="center">
-                          {val.comeAt || "-"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {val.closeAt || "-"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {val.absent === "P" ? "Bekerja" : "Tidak Bekerja"}
+                  <TableBody>
+                    {Object.keys(data).length > 0 && data.members ? (
+                      data.members.map((val, idx) => (
+                        <TableRow
+                          key={idx}
+                          selected={trigger.openTable === val.workerId}
+                        >
+                          <TableCell align="center">{idx + 1}</TableCell>
+                          <TableCell>{val.name}</TableCell>
+                          <TableCell align="center">
+                            {utils.typesLabel(val.role)}
+                          </TableCell>
+                          <TableCell align="center">
+                            {moment(val.absentAt).format("DD-MM-yyyy")}
+                          </TableCell>
+                          <TableCell align="center">
+                            {val.comeAt || "-"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {val.closeAt || "-"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {val.absent === "P" ? "Bekerja" : "Tidak Bekerja"}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} align="center">
+                          Tidak Ada Absent
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={4} align="center">
-                        Tidak Ada Absent
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Box>
             <Divider flexItem orientation="vertical" />
             <div style={{ width: trigger.openTable > 0 ? "35%" : "100%" }}>
@@ -219,7 +230,7 @@ export default () => {
               absents.getQuery("year", moment().year())
             )
             .map((v, i) => (
-              <Grid item key={i} xs={2}>
+              <Grid item key={i} xs={7} sm={7} md={7} lg={2} xl={2}>
                 <Card>
                   <CardHeader
                     avatar={

@@ -1,5 +1,12 @@
 import React from "react";
-import { Button, Stack, Box, Typography, TextField, ButtonGroup } from "@mui/material";
+import {
+  Button,
+  Stack,
+  Box,
+  Typography,
+  TextField,
+  ButtonGroup,
+} from "@mui/material";
 import { BasicDropdown, IconButton, Select } from "@components/base";
 import { useSnackbar } from "notistack";
 import * as utils from "@utils/";
@@ -253,7 +260,12 @@ export default () => {
       headRight={{
         children: (
           <ButtonGroup>
-            <Button disableElevation  variant="contained" startIcon={<Add />} onClick={onOpen}>
+            <Button
+              disableElevation
+              variant="contained"
+              startIcon={<Add />}
+              onClick={onOpen}
+            >
               Tambah Event
             </Button>
             <LoadingButton
@@ -270,7 +282,25 @@ export default () => {
         ),
       }}
     >
-      <Stack direction="row" spacing={1} mb={2} alignItems="center">
+      <Stack
+        direction={{
+          xs: "column",
+          sm: "column",
+          md: "column",
+          lg: "row",
+          xl: "row",
+        }}
+        justifyContent="space-between"
+        alignItems={{
+          xs: "flex-start",
+          sm: "flex-start",
+          md: "flex-start",
+          lg: "center",
+          xl: "center",
+        }}
+        spacing={1}
+        mb={2}
+      >
         <TextField
           placeholder="Cari"
           value={table.query("title", "")}
@@ -285,7 +315,13 @@ export default () => {
             { text: "Tanggal Aktual", value: "actual_date" },
           ]}
           sx={{
-            width: "25%",
+            width: {
+              xs: "100%",
+              sm: "100%",
+              md: "100%",
+              lg: "25%",
+              xl: "25%",
+            },
             "& .MuiOutlinedInput-root": {
               paddingLeft: 0.8,
             },
@@ -321,7 +357,13 @@ export default () => {
             { text: "Selesai", value: "DONE" },
           ]}
           sx={{
-            width: "25%",
+            width: {
+              xs: "100%",
+              sm: "100%",
+              md: "100%",
+              lg: "25%",
+              xl: "25%",
+            },
           }}
           value={table.query("status", "00")}
           onChange={(e) => {

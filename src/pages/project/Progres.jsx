@@ -159,7 +159,15 @@ export default () => {
       title="Progres"
       subtitle={`Daftar semua data progres`}
       headRight={{
-        sx: { width: "50%" },
+        sx: {
+          width: {
+            xs: "100%",
+            sm: "100%",
+            md: "100%",
+            lg: "50%",
+            xl: "50%",
+          },
+        },
         children: (
           <Stack
             spacing={2}
@@ -167,6 +175,13 @@ export default () => {
             mb={2}
             justifyContent="flex-start"
             alignItems="center"
+            overflow={{
+              xs: "scroll",
+              sm: "scroll",
+              md: "scroll",
+              lg: "unset",
+              xl: "unset",
+            }}
           >
             <BASE.Select
               value={progres.getQuery("month", +moment().month() + 1)}
@@ -203,6 +218,7 @@ export default () => {
               onClick={() => {
                 progres.clear();
               }}
+              sx={{whiteSpace: "nowrap"}}
             >
               Muat Ulang
             </Button>

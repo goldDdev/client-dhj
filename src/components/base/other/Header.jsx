@@ -12,6 +12,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import { useSelector, apiRoute } from "frhooks";
 import { useAlert } from "@contexts/AlertContext";
 import { useNavigate } from "react-router-dom";
+import { Menu } from "@mui/icons-material";
 
 const Header = (props) => {
   const { user } = useSelector(["user"]);
@@ -32,9 +33,35 @@ const Header = (props) => {
           sx={{
             marginRight: "36px",
             transform: "rotate(90deg)",
+            display: {
+              xs: "none",
+              sm: "none",
+              md: "none",
+              lg: "block",
+              xl: "block",
+            },
           }}
         >
           <BarChartIcon color="primary" />
+        </IconButton>
+
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="open drawer"
+          onClick={props.onToggleMobileDrawer}
+          sx={{
+            marginRight: "36px",
+            display: {
+              xs: "block",
+              sm: "block",
+              md: "block",
+              lg: "none",
+              xl: "none",
+            },
+          }}
+        >
+          <Menu color="primary" />
         </IconButton>
         <Typography
           component="h1"

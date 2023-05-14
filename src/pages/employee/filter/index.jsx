@@ -14,9 +14,27 @@ import _ from "lodash";
 export const TableFilter = ({ table }) => {
   return (
     <Stack mb={2} direction="column" spacing={1}>
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack
+        direction="row"
+        direction={{
+          xs: "column",
+          sm: "column",
+          md: "column",
+          lg: "row",
+          xl: "row",
+        }}
+        alignItems={{
+          xs: "flex-start",
+          sm: "flex-start",
+          md: "flex-start",
+          lg: "center",
+          xl: "center",
+        }}
+        spacing={1}
+      >
         <Paper elevation={0}>
           <TextField
+          fullWidth
             value={table.query("name", "")}
             placeholder="Cari"
             onChange={(e) => table.setQuery({ name: e.target.value })}
@@ -32,7 +50,7 @@ export const TableFilter = ({ table }) => {
             select
           >
             <MenuItem value="" selected>
-            Pilih
+              Pilih
             </MenuItem>
             <MenuItem value="ACTIVE">Aktif</MenuItem>
             <MenuItem value="INACTIVE">Non Aktif</MenuItem>
@@ -45,11 +63,11 @@ export const TableFilter = ({ table }) => {
             select
           >
             <MenuItem value="" selected>
-            Pilih
+              Pilih
             </MenuItem>
             {utils.types.map((v) => (
               <MenuItem key={v} value={v}>
-               {utils.typesLabel(v)}
+                {utils.typesLabel(v)}
               </MenuItem>
             ))}
           </TextField>

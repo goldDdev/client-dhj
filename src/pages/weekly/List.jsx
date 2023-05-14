@@ -205,7 +205,24 @@ export default () => {
         ),
       }}
     >
-      <Box display="flex" gap={2} sx={{ mb: 2 }}>
+      <Stack
+        direction={{
+          xs: "column",
+          sm: "column",
+          md: "column",
+          lg: "row",
+          xl: "row",
+        }}
+        alignItems={{
+          xs: "flex-start",
+          sm: "flex-start",
+          md: "flex-start",
+          lg: "center",
+          xl: "center",
+        }}
+        spacing={1}
+        sx={{ mb: 2 }}
+      >
         <BASE.Select
           label="Minggu"
           value={filter.week}
@@ -249,7 +266,7 @@ export default () => {
             table.setQuery({ year: +e.target.value });
           }}
         />
-      </Box>
+      </Stack>
 
       <Paper elevation={0} variant="outlined">
         <TableContainer>

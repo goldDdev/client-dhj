@@ -42,6 +42,9 @@ const columns = (table, onUpdate, onDelete) => [
         {value.name}
       </Link>
     ),
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
   {
     label: "Nilai Proyek",

@@ -4,6 +4,7 @@ import DataTable from "../../components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
 import apiRoute from "@services/apiRoute";
+import * as BASE from "@components/base";
 import { UpdateOvertime } from "./form";
 import { LoadingButton } from "@mui/lab";
 import { Stack, TextField, Paper, ListItemText } from "@mui/material";
@@ -14,6 +15,7 @@ import { MoreVert, Search, Refresh } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
 import {
   formatCurrency,
+  listYear,
   overtimeStatus,
   overtimeStatusLabel,
   typesLabel,
@@ -43,6 +45,9 @@ const columns = (onDelete, onAction, onUpdate) => [
       />
     ),
     size: "small",
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
 
   {
@@ -97,8 +102,20 @@ const columns = (onDelete, onAction, onUpdate) => [
     size: "small",
   },
   {
-    label: "Status",
+    label: "Status SPV",
     value: (value) => <strong>{overtimeStatusLabel(value.status)}</strong>,
+    align: "center",
+    head: {
+      align: "center",
+      sx: { whiteSpace: "nowrap" },
+    },
+    size: "small",
+  },
+  {
+    label: "Status",
+    value: (value) => (
+      <strong>{overtimeStatusLabel(value.confirmStatus)}</strong>
+    ),
     align: "center",
     head: {
       align: "center",
@@ -117,9 +134,12 @@ const columns = (onDelete, onAction, onUpdate) => [
       />
     ),
     size: "small",
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
   {
-    label: "Aksi Oleh",
+    label: "Disetujui SPV",
     value: (value) =>
       value.actionEmployee ? (
         <ListItemText
@@ -137,12 +157,38 @@ const columns = (onDelete, onAction, onUpdate) => [
       sx: { whiteSpace: "nowrap" },
     },
     size: "small",
+    sx: {
+      whiteSpace: "nowrap",
+    },
+  },
+  {
+    label: "Disetujui Oleh",
+    value: (value) =>
+      value.actionEmployee ? (
+        <ListItemText
+          primary={value.confirmEmployee?.name || "-"}
+          primaryTypographyProps={{ variant: "body2" }}
+          secondaryTypographyProps={{ variant: "body2" }}
+          secondary={value.confirmEmployee?.role || "-"}
+        />
+      ) : (
+        "Belum Ada Aksi"
+      ),
+    align: "center",
+    head: {
+      align: "center",
+      sx: { whiteSpace: "nowrap" },
+    },
+    size: "small",
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
   {
     value: (value) => {
       const menu = [];
 
-      if (value.status === "PENDING") {
+      if (value.confirmStatus === "PENDING") {
         menu.push({
           text: "Hapus",
           onClick: onDelete(value.id),
@@ -171,7 +217,9 @@ const columns = (onDelete, onAction, onUpdate) => [
 
       return (
         <BasicDropdown
-          disabled={value.status !== "PENDING"}
+          disabled={
+            value.status === "PENDING" && value.confirmStatus !== "PENDING"
+          }
           type="icon"
           menu={menu}
           size="small"
@@ -273,14 +321,7 @@ export default () => {
                 variant: "success",
               }
             );
-            table.update((v) => v.id === id, {
-              status,
-              acttionBy: data.actionBy,
-              actionEmployee: {
-                name: data.actionEmployee.name,
-                role: data.actionEmployee.role,
-              },
-            });
+            table.reload();
           } catch (err) {
           } finally {
             alert.reset();
@@ -304,12 +345,11 @@ export default () => {
     mutation.put(apiRoute.project.updateOvertime, {
       onSuccess: () => {
         table.reload();
-        enqueueSnackbar("Permintaan Lembur Berhasil diubah")
-        
+        enqueueSnackbar("Permintaan Lembur Berhasil diubah");
       },
       onAlways: () => {
         setTrigger((state) => ({ ...state, open: false }));
-      }
+      },
     });
   };
 
@@ -332,21 +372,88 @@ export default () => {
         ),
       }}
     >
-      <Stack direction="row" spacing={1} mb={2} alignItems="center">
-        <TextField
+      <Stack
+        direction={{
+          xs: "column",
+          sm: "column",
+          md: "column",
+          lg: "row",
+          xl: "row",
+        }}
+        alignItems={{
+          xs: "flex-start",
+          sm: "flex-start",
+          md: "flex-start",
+          lg: "center",
+          xl: "center",
+        }}
+        spacing={1}
+        mb={2}
+      >
+        {/* <TextField
           placeholder="Cari"
           value={table.query("name", "")}
           onChange={(e) => table.setQuery({ name: e.target.value })}
           InputProps={{ startAdornment: <Search color="disabled" /> }}
-        />
+        /> */}
         <TextField
           label="Tanggal"
           type="date"
           value={table.query("absentAt", "")}
           onChange={(e) => table.setQuery({ absentAt: e.target.value })}
           InputLabelProps={{ shrink: true }}
-          sx={{ width: "25%" }}
         />
+        <BASE.Select
+          label="Bulan"
+          value={table.query("month", moment().month() + 1)}
+          menu={[
+            { text: "Januari", value: 1 },
+            { text: "Februari", value: 2 },
+            { text: "Maret", value: 3 },
+            { text: "April", value: 4 },
+            { text: "Mei", value: 5 },
+            { text: "Juni", value: 6 },
+            { text: "Juli", value: 7 },
+            { text: "Agustus", value: 8 },
+            { text: "September", value: 9 },
+            { text: "Oktober", value: 10 },
+            { text: "November", value: 11 },
+            { text: "Desember", value: 12 },
+          ]}
+          onChange={(e) => {
+            table.setQuery({ month: +e.target.value });
+          }}
+        />
+        <BASE.Select
+          label="Tahun"
+          value={table.query("year", moment().year())}
+          menu={listYear().map((v) => ({ text: v, value: v }))}
+          onChange={(e) => {
+            table.setQuery({ year: +e.target.value });
+          }}
+        />
+        <Select
+          label="Status SPV"
+          menu={[
+            { text: "Pilih", divider: true, value: "00" },
+            ...Object.keys(overtimeStatus).map((v) => ({
+              text: overtimeStatusLabel(v),
+              value: v,
+            })),
+          ]}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              paddingLeft: 0.8,
+            },
+          }}
+          value={table.query("status", "00")}
+          onChange={(e) => {
+            table.setQuery({
+              status: e.target.value === "00" ? "" : e.target.value,
+            });
+          }}
+        />
+
         <Select
           label="Status"
           menu={[
@@ -357,15 +464,14 @@ export default () => {
             })),
           ]}
           sx={{
-            width: "25%",
             "& .MuiOutlinedInput-root": {
               paddingLeft: 0.8,
             },
           }}
-          value={table.query("status", "00")}
+          value={table.query("approval", "00")}
           onChange={(e) => {
             table.setQuery({
-              status: e.target.value === "00" ? "" : e.target.value,
+              approval: e.target.value === "00" ? "" : e.target.value,
             });
           }}
         />

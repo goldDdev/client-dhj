@@ -16,6 +16,7 @@ const App = () => {
   const { user } = FRHooks.useSelector(["user"]);
   const [trigger, setTrigger] = React.useState({
     open: true,
+    openMobile: false,
   });
   const { dispatch, clearMutation } = FRHooks.useDispatch("user", {
     type: "mutation",
@@ -55,11 +56,18 @@ const App = () => {
           onToggleDrawer={() => {
             setTrigger((state) => ({ open: !state.open }));
           }}
+          onToggleMobileDrawer={() => {
+            setTrigger((state) => ({ openMobile: !state.openMobile }));
+          }}
         />
         <SideBar
           open={trigger.open}
+          openMobile={trigger.openMobile}
           onToggleDrawer={() => {
             setTrigger((state) => ({ open: !state.open }));
+          }}
+          onToggleMobileDrawer={() => {
+            setTrigger((state) => ({ openMobile: !state.openMobile }));
           }}
         />
         <Box
@@ -88,8 +96,8 @@ const App = () => {
               mt: 2,
               mb: 1,
               [theme.breakpoints.between("xs", "md")]: {
-                pl: 0,
-                pr: 0,
+                pl: 1,
+                pr: 1,
                 mt: 0,
                 mb: 0,
               },

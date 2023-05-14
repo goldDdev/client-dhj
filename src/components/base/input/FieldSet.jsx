@@ -20,11 +20,23 @@ export default ({
       {disabledDivider ? null : <Divider flexItem />}
 
       <Stack
-        direction="row"
         justifyContent="space-between"
-        alignItems="center"
+        alignItems={{
+          xs: "flex-start",
+          sm: "flex-start",
+          md: "flex-start",
+          lg: "center",
+          xl: "center",
+        }}
         pt={0.8}
         spacing={1}
+        direction={{
+          xs: "column",
+          sm: "column",
+          md: "column",
+          lg: "row",
+          xl: "row",
+        }}
         {...stackProps}
       >
         {children}

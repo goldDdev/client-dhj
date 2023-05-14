@@ -65,7 +65,7 @@ const columns = (
           <ListItemText
             sx={{ mx: 1, my: 0 }}
             primary={value.name || "-"}
-            primaryTypographyProps={{ variant: "body2" }}
+            primaryTypographyProps={{ variant: "body2", whiteSpace: "nowrap" }}
             secondary={value.typeUnit || "-"}
             secondaryTypographyProps={{ variant: "body2" }}
           />
@@ -429,12 +429,18 @@ export default () => {
           value={table.query("name", "")}
           onChange={(e) => table.setQuery({ name: e.target.value })}
           InputProps={{ startAdornment: <Search color="disabled" /> }}
-          sx={{ width: "30%" }}
+          sx={{   width: {
+            xs: "100%",
+            sm: "100%",
+            md: "100%",
+            lg: "30%",
+            xl: "30%",
+          },}}
         />
       </Stack>
 
       <Grid container direction="row" spacing={1}>
-        <Grid item xs={9}>
+        <Grid item xs={12} sm={12} md={12} lg={9} xl={9}>
           <Paper variant="outlined">
             <DataTable
               tableProps={{ size: "small" }}
@@ -460,7 +466,7 @@ export default () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={3}>
+        <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
           <Paper variant="outlined">
             <Stack
               direction="row"

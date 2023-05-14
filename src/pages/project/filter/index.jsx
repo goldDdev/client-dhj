@@ -11,15 +11,7 @@ import {
 import Search from "@mui/icons-material/Search";
 import * as utils from "@utils/";
 import _ from "lodash";
-import {
-  Block,
-  Check,
-  CheckCircle,
-  ExpandMore,
-  FilterAlt,
-  Schedule,
-  Work,
-} from "@mui/icons-material";
+import { Block, CheckCircle, Schedule, Work } from "@mui/icons-material";
 
 export const TableFilter = ({ t, table }) => {
   return (
@@ -77,19 +69,44 @@ export const ButtonFilter = ({ table }) => {
   return (
     <Stack
       mb={2}
-      direction="row"
+      direction={{
+        xs: "column",
+        sm: "column",
+        md: "column",
+        lg: "row",
+        xl: "row",
+      }}
       spacing={1}
       justifyContent="space-between"
-      alignItems="center"
+      alignItems={{
+        xs: "flex-start",
+        sm: "flex-start",
+        md: "flex-start",
+        lg: "center",
+        xl: "center",
+      }}
     >
-      <Stack direction="row" spacing={1}>
+      <Stack
+        direction="row"
+        overflow={{
+          xs: "scroll",
+          sm: "scroll",
+          md: "scroll",
+          lg: "unset",
+          xl: "unset",
+        }}
+        width={"100%"}
+        spacing={1}
+      >
         <Button
+          fullWidth
           key={99}
           variant={!table.query("status") ? "contained" : "outlined"}
           color={!table.query("status") ? "primary" : "inherit"}
           onClick={() => {
-            table.setQuery({ status: '' });
+            table.setQuery({ status: "" });
           }}
+          sx={{ whiteSpace: "nowrap", minWidth: "30%" }}
         >
           Semua Status
         </Button>
@@ -107,16 +124,15 @@ export const ButtonFilter = ({ table }) => {
         ))}
       </Stack>
 
-      <Stack direction="row" flexGrow={1} spacing={1} alignItems="center">
-        <TextField
-          value={table.query("name", "")}
-          placeholder="Cari disini"
-          InputProps={{
-            endAdornment: <Search />,
-          }}
-          onChange={(e) => table.setQuery({ name: e.target.value })}
-        />
-      </Stack>
+      <TextField
+        fullWidth
+        value={table.query("name", "")}
+        placeholder="Cari disini"
+        InputProps={{
+          endAdornment: <Search />,
+        }}
+        onChange={(e) => table.setQuery({ name: e.target.value })}
+      />
     </Stack>
   );
 };

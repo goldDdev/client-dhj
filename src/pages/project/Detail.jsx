@@ -242,7 +242,7 @@ export default () => {
       }}
     >
       <Grid container spacing={2} justifyContent="space-between">
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
           <Paper elevation={0} variant="outlined">
             <List dense>
               <ListItem
@@ -302,7 +302,7 @@ export default () => {
             </List>
           </Paper>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
           <Paper elevation={0} variant="outlined">
             <List dense>
               <ListItem divider>
@@ -369,7 +369,7 @@ export default () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
           <Paper variant="outlined">
             <Stack
               p={1.5}
@@ -442,7 +442,7 @@ export default () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={12} md={12} lg={6} xl={6}>
           <Paper variant="outlined">
             <Stack
               p={1.5}

@@ -92,14 +92,34 @@ export default () => {
       title="Absensi"
       subtitle={`Daftar semua data absensi karyawan`}
       headRight={{
-        sx: { width: "60%" },
+        sx: {
+          width: {
+            xs: "100%",
+            sm: "100%",
+            md: "100%",
+            lg: "60%",
+            xl: "60%",
+          },
+        },
         children: (
           <Stack
             spacing={1}
-            direction="row"
             mb={2}
             justifyContent="flex-start"
-            alignItems="center"
+            direction={{
+              xs: "column",
+              sm: "column",
+              md: "column",
+              lg: "row",
+              xl: "row",
+            }}
+            alignItems={{
+              xs: "flex-start",
+              sm: "flex-start",
+              md: "flex-start",
+              lg: "center",
+              xl: "center",
+            }}
           >
             <Autocomplete
               id="asynchronous-demo"

@@ -59,7 +59,23 @@ const ProjectTemplate = ({
 
   return (
     <Stack direction="column">
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack
+        direction={{
+          xs: "column",
+          sm: "column",
+          md: "column",
+          lg: "row",
+          xl: "row",
+        }}
+        justifyContent="space-between"
+        alignItems={{
+          xs: "flex-start",
+          sm: "flex-start",
+          md: "flex-start",
+          lg: "center",
+          xl: "center",
+        }}
+      >
         <Box sx={{ diplay: "flex", flexDirection: "column" }}>
           <Typography component="h5" variant="h5">
             {title}
@@ -78,10 +94,18 @@ const ProjectTemplate = ({
         sx={{ mt: { xs: 2 } }}
         spacing={1}
         alignItems="center"
+        overflow={{
+          xs: "scroll",
+          sm: "scroll",
+          md: "scroll",
+          lg: "unset",
+          xl: "unset",
+        }}
       >
         {path(id).map((v, i) => (
-          <div key={"settings-" + i}>
+          <div key={"settings-" + i} style={{ whiteSpace: "nowrap" }}>
             <Button
+              fullWidth
               variant={pathname === v.link ? "contained" : "text"}
               startIcon={v.startIcon}
               onClick={() => navigate(v.link)}
@@ -102,11 +126,11 @@ const ProjectTemplate = ({
         ModalProps={{
           keepMounted: false,
         }}
-        PaperProps={{ sx: { width: "30%" } }}
+        PaperProps={{ sx: {  width: "30%" } }}
         {...drawer.drawerProps}
       >
         <Toolbar>
-          <Typography flexGrow={1}>{drawer.title || ""}</Typography>
+          <Typography whiteSpace="nowrap" flexGrow={1}>{drawer.title || ""}</Typography>
           <IconButton onClick={drawer.onClose}>
             <Close />
           </IconButton>

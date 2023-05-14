@@ -51,6 +51,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
           <Stack spacing={2.5} direction="column">
             <FieldSet disabledDivider>
               <TextField
+                fullWidth
                 disabled={mutation.loading || mutation.processing}
                 label="Nomor SPK"
                 value={mutation.data.noSpk || ""}
@@ -64,9 +65,18 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
                       <CircularProgress size={20} />
                     ) : null,
                 }}
-                sx={{ width: "35%" }}
+                sx={{
+                  width: {
+                    xs: "100%",
+                    sm: "100%",
+                    md: "100%",
+                    lg: "35%",
+                    xl: "35%",
+                  },
+                }}
               />
               <TextField
+                fullWidth
                 disabled={mutation.loading || mutation.processing}
                 label="Nama Proyek"
                 value={mutation.data.name || ""}
@@ -80,12 +90,21 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
                       <CircularProgress size={20} />
                     ) : null,
                 }}
-                sx={{ width: "65%" }}
+                sx={{
+                  width: {
+                    xs: "100%",
+                    sm: "100%",
+                    md: "100%",
+                    lg: "65%",
+                    xl: "65%",
+                  },
+                }}
               />
             </FieldSet>
 
             <FieldSet disabledDivider>
               <TextField
+                fullWidth
                 disabled={mutation.loading || mutation.processing}
                 label="Nilai Proyek"
                 value={mutation.data.price || 0}
@@ -100,9 +119,25 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
                       <CircularProgress size={20} />
                     ) : null,
                 }}
-                sx={{ width: "75%" }}
+                sx={{
+                  width: {
+                    xs: "100%",
+                    sm: "100%",
+                    md: "100%",
+                    lg: "75%",
+                    xl: "75%",
+                  },
+                }}
               />
-              <Box width="25%">
+              <Box
+                width={{
+                  xs: "100%",
+                  sm: "100%",
+                  md: "100%",
+                  lg: "25%",
+                  xl: "25%",
+                }}
+              >
                 <Select
                   fullWidth
                   name="status"
@@ -128,6 +163,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
               stackProps={{ direction: "column", spacing: 2 }}
             >
               <TextField
+                fullWidth
                 disabled={mutation.loading || mutation.processing}
                 label="Perusahaan"
                 value={mutation.data.companyName || ""}
@@ -146,6 +182,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
               />
 
               <TextField
+                fullWidth
                 multiline
                 rows={2}
                 disabled={mutation.loading || mutation.processing}
@@ -169,6 +206,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
               }}
             >
               <TextField
+                fullWidth
                 multiline
                 rows={2}
                 disabled={mutation.loading || mutation.processing}
@@ -180,9 +218,18 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
               />
 
               <TextField
+                fullWidth
                 disabled={mutation.loading || mutation.processing}
                 label="Latitude Koordinat"
-                sx={{ width: "49%" }}
+                sx={{
+                  width: {
+                    xs: "100%",
+                    sm: "100%",
+                    md: "100%",
+                    lg: "49%",
+                    xl: "49%",
+                  },
+                }}
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                 type="number"
                 value={mutation.data.latitude || 0}
@@ -191,9 +238,18 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
               />
 
               <TextField
+                fullWidth
                 disabled={mutation.loading || mutation.processing}
                 label="Longitude Koordinat"
-                sx={{ width: "49%" }}
+                sx={{
+                  width: {
+                    xs: "100%",
+                    sm: "100%",
+                    md: "100%",
+                    lg: "49%",
+                    xl: "49%",
+                  },
+                }}
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                 type="number"
                 value={mutation.data.longitude || 0}
@@ -206,6 +262,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
 
             <FieldSet label="Tanggal Proyek">
               <TextField
+                fullWidth
                 disabled={mutation.loading || mutation.processing}
                 label="Tanggal Mulai"
                 type="date"
@@ -214,6 +271,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
                 InputLabelProps={{ shrink: true }}
               />
               <TextField
+                fullWidth
                 disabled={mutation.loading || mutation.processing}
                 label="Tanggal Berakhir"
                 InputLabelProps={{
@@ -226,6 +284,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
               />
 
               <TextField
+                fullWidth
                 disabled={mutation.loading || mutation.processing}
                 label="Tanggal Target"
                 InputLabelProps={{
@@ -240,10 +299,17 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
               />
 
               <TextField
+                fullWidth
                 disabled
                 label="Duration"
                 type="number"
-                sx={{ width: "40%" }}
+                sx={{  width: {
+                  xs: "100%",
+                  sm: "100%",
+                  md: "100%",
+                  lg: "40%",
+                  xl: "40%"
+                }, }}
                 value={duration}
                 inputProps={{ style: { textAlign: "center" } }}
               />
@@ -314,6 +380,7 @@ export const ListWorker = ({
         {open ? (
           <Stack direction="column" flex={1} p={1}>
             <TextField
+              fullWidth
               placeholder="Cari Pekerja"
               InputProps={{
                 startAdornment: <Search />,
@@ -362,15 +429,15 @@ export const ListWorker = ({
             iconProps:
               v.role === "MANDOR"
                 ? {
-                  sx: {
-                    justifyContent: "center",
-                  },
-                  children: (
-                    <IconButton size="small">
-                      <ExpandMore />
-                    </IconButton>
-                  ),
-                }
+                    sx: {
+                      justifyContent: "center",
+                    },
+                    children: (
+                      <IconButton size="small">
+                        <ExpandMore />
+                      </IconButton>
+                    ),
+                  }
                 : undefined,
             itemProps: {
               disableGutters: v.role === "MANDOR",
@@ -424,6 +491,7 @@ export const EventCreate = ({
           <Stack spacing={1.5} direction="column">
             {type === "full" ? (
               <TextField
+                fullWidth
                 disabled={mutation.loading || mutation.processing}
                 label="Nama Event"
                 value={mutation.data.title || ""}
@@ -442,6 +510,7 @@ export const EventCreate = ({
 
             <FieldSet disabledDivider>
               <TextField
+                fullWidth
                 InputLabelProps={{ shrink: true }}
                 disabled={mutation.loading || mutation.processing}
                 label={type === "full" ? "Tanggal" : "Tanggal Aktual"}
@@ -475,6 +544,7 @@ export const EventCreate = ({
               />
 
               <TextField
+                fullWidth
                 InputLabelProps={{ shrink: true }}
                 disabled={mutation.loading || mutation.processing}
                 label={type === "full" ? "Waktu" : "Waktu Aktual"}
@@ -540,6 +610,7 @@ export const EventCreate = ({
               >
                 <div id="description"></div>
                 <TextField
+                  fullWidth
                   id="description"
                   multiline
                   rows={2}
@@ -614,6 +685,7 @@ export const BOQCreate = ({
       children: (
         <Stack spacing={1.5} direction="column">
           <TextField
+            fullWidth
             InputProps={{ startAdornment: <Search /> }}
             placeholder="Cari disini"
             value={table.getQuery("name", "")}
@@ -629,53 +701,53 @@ export const BOQCreate = ({
             ) : null}
             {!table.loading && !table.isEmpty
               ? table.data.map((v, index) => (
-                <ListItem
-                  key={index}
-                  divider
-                  secondaryAction={
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        const id = v.id;
-                        mutation.merge({ boqId: id });
-                        mutation.post(apiRoute.project.boq, {
-                          except: ["id"],
-                          onBeforeSend: () => {
-                            table.destroy((_v) => _v.id === id);
-                            setTrigger((state) => ({
-                              ...state,
-                              postLoading: state.postLoading.concat([v.id]),
-                            }));
-                            list.add({
-                              id: list.length === 0 ? 0 : list.length - 1,
-                              name: "loading",
-                              boqId: id,
-                              typeUnit: "loading",
-                              unit: 0,
-                              updateAt: new Date().toLocaleString(),
-                            });
-                          },
-                          onSuccess: ({ data }) => {
-                            list.update((_v) => _v.boqId === id, data);
-                          },
-                          onAlways: () => {
-                            setTrigger((state) => ({
-                              ...state,
-                              postLoading: state.postLoading.filter(
-                                (_v) => _v !== id
-                              ),
-                            }));
-                          },
-                        });
-                      }}
-                    >
-                      <Add fontSize="inherit" />
-                    </IconButton>
-                  }
-                >
-                  <ListItemText primary={v.name} secondary={v.typeUnit} />
-                </ListItem>
-              ))
+                  <ListItem
+                    key={index}
+                    divider
+                    secondaryAction={
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          const id = v.id;
+                          mutation.merge({ boqId: id });
+                          mutation.post(apiRoute.project.boq, {
+                            except: ["id"],
+                            onBeforeSend: () => {
+                              table.destroy((_v) => _v.id === id);
+                              setTrigger((state) => ({
+                                ...state,
+                                postLoading: state.postLoading.concat([v.id]),
+                              }));
+                              list.add({
+                                id: list.length === 0 ? 0 : list.length - 1,
+                                name: "loading",
+                                boqId: id,
+                                typeUnit: "loading",
+                                unit: 0,
+                                updateAt: new Date().toLocaleString(),
+                              });
+                            },
+                            onSuccess: ({ data }) => {
+                              list.update((_v) => _v.boqId === id, data);
+                            },
+                            onAlways: () => {
+                              setTrigger((state) => ({
+                                ...state,
+                                postLoading: state.postLoading.filter(
+                                  (_v) => _v !== id
+                                ),
+                              }));
+                            },
+                          });
+                        }}
+                      >
+                        <Add fontSize="inherit" />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemText primary={v.name} secondary={v.typeUnit} />
+                  </ListItem>
+                ))
               : null}
 
             {!table.loading && table.isEmpty ? (
@@ -711,6 +783,7 @@ export const WorkerCreate = ({
       children: (
         <Stack spacing={1.5} direction="column">
           <TextField
+            fullWidth
             InputProps={{ startAdornment: <Search /> }}
             placeholder="Cari disini"
             value={searchWorkers.getQuery("name", "")}
@@ -727,21 +800,21 @@ export const WorkerCreate = ({
 
             {!searchWorkers.loading && !searchWorkers.isEmpty
               ? searchWorkers.data.map((v, index) => (
-                <ListItem
-                  key={index}
-                  divider
-                  secondaryAction={
-                    <IconButton size="small" onClick={onAddMember(v)}>
-                      <Add fontSize="inherit" />
-                    </IconButton>
-                  }
-                >
-                  <ListItemText
-                    primary={v.name}
-                    secondary={utils.typesLabel(v.role)}
-                  />
-                </ListItem>
-              ))
+                  <ListItem
+                    key={index}
+                    divider
+                    secondaryAction={
+                      <IconButton size="small" onClick={onAddMember(v)}>
+                        <Add fontSize="inherit" />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemText
+                      primary={v.name}
+                      secondary={utils.typesLabel(v.role)}
+                    />
+                  </ListItem>
+                ))
               : null}
 
             {!searchWorkers.loading && searchWorkers.isEmpty ? (
@@ -783,6 +856,7 @@ export const ProgresUpdate = ({
               {boq.name} ({boq.typeUnit})
             </Typography>
             <TextField
+              fullWidth
               InputLabelProps={{ shrink: true }}
               label="Unit"
               value={current.progres || 0}
@@ -856,8 +930,9 @@ export const UpdateOvertime = ({ open, mutation, onOpen, data, onSubmit }) => {
                   <ListItem divider sx={{ py: 0, px: 1 }}>
                     <ListItemText
                       primary="Nama"
-                      secondary={`${data.employeeName || "-"
-                        } - ${utils.typesLabel(data.employeeRole)}`}
+                      secondary={`${
+                        data.employeeName || "-"
+                      } - ${utils.typesLabel(data.employeeRole)}`}
                     />
                   </ListItem>
                 )}
@@ -876,22 +951,24 @@ export const UpdateOvertime = ({ open, mutation, onOpen, data, onSubmit }) => {
                 <ListItem divider sx={{ py: 0, px: 1 }}>
                   <ListItemText
                     primary="Durasi"
-                    secondary={`${data.durationOvertime === 0
+                    secondary={`${
+                      data.durationOvertime === 0
                         ? 0
                         : data.overtimeDuration / 60
-                      } Jam`}
+                    } Jam`}
                   />
                 </ListItem>
 
                 <ListItem divider sx={{ py: 0, px: 1 }}>
                   <ListItemText
                     primary="Biaya"
-                    secondary={`${data.durationOvertime === 0
+                    secondary={`${
+                      data.durationOvertime === 0
                         ? 0
                         : data.overtimeDuration / 60
-                      } Jam X ${utils.formatCurrency(
-                        data.overtimePrice || 0
-                      )} = ${utils.formatCurrency(data.totalEarn)}`}
+                    } Jam X ${utils.formatCurrency(
+                      data.overtimePrice || 0
+                    )} = ${utils.formatCurrency(data.totalEarn)}`}
                   />
                 </ListItem>
 
@@ -907,10 +984,11 @@ export const UpdateOvertime = ({ open, mutation, onOpen, data, onSubmit }) => {
                 <ListItem divider sx={{ py: 0, px: 1 }}>
                   <ListItemText
                     primary="Dikonfirmasi Oleh"
-                    secondary={`${data.actionEmployee?.name || "-"} - ${data.actionEmployee
+                    secondary={`${data.actionEmployee?.name || "-"} - ${
+                      data.actionEmployee
                         ? utils.typesLabel(data.actionEmployee?.role)
                         : ""
-                      }`}
+                    }`}
                   />
                 </ListItem>
               </List>
@@ -946,6 +1024,7 @@ export const UpdateOvertime = ({ open, mutation, onOpen, data, onSubmit }) => {
 
                       <TableCell sx={{ borderBottom: 0 }} align="left">
                         <TextField
+                          fullWidth
                           disabled
                           label="Biaya"
                           variant="standard"
@@ -968,7 +1047,7 @@ export const UpdateOvertime = ({ open, mutation, onOpen, data, onSubmit }) => {
                         <Typography variant="subtitle1">
                           {utils.formatCurrency(
                             (mutation.data.duration / 60) *
-                            (data.overtimePrice || 0)
+                              (data.overtimePrice || 0)
                           )}
                         </Typography>
                       </TableCell>

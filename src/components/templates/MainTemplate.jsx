@@ -5,7 +5,23 @@ const MainTemplate = ({ title, subtitle, breadcrumb, children, headRight }) => {
   document.title = title;
   return (
     <>
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack
+        direction={{
+          xs: "column",
+          sm: "column",
+          md: "column",
+          lg: "row",
+          xl: "row",
+        }}
+        justifyContent="space-between"
+        alignItems={{
+          xs: "flex-start",
+          sm: "flex-start",
+          md: "flex-start",
+          lg: "center",
+          xl: "center",
+        }}
+      >
         <Box sx={{ diplay: "flex", flexDirection: "column" }}>
           <Typography component="h5" variant="h5">
             {title}

@@ -22,7 +22,6 @@ import logo from "@assets/png/logo-dhj.png";
 import logoSmall from "@assets/png/logo-small.png";
 
 const menu = [
-  
   {
     canAccess: [],
     text: "Proyek",
@@ -96,11 +95,11 @@ const SideBar = (props) => {
   return (
     <>
       {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-      {/* <MobileDrawer
+      <MobileDrawer
         container={container}
         variant="temporary"
-        open={props.open}
-        onClose={props.onToggleDrawer}
+        open={props.openMobile}
+        onClose={props.onToggleMobileDrawer}
         ModalProps={{
           keepMounted: true, // Better open performance on mobile.
         }}
@@ -126,17 +125,18 @@ const SideBar = (props) => {
             px: [1],
           }}
         >
-          <IconButton onClick={props.onToggleDrawer}>
+          <img src={logo} alt="PT. Duta Hita Jaya" height={50} />
+          <IconButton onClick={props.onToggleMobileDrawer}>
             <icon.ChevronLeft />
           </IconButton>
         </Toolbar>
 
         <Divider />
         <List>
-          <li>
-            {menu.length > 0 &&
-              menu.map((val, index) => (
-                <ListItemButton key={index} onClick={() => console.log("hai")}>
+          {menu.length > 0 &&
+            menu.map((val, index) => (
+              <li key={index}>
+                <ListItemButton onClick={onClick(val, index)}>
                   <ListItemIcon>
                     <Tooltip title={val.text}>
                       <SvgIcon component={val.icon} />
@@ -148,11 +148,49 @@ const SideBar = (props) => {
                       fontWeight: 500,
                     }}
                   />
+                  {val.children ? (
+                    openParent === index ? (
+                      <ExpandLess />
+                    ) : (
+                      <ExpandMore />
+                    )
+                  ) : null}
                 </ListItemButton>
-              ))}
-          </li>
+                {val.children
+                  ? val.children.map((_val, j) => (
+                      <Collapse
+                        in={openParent === index}
+                        key={`${index}${j}`}
+                        timeout="auto"
+                        unmountOnExit
+                      >
+                        <List component="div" disablePadding>
+                          <ListItemButton
+                            sx={{ pl: 6 }}
+                            onClick={onClick(_val, j)}
+                          >
+                            {_val.icon ? (
+                              <ListItemIcon>
+                                <Tooltip title={_val.text}>
+                                  <SvgIcon component={_val.icon} />
+                                </Tooltip>
+                              </ListItemIcon>
+                            ) : null}
+                            <ListItemText
+                              primary={_val.text}
+                              primaryTypographyProps={{
+                                fontWeight: 500,
+                              }}
+                            />
+                          </ListItemButton>
+                        </List>
+                      </Collapse>
+                    ))
+                  : null}
+              </li>
+            ))}
         </List>
-      </MobileDrawer> */}
+      </MobileDrawer>
 
       <Drawer
         variant="permanent"
