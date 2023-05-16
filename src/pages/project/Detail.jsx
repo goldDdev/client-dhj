@@ -212,15 +212,6 @@ export default () => {
     });
   }, [id]);
 
-  const dateProject = `${moment(
-    mutation.data.startAt
-  ).format("DD-MM-yyyy")} s/d ${moment(mutation.data.finishAt).format(
-    "DD-MM-yyyy"
-  )} ${
-    mutation.data.targetDate
-      ? `-> ${moment(mutation.data.targetDate).format("DD-MM-yyyy")}`
-      : ""
-  }`;
   return (
     <ProjectTemplate
       container={"container"}
@@ -291,7 +282,30 @@ export default () => {
               <ListItem>
                 <ListItemText
                   primary={`Durasi Proyek : ${mutation.data.duration} Hari`}
-                  secondary={dateProject}
+                  secondary={
+                    <span
+                      style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <span>
+                        Tanggal Mulai :{" "}
+                        {moment(mutation.data.startAt).format("DD-MM-yyyy")}
+                      </span>
+
+                      <span>
+                        Tanggal Berakhir :{" "}
+                        {moment(mutation.data.finishAt).format("DD-MM-yyyy")}
+                      </span>
+
+                      <span>
+                        Target Selesai :{" "}
+                        {moment(mutation.data.targetDate).format("DD-MM-yyyy")}
+                      </span>
+                    </span>
+                  }
                   primaryTypographyProps={{
                     variant: "subtitle1",
                     fontWeight: 500,
@@ -307,7 +321,7 @@ export default () => {
             <List dense>
               <ListItem divider>
                 <ListItemText
-                  primary="Informasi Pemberi Proyek"
+                  primary="Team"
                   primaryTypographyProps={{
                     variant: "subtitle1",
                     fontWeight: 500,
@@ -378,7 +392,7 @@ export default () => {
               alignItems="center"
             >
               <Typography variant="subtitle1" fontWeight={500} gutterBottom>
-                Daftar Pekerja
+                PIC
               </Typography>
 
               <Button
@@ -387,7 +401,7 @@ export default () => {
                 disableElevation
                 onClick={onOpenAddWorker("lead")}
               >
-                Tambah Pekerja
+                Tambah PIC
               </Button>
             </Stack>
             <Divider />

@@ -50,6 +50,10 @@ export const kom = {
   description: "",
   datePlan: moment().format("yyyy-MM-DD"),
   timePlan: moment().format("HH:00:00"),
+  revise1: "",
+  revise2: "",
+  reviseTime1: "",
+  reviseTime2: "",
   status: "PLAN",
 };
 
@@ -85,4 +89,14 @@ export const weeklyPlan = {
   role: "",
   startDate: moment().format("yyyy-MM-DD"),
   endDate: moment().format("yyyy-MM-DD"),
+};
+
+export const dailyPlan = {
+  id: 0,
+  projectId: 0,
+  employeeId: 0,
+  projectName: "",
+  name: "",
+  role: "",
+  date: moment().format("yyyy-MM-DD"),
 };

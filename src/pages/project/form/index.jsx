@@ -159,7 +159,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
             </FieldSet>
 
             <FieldSet
-              label="Informasi Pemberi Proyek"
+              label="Team"
               stackProps={{ direction: "column", spacing: 2 }}
             >
               <TextField
@@ -265,7 +265,14 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
                 label="Tanggal Mulai"
                 type="date"
                 value={mutation.data.startAt || ""}
-                onChange={(e) => mutation.setData({ startAt: e.target.value })}
+                onChange={(e) =>
+                  mutation.setData({
+                    startAt: e.target.value,
+                    targetDate: moment(e.target.value)
+                      .add(mutation.data.duration, "day")
+                      .format("yyyy-MM-DD"),
+                  })
+                }
                 InputLabelProps={{ shrink: true }}
               />
               <TextField
@@ -283,7 +290,33 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
 
               <TextField
                 fullWidth
-                disabled={mutation.loading || mutation.processing}
+                label="Duration"
+                sx={{
+                  width: {
+                    xs: "100%",
+                    sm: "100%",
+                    md: "100%",
+                    lg: "40%",
+                    xl: "40%",
+                  },
+                }}
+                value={mutation.data.duration}
+                inputProps={{ style: { textAlign: "center" } }}
+                onChange={(e) => {
+                  if (Number.isInteger(+e.target.value)) {
+                    mutation.setData({
+                      duration: +e.target.value,
+                      targetDate: moment(mutation.data.startAt)
+                        .add(+e.target.value, "day")
+                        .format("yyyy-MM-DD"),
+                    });
+                  }
+                }}
+              />
+
+              <TextField
+                fullWidth
+                disabled
                 label="Tanggal Target"
                 InputLabelProps={{
                   shrink: true,
@@ -294,22 +327,6 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
                 onChange={(e) =>
                   mutation.setData({ targetDate: e.target.value })
                 }
-              />
-
-              <TextField
-                fullWidth
-                disabled
-                label="Duration"
-                type="number"
-                sx={{  width: {
-                  xs: "100%",
-                  sm: "100%",
-                  md: "100%",
-                  lg: "40%",
-                  xl: "40%"
-                }, }}
-                value={duration}
-                inputProps={{ style: { textAlign: "center" } }}
               />
             </FieldSet>
           </Stack>
@@ -506,76 +523,226 @@ export const EventCreate = ({
               />
             ) : null}
 
-            <FieldSet disabledDivider>
-              <TextField
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                disabled={mutation.loading || mutation.processing}
-                label={type === "full" ? "Tanggal" : "Tanggal Aktual"}
-                value={
-                  mutation.data[type === "full" ? "datePlan" : "actualDate"] ||
-                  ""
-                }
-                onChange={(e) =>
-                  mutation.setData({
-                    [type === "full" ? "datePlan" : "actualDate"]:
-                      e.target.value,
-                  })
-                }
-                onBlur={async () =>
-                  mutation.validate(type === "full" ? "datePlan" : "actualDate")
-                }
-                error={mutation.error(
-                  type === "full" ? "datePlan" : "actualDate"
-                )}
-                helperText={mutation.message(
-                  type === "full" ? "datePlan" : "actualDate"
-                )}
-                InputProps={{
-                  endAdornment:
-                    mutation.loading || mutation.processing ? (
-                      <CircularProgress size={20} />
-                    ) : null,
-                }}
-                sx={{ width: "75%" }}
-                type="date"
-              />
+            {type === "full" ? (
+              <FieldSet disabledDivider label="Tanggal Plan">
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  disabled={mutation.loading || mutation.processing}
+                  label={"Tanggal"}
+                  value={mutation.data.datePlan}
+                  onChange={(e) =>
+                    mutation.setData({
+                      datePlan: e.target.value,
+                    })
+                  }
+                  onBlur={async () => mutation.validate("datePlan")}
+                  error={mutation.error("datePlan")}
+                  helperText={mutation.message("datePlan")}
+                  InputProps={{
+                    endAdornment:
+                      mutation.loading || mutation.processing ? (
+                        <CircularProgress size={20} />
+                      ) : null,
+                  }}
+                  sx={{ width: "75%" }}
+                  type="date"
+                />
 
-              <TextField
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                disabled={mutation.loading || mutation.processing}
-                label={type === "full" ? "Waktu" : "Waktu Aktual"}
-                value={
-                  mutation.data[type === "full" ? "timePlan" : "actualTime"] ||
-                  ""
-                }
-                onChange={(e) =>
-                  mutation.setData({
-                    [type === "full" ? "timePlan" : "actualTime"]:
-                      e.target.value,
-                  })
-                }
-                onBlur={async () =>
-                  mutation.validate(type === "full" ? "timePlan" : "actualTime")
-                }
-                error={mutation.error(
-                  type === "full" ? "timePlan" : "actualTime"
-                )}
-                helperText={mutation.message(
-                  type === "full" ? "timePlan" : "actualTime"
-                )}
-                InputProps={{
-                  endAdornment:
-                    mutation.loading || mutation.processing ? (
-                      <CircularProgress size={20} />
-                    ) : null,
-                }}
-                sx={{ width: "75%" }}
-                type="time"
-              />
-            </FieldSet>
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  disabled={mutation.loading || mutation.processing}
+                  label={type === "full" ? "Waktu" : "Waktu Aktual"}
+                  value={
+                    mutation.data[
+                      type === "full" ? "timePlan" : "actualTime"
+                    ] || ""
+                  }
+                  onChange={(e) =>
+                    mutation.setData({
+                      [type === "full" ? "timePlan" : "actualTime"]:
+                        e.target.value,
+                    })
+                  }
+                  onBlur={async () =>
+                    mutation.validate(
+                      type === "full" ? "timePlan" : "actualTime"
+                    )
+                  }
+                  error={mutation.error(
+                    type === "full" ? "timePlan" : "actualTime"
+                  )}
+                  helperText={mutation.message(
+                    type === "full" ? "timePlan" : "actualTime"
+                  )}
+                  InputProps={{
+                    endAdornment:
+                      mutation.loading || mutation.processing ? (
+                        <CircularProgress size={20} />
+                      ) : null,
+                  }}
+                  sx={{ width: "75%" }}
+                  type="time"
+                />
+              </FieldSet>
+            ) : null}
 
+            {type === "revise1" ? (
+              <FieldSet disabledDivider label="Revise 1">
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  disabled={mutation.loading || mutation.processing}
+                  label={"Tanggal"}
+                  value={mutation.data.revise1}
+                  onChange={(e) =>
+                    mutation.setData({
+                      revise1: e.target.value,
+                    })
+                  }
+                  onBlur={async () => mutation.validate("revise1")}
+                  error={mutation.error("revise1")}
+                  helperText={mutation.message("revise1")}
+                  InputProps={{
+                    endAdornment:
+                      mutation.loading || mutation.processing ? (
+                        <CircularProgress size={20} />
+                      ) : null,
+                  }}
+                  sx={{ width: "75%" }}
+                  type="date"
+                />
+
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  disabled={mutation.loading || mutation.processing}
+                  label={"Waktu"}
+                  value={mutation.data.reviseTime1}
+                  onChange={(e) =>
+                    mutation.setData({
+                      reviseTime1: e.target.value,
+                    })
+                  }
+                  onBlur={async () => mutation.validate("reviseTime1")}
+                  error={mutation.error("reviseTime1")}
+                  helperText={mutation.message("reviseTime1")}
+                  InputProps={{
+                    endAdornment:
+                      mutation.loading || mutation.processing ? (
+                        <CircularProgress size={20} />
+                      ) : null,
+                  }}
+                  sx={{ width: "75%" }}
+                  type="time"
+                />
+              </FieldSet>
+            ) : null}
+
+            {type === "revise2" ? (
+              <FieldSet disabledDivider label="Revise 2">
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  disabled={mutation.loading || mutation.processing}
+                  label={"Tanggal"}
+                  value={mutation.data.revise2}
+                  onChange={(e) =>
+                    mutation.setData({
+                      revise2: e.target.value,
+                    })
+                  }
+                  onBlur={async () => mutation.validate("revise2")}
+                  error={mutation.error("revise2")}
+                  helperText={mutation.message("revise2")}
+                  InputProps={{
+                    endAdornment:
+                      mutation.loading || mutation.processing ? (
+                        <CircularProgress size={20} />
+                      ) : null,
+                  }}
+                  sx={{ width: "75%" }}
+                  type="date"
+                />
+
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  disabled={mutation.loading || mutation.processing}
+                  label={"Waktu"}
+                  value={mutation.data.reviseTime2}
+                  onChange={(e) =>
+                    mutation.setData({
+                      reviseTime2: e.target.value,
+                    })
+                  }
+                  onBlur={async () => mutation.validate("reviseTime2")}
+                  error={mutation.error("reviseTime2")}
+                  helperText={mutation.message("reviseTime2")}
+                  InputProps={{
+                    endAdornment:
+                      mutation.loading || mutation.processing ? (
+                        <CircularProgress size={20} />
+                      ) : null,
+                  }}
+                  sx={{ width: "75%" }}
+                  type="time"
+                />
+              </FieldSet>
+            ) : null}
+
+            {type === "actual" ? (
+              <FieldSet disabledDivider label="Tanggal Aktual">
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  disabled={mutation.loading || mutation.processing}
+                  label={"Tanggal"}
+                  value={mutation.data.actualDate || ""}
+                  onChange={(e) =>
+                    mutation.setData({
+                      actualDate: e.target.value,
+                    })
+                  }
+                  onBlur={async () => mutation.validate("actualDate")}
+                  error={mutation.error("actualDate")}
+                  helperText={mutation.message("actualDate")}
+                  InputProps={{
+                    endAdornment:
+                      mutation.loading || mutation.processing ? (
+                        <CircularProgress size={20} />
+                      ) : null,
+                  }}
+                  sx={{ width: "75%" }}
+                  type="date"
+                />
+
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  disabled={mutation.loading || mutation.processing}
+                  label={"Waktu"}
+                  value={mutation.data.actualTime || ""}
+                  onChange={(e) =>
+                    mutation.setData({
+                      actualTime: e.target.value,
+                    })
+                  }
+                  onBlur={async () => mutation.validate("actualTime")}
+                  error={mutation.error("actualTime")}
+                  helperText={mutation.message("actualTime")}
+                  InputProps={{
+                    endAdornment:
+                      mutation.loading || mutation.processing ? (
+                        <CircularProgress size={20} />
+                      ) : null,
+                  }}
+                  sx={{ width: "75%" }}
+                  type="time"
+                />
+              </FieldSet>
+            ) : null}
             <FieldSet
               label="Status Event"
               stackProps={{

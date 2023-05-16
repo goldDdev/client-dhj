@@ -85,6 +85,14 @@ const apiRoute = {
     destroy: "/weekly-plan/:id",
     validation: "/weekly-plan/validation",
   },
+
+  dailyPlan: {
+    index: "/daily-plan",
+    project: "/daily-plan/project",
+    employee: "/daily-plan/employee",
+    destroy: "/daily-plan/:id",
+    validation: "/daily-plan/validation",
+  },
 };
 
 export default apiRoute;

@@ -42,9 +42,23 @@ const menu = [
   },
   {
     canAccess: [],
-    text: "Weekly Plan",
-    link: "/weekly",
-    icon: icon.SummarizeOutlined,
+    text: "Resource Plan",
+    link: "",
+    icon: icon.Inventory,
+    children: [
+      {
+        canAccess: [],
+        text: "Daily Plan",
+        link: "/daily",
+        icon: icon.SummarizeOutlined,
+      },
+      {
+        canAccess: [],
+        text: "Weekly Plan",
+        link: "/weekly",
+        icon: icon.SummarizeOutlined,
+      },
+    ],
   },
   {
     canAccess: [],

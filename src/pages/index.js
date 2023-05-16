@@ -18,6 +18,7 @@ import PayrolAdd from "./payrol/Add";
 import PayrolHtmlPdf from "./payrol/HtmlPdf";
 
 import WeeklyList from "./weekly/List";
+import DailyList from "./daily/List";
 
 import SettingGeneral from "./settings/general/Form";
 import BoqList from "./settings/boq/List";
@@ -47,6 +48,7 @@ export {
   PayrolAdd,
   PayrolHtmlPdf,
   WeeklyList,
+  DailyList,
   MapTracking,
   MasterInventoryList,
   UsingInventoryList,

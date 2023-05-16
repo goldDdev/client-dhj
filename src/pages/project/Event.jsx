@@ -41,7 +41,7 @@ const columns = (onDelete, onUpdate) => [
           {moment(value.datePlan).format("DD")}
         </Typography>
         <Typography variant="caption">
-          {utils.getMonth(moment(value.datePlan).format("m"))}
+          {utils.getMonth(moment(value.datePlan).format("M"))}
         </Typography>
       </Box>
     ),
@@ -59,8 +59,10 @@ const columns = (onDelete, onUpdate) => [
   {
     value: (value) => (
       <Stack direction="column">
-        <Typography variant="subtitle2">{value.title}</Typography>
-        <Stack direction="row" alignItems="center" spacing={0.5}>
+        <Typography variant="body2">
+          {value.title}
+        </Typography>
+        <Stack direction="row" alignItems="center" spacing={0.25}>
           {value.status === "PLAN" ? (
             <Schedule fontSize="inherit" sx={{ verticalAlign: "center" }} />
           ) : value.status === "CANCEL" ? (
@@ -93,6 +95,48 @@ const columns = (onDelete, onUpdate) => [
               {date} {value.timePlan}
             </Typography>
           </div>
+
+          {value.revise1 || value.reviseTime1 ? (
+            <>
+              <div>
+                <ArrowRight />
+              </div>
+
+              <div>
+                <Typography
+                  variant="caption"
+                  color="success.main"
+                  fontWeight={600}
+                >
+                  Tanggal Revise 1
+                </Typography>
+                <Typography variant="body2">
+                  {moment(value.revise1).format("DD-MM-Y")} {value.reviseTime1}
+                </Typography>
+              </div>
+            </>
+          ) : null}
+
+          {value.revise2 || value.reviseTime2 ? (
+            <>
+              <div>
+                <ArrowRight />
+              </div>
+
+              <div>
+                <Typography
+                  variant="caption"
+                  color="success.main"
+                  fontWeight={600}
+                >
+                  Tanggal Revise 2
+                </Typography>
+                <Typography variant="body2">
+                  {moment(value.revise2).format("DD-MM-Y")} {value.reviseTime2}
+                </Typography>
+              </div>
+            </>
+          ) : null}
 
           {value.actualDate || value.actualTime ? (
             <>
@@ -141,25 +185,50 @@ const columns = (onDelete, onUpdate) => [
   // },
 
   {
-    value: (value) => (
-      <BasicDropdown
-        type="icon"
-        menu={[
-          {
-            text: "Event Ulang",
-            divider: true,
-            onClick: onUpdate(value.id, "actual"),
-          },
-          {
-            text: "Ubah Data",
-            divider: true,
-            onClick: onUpdate(value.id, "full"),
-          },
-          { text: "Hapus Event", onClick: onDelete(value.id) },
-        ]}
-        label={<MoreVert />}
-      />
-    ),
+    value: (value) => {
+      let menu = [
+        {
+          text: "Revise 1",
+          divider: true,
+          onClick: onUpdate(value.id, "revise1"),
+        },
+        {
+          text: "Ubah Data",
+          divider: true,
+          onClick: onUpdate(value.id, "full"),
+        },
+        { text: "Hapus Milestone", onClick: onDelete(value.id) },
+      ];
+
+      if (!!value.revise1 || !!value.reviseTime1) {
+        menu[0] = {
+          text: "Revise 2",
+          divider: true,
+          onClick: onUpdate(value.id, "revise2"),
+        };
+      }
+
+      if (!!value.revise2 || !!value.reviseTime2) {
+        menu[0] = {
+          text: "Aktual",
+          divider: true,
+          onClick: onUpdate(value.id, "actual"),
+        };
+      }
+
+      if (!!value.actualDate || !!value.actualTime) {
+        delete menu[0];
+      }
+
+      return (
+        <BasicDropdown
+          size="small"
+          type="icon"
+          menu={menu}
+          label={<MoreVert fontSize="inherit" />}
+        />
+      );
+    },
     align: "center",
     padding: "checkbox",
     sx: {
@@ -196,6 +265,12 @@ export default () => {
         description: y.string().nullable(),
         datePlan: y.string().nullable(),
         timePlan: y.string().nullable(),
+        revise1: y.string().nullable(),
+        revise2: y.string().nullable(),
+        reviseTime1: y.string().nullable(),
+        reviseTime2: y.string().nullable(),
+        actualDate: y.string().nullable(),
+        actualTime: y.string().nullable(),
         status: y.string().nullable(),
       }),
   });
@@ -214,7 +289,17 @@ export default () => {
         mutation.clearError();
       },
       onSuccess: ({ data }) => {
-        mutation.setData(data, { include: ["id"] });
+        mutation.setData(
+          {
+            ...data,
+            reviseTime1: !!!data.reviseTime1 ? data.timePlan : data.reviseTime1,
+            reviseTime2: !!!data.reviseTime2
+              ? data.reviseTime1
+              : data.reviseTime2,
+            actualTime: !!!data.actualTime ? data.reviseTime2 : data.actualTime,
+          },
+          { include: ["id"] }
+        );
       },
     });
   };
@@ -223,7 +308,8 @@ export default () => {
     alert.set({
       open: true,
       title: "Mohon Perhatian",
-      message: "Anda akan menghapus Event ini dari daftar, apakah anda yakin?",
+      message:
+        "Anda akan menghapus Milestone ini dari daftar, apakah anda yakin?",
       type: "warning",
       loading: false,
       close: {
@@ -255,8 +341,8 @@ export default () => {
 
   return (
     <ProjectTemplate
-      title="Event"
-      subtitle="Menampilkan daftar event/Event proyek"
+      title="Milestone"
+      subtitle="Menampilkan daftar event/Milestone proyek"
       headRight={{
         children: (
           <ButtonGroup>
@@ -266,7 +352,7 @@ export default () => {
               startIcon={<Add />}
               onClick={onOpen}
             >
-              Tambah Event
+              Tambah Milestone
             </Button>
             <LoadingButton
               loading={table.loading}
@@ -312,6 +398,8 @@ export default () => {
           menu={[
             { text: "Pilih", divider: true, value: "id" },
             { text: "Tanggal Plan", divider: true, value: "date_plan" },
+            { text: "Revise 1", divider: true, value: "revise_1" },
+            { text: "Revise 2", divider: true, value: "revise_2" },
             { text: "Tanggal Aktual", value: "actual_date" },
           ]}
           sx={{

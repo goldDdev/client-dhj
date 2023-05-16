@@ -20,6 +20,7 @@ import {
   TableBody,
   Box,
   TableContainer,
+  ListItem,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { KeyboardArrowRight, Refresh } from "@mui/icons-material";
@@ -166,29 +167,41 @@ export default () => {
                 {absents.data
                   .filter((v) => v.absentAt === absentAt)
                   .map((v, i) => (
-                    <ListItemButton
+                    <ListItem
                       key={i}
                       dense
                       divider
                       selected={trigger.openTable === v.parentId}
-                      onClick={async () => {
-                        const absent = await FRHooks.apiRoute()
-                          .project("detilAbsent", { id, parent: v.parentId })
-                          .params({ date: v.absentAt })
-                          .get((resp) => resp.data);
-                        setData(absent);
-                        setTrigger((state) => ({
-                          ...state,
-                          openTable: v.parentId,
-                        }));
-                      }}
+                      secondaryAction={
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={async () => {
+                            const absent = await FRHooks.apiRoute()
+                              .project("detilAbsent", {
+                                id,
+                                parent: v.parentId,
+                              })
+                              .params({ date: v.absentAt })
+                              .get((resp) => resp.data);
+                            setData(absent);
+                            setTrigger((state) => ({
+                              ...state,
+                              openTable: v.parentId,
+                            }));
+                          }}
+                          color="primary"
+                        >
+                          Lihat Detil
+                        </Button>
+                      }
                     >
                       <ListItemText
                         sx={{ my: 0 }}
                         primary={v.name || ""}
                         secondary={utils.typesLabel(v.role) || ""}
                       />
-                    </ListItemButton>
+                    </ListItem>
                   ))}
               </List>
             </div>

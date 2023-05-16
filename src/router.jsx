@@ -23,6 +23,7 @@ const router = createBrowserRouter([
       { path: "/project/:id/progres", element: <Page.ProjectProgres /> },
       { path: "/tracking", element: <Page.MapTracking /> },
       { path: "/weekly", element: <Page.WeeklyList /> },
+      { path: "/daily", element: <Page.DailyList /> },
       { path: "/absent", element: <Page.AbsentList /> },
       { path: "/payrol", element: <Page.PayrolList /> },
       { path: "/payrol/add", element: <Page.PayrolAdd /> },

@@ -218,7 +218,7 @@ export default () => {
               onClick={() => {
                 progres.clear();
               }}
-              sx={{whiteSpace: "nowrap"}}
+              sx={{ whiteSpace: "nowrap" }}
             >
               Muat Ulang
             </Button>
@@ -253,20 +253,13 @@ export default () => {
       <Stack
         direction="row"
         spacing={1}
-        justifyContent="flex-end"
+        mb={1}
+        justifyContent="flex-start"
         alignItems="center"
       >
         <Square color="warning" />
         <div>Progres Belum Dikonfirmasi</div>
-      </Stack>
 
-      <Stack
-        direction="row"
-        mb={2}
-        spacing={1}
-        justifyContent="flex-end"
-        alignItems="center"
-      >
         <Square sx={{ color: "gainsboro" }} />
         <div>Plan SPV</div>
       </Stack>

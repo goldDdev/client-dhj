@@ -18,7 +18,7 @@ const path = (id) => [
     startIcon: <ListAlt />,
   },
   {
-    label: "Event",
+    label: "Milestone",
     link: `/project/${id}/event`,
     startIcon: <ListAlt />,
   },
@@ -28,7 +28,7 @@ const path = (id) => [
     startIcon: <ListAlt />,
   },
   {
-    label: "Activity",
+    label: "Progress",
     link: `/project/${id}/progres`,
     startIcon: <ListAlt />,
   },
