@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Button,
   Stack,
@@ -19,6 +19,7 @@ import { BasicDropdown, Timeline } from "@components/base";
 import { useSnackbar } from "notistack";
 import * as Dummy from "../../constants/dummy";
 import * as FORM from "./form";
+import * as utils from "@utils/";
 import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
@@ -31,20 +32,19 @@ import {
   Edit,
   Close,
   Check,
-  Clear,
   RefreshOutlined,
   Refresh,
-  NotificationImportant,
-  ErrorOutline,
+  ImportExport,
 } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
-import apiRoute from "@services/apiRoute";
 import { LoadingButton } from "@mui/lab";
+import apiRoute from "@services/apiRoute";
 
 const columns = (
   onDelete,
   onUpdate,
   onHistory,
+  onBoqUpdate,
   table,
   mutation,
   currentId,
@@ -55,6 +55,17 @@ const columns = (
 ) => {
   const borderPlan = { borderRight: 1, borderLeft: 1, borderColor: "divider" };
   return [
+    {
+      label: "No",
+      padding: "checkbox",
+      value: (_, idx) => idx + 1,
+      align: "center",
+      head: {
+        padding: "checkbox",
+        align: "center",
+      },
+    },
+
     {
       label: "Nama",
       sortKey: "name",
@@ -71,6 +82,17 @@ const columns = (
           />
         ),
       padding: "none",
+    },
+    {
+      label: "Harga",
+      value: (value) => utils.formatCurrency(value.price),
+      align: "right",
+    },
+
+    {
+      label: "Jumlah Harga",
+      value: (value) => utils.formatCurrency(value.price),
+      align: "right",
     },
 
     {
@@ -276,6 +298,11 @@ const columns = (
                 onClick: onHistory(value),
                 divider: true,
               },
+              {
+                text: "Ubah",
+                onClick: onBoqUpdate(value),
+                divider: true,
+              },
               { text: "Hapus", onClick: onDelete(value.id) },
             ]}
             label={<MoreVert fontSize="inherit" />}
@@ -292,12 +319,16 @@ const columns = (
 };
 
 export default () => {
+  const reader = new FileReader();
   const alert = useAlert();
   const navigate = useNavigate();
   const { id } = useParams();
   const { enqueueSnackbar } = useSnackbar();
+  const [jsonData, setJsonData] = React.useState([]);
+  const [filename, setFileName] = React.useState("");
   const [trigger, setTrigger] = React.useState({
     form: false,
+    import: false,
     postLoading: [],
     currentId: 0,
     pboid: 0,
@@ -306,12 +337,6 @@ export default () => {
 
   const table = FRHooks.useTable([apiRoute.project.listBoqs, { id }], {
     selector: (resp) => resp.data,
-  });
-
-  const boqs = FRHooks.useFetch([apiRoute.project.listBoqSearch, { id }], {
-    selector: (resp) => resp.data,
-    defaultValue: [],
-    disabledOnDidMount: true,
   });
 
   const progres = FRHooks.useFetch([apiRoute.project.listProgress, { id }], {
@@ -325,8 +350,13 @@ export default () => {
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
+        id: y.number(),
         projectId: y.number().nullable(),
-        boqId: y.number().nullable(),
+        name: y.string().required(),
+        typeUnit: y.string().required(),
+        price: y.number().nullable(),
+        unit: y.number().nullable(),
+        totalPrice: y.number().nullable(),
       }),
   });
 
@@ -342,9 +372,55 @@ export default () => {
 
   const onOpen = () => {
     setTrigger((state) => ({ ...state, form: !state.form }));
-    boqs.refresh();
     mutation.clearData();
     mutation.clearError();
+  };
+
+  const onImport = () => {
+    setTrigger((state) => ({ ...state, import: !state.import }));
+    setJsonData([]);
+    setFileName("")
+  };
+
+  const onUpload = (e) => {
+    e.preventDefault();
+    setJsonData([]);
+
+    // if(e.target.value.length === 0) return
+
+    if (e.target.files.length > 0) {
+      setFileName(e.target.files[0].name);
+    }
+
+    reader.onload = (evt) => {
+      const workbook = XLSX.read(evt.target.result, { type: "binary" });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(worksheet, {
+        defVal: null,
+        header: ["name", "typeUnit", "unit", "price", "totalPrice"],
+        blankrows: null,
+      });
+
+      if (!!data.length) {
+        delete data[0];
+
+        setJsonData(
+          data
+            .map((vl, i) => ({
+              name: vl.name || "",
+              typeUnit: vl.typeUnit ?? "",
+              unit: parseFloat(vl.unit || 0),
+              price: +vl.price,
+              totalPrice: +(vl.totalPrice || 0),
+              row: vl.__rowNum__ || i,
+            }))
+            .filter((v) => v !== null)
+        );
+      }
+    };
+
+    reader.readAsArrayBuffer(e.target.files[0]);
+    e.target.value = null;
   };
 
   const onHistory = (value) => () => {
@@ -363,6 +439,11 @@ export default () => {
       state.currentId = state.currentId === value.id ? 0 : value.id;
       return state;
     });
+  };
+
+  const onBoqUpdate = (value) => () => {
+    onOpen();
+    mutation.setData(value);
   };
 
   const onDelete = (id) => () => {
@@ -399,6 +480,42 @@ export default () => {
     });
   };
 
+  const onCreate = () => {
+    mutation.post(apiRoute.project.boq, {
+      method: mutation.isNewRecord ? "post" : "put",
+      except: mutation.isNewRecord ? ["id"] : [],
+      validation: true,
+      onSuccess: () => {
+        table.reload();
+        enqueueSnackbar(
+          mutation.isNewRecord
+            ? "BOQ berhasil Ditambahkan"
+            : "BOQ berhasil diperbaharui"
+        );
+        onOpen();
+      },
+      onAlways: () => {},
+    });
+  };
+
+  const onSubmit = () => {
+    mutation.post(apiRoute.project.boqImport, {
+      options: {
+        data: {
+          projectId: +id,
+          items: jsonData.map(({ __rowNum__, ...dt }) => dt),
+        },
+      },
+      onBeforeSend: () => {},
+      onSuccess: ({ data }) => {
+        table.reload();
+        enqueueSnackbar("Import BOQ berhasil");
+        onImport();
+      },
+      onAlways: () => {},
+    });
+  };
+
   return (
     <ProjectTemplate
       title="BOQ"
@@ -406,9 +523,24 @@ export default () => {
       headRight={{
         children: (
           <ButtonGroup>
-            <Button disableElevation variant="contained" startIcon={<Add />} onClick={onOpen}>
+            <Button
+              disableElevation
+              variant="contained"
+              startIcon={<ImportExport />}
+              onClick={onImport}
+            >
+              Import BOQ
+            </Button>
+
+            <Button
+              disableElevation
+              variant="outlined"
+              startIcon={<Add />}
+              onClick={onOpen}
+            >
               Tambah BOQ
             </Button>
+
             <LoadingButton
               loading={table.loading}
               disabled={table.loading}
@@ -429,13 +561,15 @@ export default () => {
           value={table.query("name", "")}
           onChange={(e) => table.setQuery({ name: e.target.value })}
           InputProps={{ startAdornment: <Search color="disabled" /> }}
-          sx={{   width: {
-            xs: "100%",
-            sm: "100%",
-            md: "100%",
-            lg: "30%",
-            xl: "30%",
-          },}}
+          sx={{
+            width: {
+              xs: "100%",
+              sm: "100%",
+              md: "100%",
+              lg: "30%",
+              xl: "30%",
+            },
+          }}
         />
       </Stack>
 
@@ -450,6 +584,7 @@ export default () => {
                 onDelete,
                 onUpdate,
                 onHistory,
+                onBoqUpdate,
                 progres,
                 boq,
                 trigger.currentId,
@@ -516,14 +651,22 @@ export default () => {
         </Grid>
       </Grid>
 
-      <FORM.BOQCreate
+      <FORM.BOQCreateV2
         trigger={trigger}
-        table={boqs}
-        list={table}
         mutation={mutation}
-        route={FRHooks.apiRoute}
         onOpen={onOpen}
-        setTrigger={setTrigger}
+        onSubmit={onCreate}
+      />
+
+      <FORM.BOQImport
+        data={jsonData}
+        loading={mutation.processing}
+        trigger={trigger}
+        onOpen={onImport}
+        onUpload={onUpload}
+        onSubmit={onSubmit}
+        setJsonData={setJsonData}
+        filename={filename}
       />
     </ProjectTemplate>
   );

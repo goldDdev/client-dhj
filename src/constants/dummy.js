@@ -59,8 +59,11 @@ export const kom = {
 
 export const projectBoq = {
   id: 0,
-  boqId: 0,
   projectId: 0,
+  typeUnit: "",
+  unit: 0,
+  price: 0,
+  totalPrice: 0,
 };
 
 export const inventory = {

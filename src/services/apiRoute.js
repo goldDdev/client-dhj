@@ -51,6 +51,7 @@ const apiRoute = {
     listBoqs: "/project/:id/boqs",
     boq: "/project/boq",
     boqValue: "/project/boq/value",
+    boqImport: "/project/boq/import",
     listBoqSearch: "/project/:id/search",
     listProgress: "/project/:id/progress",
     listKomDetail: "/project/:id/kom",

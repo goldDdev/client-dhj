@@ -17,6 +17,8 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  TableContainer,
+  TableHead,
 } from "@mui/material";
 import {
   Add,
@@ -930,6 +932,196 @@ export const BOQCreate = ({
     }}
   />
 );
+
+export const BOQCreateV2 = ({ trigger, onOpen, mutation, onSubmit }) => (
+  <DialogForm
+    open={trigger.form}
+    onClose={onOpen}
+    title="Tambah BOQ"
+    maxWidth="sm"
+    content={{
+      children: (
+        <Stack spacing={2} direction="column">
+          <TextField
+            label="Nama"
+            value={mutation.data.name || ""}
+            onChange={(e) => mutation.setData({ name: e.target.value })}
+            error={mutation.error("name")}
+            helperText={mutation.message("name")}
+          />
+
+          <FieldSet disabledDivider>
+            <TextField
+              label="Satuan"
+              value={mutation.data.typeUnit || ""}
+              onChange={(e) => mutation.setData({ typeUnit: e.target.value })}
+              error={mutation.error("typeUnit")}
+              helperText={mutation.message("typeUnit")}
+            />
+
+            <TextField
+              label="Unit"
+              value={mutation.data.unit}
+              onChange={(e) => {
+                if (Number.isInteger(+e.target.value)) {
+                  mutation.setData({ unit: +e.target.value });
+                }
+              }}
+              error={mutation.error("unit")}
+              helperText={mutation.message("unit")}
+            />
+          </FieldSet>
+
+          <TextField
+            label="Harga"
+            value={mutation.data.price}
+            onChange={(e) => {
+              if (Number.isInteger(+e.target.value)) {
+                mutation.setData({ price: +e.target.value });
+              }
+            }}
+            error={mutation.error("price")}
+            helperText={mutation.message("price")}
+          />
+
+          <TextField
+            label="Jumlah Harga"
+            value={mutation.data.totalPrice}
+            onChange={(e) => {
+              if (Number.isInteger(+e.target.value)) {
+                mutation.setData({ totalPrice: +e.target.value });
+              }
+            }}
+            error={mutation.error("totalPrice")}
+            helperText={mutation.message("totalPrice")}
+          />
+        </Stack>
+      ),
+    }}
+    actions={{
+      children: (
+        <>
+          <Button variant="outlined" onClick={onOpen}>
+            Batal
+          </Button>
+          <LoadingButton
+            loading={mutation.processing}
+            disabled={mutation.processing || mutation.loading}
+            disableElevation
+            variant="contained"
+            color="primary"
+            onClick={onSubmit}
+          >
+            {mutation.isNewRecord ? "Tambah Baru" : "Simpan Perubahan"}
+          </LoadingButton>
+        </>
+      ),
+    }}
+  />
+);
+
+export const BOQImport = ({
+  data,
+  loading,
+  trigger,
+  onOpen,
+  onUpload,
+  onSubmit,
+  setJsonData,
+  filename,
+}) => {
+  const failData = data.filter((v) =>
+    !v.name ? true : !v.typeUnit ? true : !v.unit ? true : false
+  );
+
+  return (
+    <DialogForm
+      open={trigger.import}
+      onClose={onOpen}
+      title="Import BOQ"
+      maxWidth="sm"
+      content={{
+        children: (
+          <Stack spacing={1.5} direction="column">
+            <TextField
+              type="file"
+              onChange={onUpload}
+              error={failData.length > 0}
+              helperText={
+                failData.length > 0 ? "Mohon untuk melengkapi data." : ""
+              }
+            />
+
+            {filename ? (
+              <Typography gutterBottom>
+                {filename} ({data.length})
+              </Typography>
+            ) : null}
+
+            {failData.length > 0 ? (
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        component="th"
+                        padding="checkbox"
+                        align="center"
+                      >
+                        Row
+                      </TableCell>
+                      <TableCell>Nama</TableCell>
+                      <TableCell align="center">Satuan</TableCell>
+                      <TableCell align="center">Unit</TableCell>
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {failData.map((val, r) => {
+                      return (
+                        <TableRow key={r}>
+                          <TableCell align="center">{val.row + 1}</TableCell>
+                          <TableCell>{val.name || "Kosong"}</TableCell>
+
+                          <TableCell align="center">
+                            {val.typeUnit || "Kosong"}
+                          </TableCell>
+
+                          <TableCell align="center">
+                            {val.unit || "Kosong"}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : null}
+          </Stack>
+        ),
+      }}
+      actions={{
+        children: (
+          <>
+            <Button variant="outlined" onClick={onOpen}>
+              Batal
+            </Button>
+            <LoadingButton
+              disabled={data.length === 0 || failData.length > 0}
+              loading={loading}
+              disableElevation
+              variant="contained"
+              color="primary"
+              onClick={onSubmit}
+            >
+              Import BOQ
+            </LoadingButton>
+          </>
+        ),
+      }}
+    />
+  );
+};
 
 export const WorkerCreate = ({
   trigger,

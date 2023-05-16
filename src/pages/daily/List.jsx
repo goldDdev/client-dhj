@@ -312,7 +312,8 @@ export default () => {
                           >
                             <ListItemText
                               sx={{ p: 0, m: 0 }}
-                              primary={value.projectName || "-"}
+                              primary={value.name || "-"}
+                              secondary={utils.typesLabel(value.role)}
                             />
                           </TableCell>
                         </>
@@ -367,6 +368,7 @@ export default () => {
                                       const fnd = value.data.find(
                                         (fn) => fn.id === find.id
                                       );
+
                                       if (fnd) {
                                         onUpdate(fnd);
                                       }
@@ -377,7 +379,7 @@ export default () => {
                                 </div>
                                 <ListItemText
                                   sx={{ p: 0, m: 0 }}
-                                  primary={find.name || "-"}
+                                  primary={find.projectName || "-"}
                                   primaryTypographyProps={{
                                     variant: "body2",
                                   }}
