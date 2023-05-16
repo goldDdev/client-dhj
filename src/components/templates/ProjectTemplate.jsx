@@ -28,7 +28,7 @@ const path = (id) => [
     startIcon: <ListAlt />,
   },
   {
-    label: "Progress",
+    label: "Progress (Plan vs Actual)",
     link: `/project/${id}/progres`,
     startIcon: <ListAlt />,
   },
