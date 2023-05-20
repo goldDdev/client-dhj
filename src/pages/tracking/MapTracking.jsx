@@ -189,7 +189,7 @@ const MapTracking = () => {
                       ]}
                       pathOptions={{ color: 'red' }}
                       radius={100}>
-                      {/* <Tooltip>Tooltip for CircleMarker</Tooltip> */}
+                      <Tooltip>Radius 100m</Tooltip>
                     </CircleMarker>
                     {tracks.data.map((track, i) => (
                       <Marker
