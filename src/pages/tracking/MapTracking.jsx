@@ -189,16 +189,17 @@ const MapTracking = () => {
                       ]}
                       pathOptions={{ color: 'red' }}
                       radius={100}>
-                      <Tooltip>Radius 100m</Tooltip>
+                      {/* <Tooltip>Radius 100m</Tooltip> */}
                     </CircleMarker>
                     {tracks.data.map((track, i) => (
                       <Marker
                         key={i}
                         position={[track.latitude, track.longitude]}
                       >
-                        <Popup>
+                        <Tooltip>{track.name} {t(track.role)}</Tooltip>
+                        {/* <Popup>
                           {track.name} {t(track.role)}
-                        </Popup>
+                        </Popup> */}
                       </Marker>
                     ))}
                   </MapContainer>
