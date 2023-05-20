@@ -196,10 +196,7 @@ const MapTracking = () => {
                         key={i}
                         position={[track.latitude, track.longitude]}
                       >
-                        <Tooltip>{track.name} {t(track.role)}</Tooltip>
-                        {/* <Popup>
-                          {track.name} {t(track.role)}
-                        </Popup> */}
+                        <Tooltip>{track.name} ({t(track.role)})</Tooltip>
                       </Marker>
                     ))}
                   </MapContainer>
