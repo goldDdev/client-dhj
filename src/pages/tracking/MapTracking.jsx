@@ -11,7 +11,7 @@ import {
   TextField,
   CircularProgress,
 } from "@mui/material";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer, CircleMarker } from "react-leaflet";
 import MainTemplate from "@components/templates/MainTemplate";
 import DataTable from "../../components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
@@ -182,6 +182,15 @@ const MapTracking = () => {
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
+                    <CircleMarker
+                      center={[
+                        tracks.data[0].project_latitude,
+                        tracks.data[0].project_longitude,
+                      ]}
+                      pathOptions={{ color: 'red' }}
+                      radius={100}>
+                      {/* <Tooltip>Tooltip for CircleMarker</Tooltip> */}
+                    </CircleMarker>
                     {tracks.data.map((track, i) => (
                       <Marker
                         key={i}
