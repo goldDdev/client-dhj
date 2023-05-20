@@ -41,7 +41,7 @@ const columns = (onDelete, onUpdate) => [
           {moment(value.datePlan).format("DD")}
         </Typography>
         <Typography variant="caption">
-          {utils.getMonth(moment(value.datePlan).format("M"))}
+          {utils.getMonth(moment(value.datePlan).format("M")-1)}
         </Typography>
       </Box>
     ),
@@ -253,6 +253,10 @@ export default () => {
     {
       selector: (resp) => resp.data,
       total: (resp) => resp.meta.total,
+      sort: {
+        orderBy: 'date_plan',
+        order: 'asc',
+      }
     }
   );
 
@@ -342,7 +346,7 @@ export default () => {
   return (
     <ProjectTemplate
       title="Milestone"
-      subtitle="Menampilkan daftar event/Milestone proyek"
+      subtitle="Menampilkan daftar Plan Milestone proyek"
       headRight={{
         children: (
           <ButtonGroup>
@@ -414,7 +418,7 @@ export default () => {
               paddingLeft: 0.8,
             },
           }}
-          value={table.orderBy}
+          value={table.orderBy || 'date_plan'}
           onChange={(e) => {
             table.onOrder(e.target.value);
           }}
