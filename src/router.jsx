@@ -29,6 +29,7 @@ const router = createBrowserRouter([
       { path: "/payrol/add", element: <Page.PayrolAdd /> },
       { path: "/settings", element: <Page.SettingGeneral /> },
       { path: "/settings/employee", element: <Page.EmployeeList /> },
+      { path: "/settings/center-location", element: <Page.CenterLocationList /> },
       { path: "/employee/:id/detail", element: <Page.EmployeeDetail /> },
       { path: "/settings/boq", element: <Page.BoqList /> },
       { path: "/settings/user", element: <Page.UserList /> },

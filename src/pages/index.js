@@ -29,6 +29,8 @@ import MasterInventoryList from "./inventory/master/List";
 import UsingInventoryList from "./inventory/using/List";
 import ReportInventoryList from "./inventory/report/List";
 
+import CenterLocationList from "./settings/centerLocation/List"
+
 export {
   SignInSide,
   ProjectBoard,
@@ -54,4 +56,5 @@ export {
   UsingInventoryList,
   ReportInventoryList,
   SettingGeneral,
+  CenterLocationList
 };

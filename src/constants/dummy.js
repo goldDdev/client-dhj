@@ -103,3 +103,11 @@ export const dailyPlan = {
   role: "",
   date: moment().format("yyyy-MM-DD"),
 };
+
+export const centerLocation = {
+  id: 0,
+  name: "",
+  description: "",
+  latitude: 0,
+  longitude: 0,
+};
