@@ -25,7 +25,6 @@ const TextField = styled(MUITextField)(({ theme }) => ({
 }));
 
 export default () => {
-  const { t, r } = FRHooks.useLang();
   const { enqueueSnackbar } = useSnackbar();
 
   const mutation = FRHooks.useMutation({
@@ -44,7 +43,7 @@ export default () => {
 
   return (
     <SettingTemplate
-      title={t(["setting", "general"])}
+      title={"Pengaturan Umum"}
       subtitle="Atur kerja kamu disini"
     >
       <Stack
@@ -158,8 +157,6 @@ export default () => {
         </Stack>
       </Stack>
 
-
-
       <Stack
         direction="row"
         justifyContent="space-between"
@@ -186,6 +183,38 @@ export default () => {
             value={mutation.data.LATE_TRESHOLD || ""}
             onChange={(e) => {
               mutation.setData({ LATE_TRESHOLD: e.target.value });
+            }}
+            disabled={table.loading || mutation.processing}
+          />
+        </Stack>
+      </Stack>
+
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        pr={2}
+        component={Paper}
+        variant="outlined"
+        mt={2}
+      >
+        <ListItem component="div">
+          <ListItemText
+            primary="Radius"
+            secondary="Jarak Lokasi"
+          />
+        </ListItem>
+        <Stack direction="row" spacing={1} width={"80%"}>
+          <TextField
+            type="text"
+            InputLabelProps={{ shrink: true }}
+            placeholder="Masukan jarak lokasi disini"
+            InputProps={{
+              endAdornment: table.loading ? <CircularProgress size={20} /> : null,
+            }}
+            value={mutation.data.RADIUS || ""}
+            onChange={(e) => {
+              mutation.setData({ RADIUS: e.target.value });
             }}
             disabled={table.loading || mutation.processing}
           />

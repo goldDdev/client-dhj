@@ -383,9 +383,24 @@ export default () => {
                                   primaryTypographyProps={{
                                     variant: "body2",
                                   }}
-                                  secondary={moment(find.date).format(
-                                    "DD-MM-yyyy"
-                                  )}
+                                  secondary={
+                                    <>
+                                      <span>
+                                        {moment(find.date).format("DD-MM-yyyy")}
+                                      </span>
+
+                                      {find.locationAt ? (
+                                        <span style={{ marginLeft: "8px" }}>
+                                          <a
+                                            href={`https://www.google.com/maps/search/?api=1&query=${find.latitude}%2C${find.longitude}`}
+                                            target="_blank"
+                                          >
+                                            Lihat Map ({find.locationAt})
+                                          </a>
+                                        </span>
+                                      ) : null}
+                                    </>
+                                  }
                                   secondaryTypographyProps={{
                                     variant: "body2",
                                   }}

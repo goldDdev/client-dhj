@@ -56,9 +56,24 @@ const columns = (table) => [
             find.absent
           ) : (
             <ListItemText
-              primary={find?.comeAt.substring(0, 5) || "-"}
+              primary={`${find?.comeAt.substring(0, 5) || "-"} ${
+                find?.closeAt ? "-" : ""
+              } ${find?.closeAt?.substring(0, 5) || ""}`}
               primaryTypographyProps={{ variant: "body2" }}
-              secondary={find?.closeAt?.substring(0, 5) || "-"}
+              secondary={
+                find?.note ? (
+                  <span style={{ marginLeft: "8px" }}>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${find.latitude}%2C${find.longitude}`}
+                      target="_blank"
+                    >
+                      {find.note}
+                    </a>
+                  </span>
+                ) : (
+                  ""
+                )
+              }
               secondaryTypographyProps={{ variant: "body2" }}
               sx={{ p: 0, m: 0 }}
             />
@@ -68,6 +83,9 @@ const columns = (table) => [
         );
       },
       align: "center",
+      sx: {
+        whiteSpace: "nowrap",
+      },
       head: {
         align: "center",
         sx: {
@@ -197,7 +215,7 @@ export default () => {
               }}
               variant="outlined"
               startIcon={<Refresh />}
-              sx={{whiteSpace: "nowrap"}}
+              sx={{ whiteSpace: "nowrap" }}
             >
               Muat Ulang
             </LoadingButton>
