@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import FRHooks from "frhooks";
 import moment from "moment";
-import { useSnackbar } from "notistack";
 import {
   Autocomplete,
   Stack,
@@ -11,7 +10,13 @@ import {
   TextField,
   CircularProgress,
 } from "@mui/material";
-import { MapContainer, Marker, Popup, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  TileLayer,
+  CircleMarker,
+  Tooltip,
+} from "react-leaflet";
 import MainTemplate from "@components/templates/MainTemplate";
 import DataTable from "../../components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
@@ -19,7 +24,7 @@ import * as utils from "@utils";
 
 import "../../assets/leaflet.scss";
 
-const columns = (t) => [
+const columns = () => [
   {
     label: "Nama",
     value: (value) => value.name,
@@ -35,32 +40,23 @@ const columns = (t) => [
 ];
 
 const MapTracking = () => {
-  const { t, r } = FRHooks.useLang();
-  const { enqueueSnackbar } = useSnackbar();
-  const [trigger, setTrigger] = React.useState({
-    form: false,
+  const [coordinate, setCoordinate] = React.useState({
+    latitude: 0,
+    longitude: 0,
   });
 
-  const projects = FRHooks.useFetch(apiRoute.project.index, {
-    selector: (resp) =>
-      resp.data.map((v) => ({ id: v.id, name: `${v.name} (${v.location})` })),
-    defaultValue: [],
-    disabledOnDidMount: false,
-    getData: (resp) => {
-      if (!resp.length) return;
-      const first = resp[0];
-      tracks.setQuery({
-        projectId: first.id,
-        project: first.name,
-        date: moment().format("yyyy-MM-DD"),
-      });
-    },
-  });
+  const [link, setLink] = React.useState(apiRoute.tracking.index);
 
-  const tracks = FRHooks.useFetch(apiRoute.tracking.index, {
-    defaultValue: [],
-    disabledOnDidMount: false,
+  const projects = FRHooks.useFetch(apiRoute.centerLocation.all, {
     selector: (resp) => resp.data,
+    defaultValue: [],
+  });
+
+  const tracks = FRHooks.useFetch(link, {
+    defaultValue: [],
+    disabledOnDidMount: true,
+    selector: (resp) => resp.data,
+    deps: [link],
   });
 
   useEffect(() => {
@@ -72,7 +68,7 @@ const MapTracking = () => {
   }, []);
 
   return (
-    <MainTemplate title={t("project")}>
+    <MainTemplate title={"Proyek atau Pusat Lokasi"}>
       <Stack
         spacing={2}
         direction={{
@@ -102,34 +98,49 @@ const MapTracking = () => {
             id="asynchronous"
             freeSolo
             fullWidth
-            value={{ id: tracks.query.projectId, name: tracks.query.project }}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             getOptionLabel={(option) => option.name}
             options={projects.data}
-            onOpen={() => {
-              projects.clear();
-            }}
-            loading={false}
+            loading={projects.loading}
             onChange={(e, v, r) => {
+              if (r === "selectOption") {
+                if (v) {
+                  setLink(
+                    v.type === "PROJECT"
+                      ? apiRoute.tracking.index
+                      : apiRoute.tracking.location
+                  );
+                  setCoordinate({
+                    latitude: v.latitude,
+                    longitude: v.longitude,
+                  });
+
+                  tracks.setQuery({
+                    [v.type === "PROJECT" ? "projectId" : "locationId"]: v.id,
+                  });
+                }
+              }
+
               if (r === "clear") {
-                tracks.clearOnly(["projectId", "project"]);
-              } else {
-                tracks.setQuery({
-                  ...tracks.query,
-                  projectId: v.id,
-                  project: v.name,
+                projects.clear();
+                tracks.clear()
+                setLink(apiRoute.tracking.index);
+                setCoordinate({
+                  latitude: 0,
+                  longitude: 0,
                 });
               }
             }}
-            renderOption={(props, option) => (
-              <li {...props} key={option.id} children={option.name} />
-            )}
+            onInputChange={(e, v, r) => {
+              if (r === "input") {
+                projects.setQuery({ name: v });
+              }
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Proyek"
                 value={tracks.query.project || undefined}
-                onChange={(e) => tracks.setQuery({ project: e.target.value })}
                 InputProps={{
                   ...params.InputProps,
                   endAdornment: (
@@ -156,10 +167,8 @@ const MapTracking = () => {
               xl: "20%",
             },
           }}
-          value={tracks.query.date || undefined}
-          onChange={(e) =>
-            tracks.setQuery({ ...tracks.query, date: e.target.value })
-          }
+          value={tracks.query.date || ""}
+          onChange={(e) => tracks.setQuery({ date: e.target.value })}
         />
       </Stack>
 
@@ -170,12 +179,9 @@ const MapTracking = () => {
               <Box>
                 <Box sx={{ height: "500px", width: "100%" }}>
                   <MapContainer
-                    center={[
-                      tracks.data[0].project_latitude,
-                      tracks.data[0].project_longitude,
-                    ]}
+                    center={[coordinate.latitude, coordinate.longitude]}
                     zoom={15}
-                    scrollWheelZoom={false}
+                    scrollWheelZoom={true}
                     style={{ height: "500px", width: "100%" }}
                   >
                     <TileLayer
@@ -187,8 +193,9 @@ const MapTracking = () => {
                         tracks.data[0].project_latitude,
                         tracks.data[0].project_longitude,
                       ]}
-                      pathOptions={{ color: 'red' }}
-                      radius={100}>
+                      pathOptions={{ color: "red" }}
+                      radius={100}
+                    >
                       {/* <Tooltip>Radius 100m</Tooltip> */}
                     </CircleMarker>
                     {tracks.data.map((track, i) => (
@@ -196,7 +203,9 @@ const MapTracking = () => {
                         key={i}
                         position={[track.latitude, track.longitude]}
                       >
-                        <Tooltip>{track.name} ({t(track.role)})</Tooltip>
+                        <Tooltip>
+                          {track.name} ({utils.typesLabel(track.role)})
+                        </Tooltip>
                       </Marker>
                     ))}
                   </MapContainer>
@@ -209,7 +218,7 @@ const MapTracking = () => {
                   <DataTable
                     data={tracks.data}
                     loading={tracks.loading}
-                    column={columns(t)}
+                    column={columns()}
                   />
                 </Box>
               </Box>

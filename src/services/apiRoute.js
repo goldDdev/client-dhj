@@ -13,6 +13,7 @@ const apiRoute = {
     detail: "/boq/:id",
   },
   centerLocation: {
+    all: "/center-location/all",
     index: "/center-location",
     detail: "/center-location/:id",
   },
@@ -68,6 +69,7 @@ const apiRoute = {
   },
   tracking: {
     index: "/tracking",
+    location:"/tracking/location"
   },
   setting: {
     index: "/setting",

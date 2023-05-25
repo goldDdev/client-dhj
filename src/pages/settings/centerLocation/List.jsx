@@ -131,7 +131,7 @@ export default () => {
       open: true,
       title: "Mohon Perhatian",
       message:
-        "Anda akan menghapus center lokasi ini dari daftar, apakah anda yakin?",
+        "Anda akan menghapus lokasi pusat ini dari daftar, apakah anda yakin?",
       type: "warning",
       loading: false,
       close: {
@@ -175,7 +175,7 @@ export default () => {
 
   return (
     <SettingTemplate
-      title={"Center Lokasi"}
+      title={"Lokasi Pusat"}
       subtitle={"Daftar semua lokasi yang didaftarkan"}
       headRight={{
         children: (

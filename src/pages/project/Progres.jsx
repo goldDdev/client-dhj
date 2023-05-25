@@ -36,6 +36,7 @@ import _ from "lodash";
 export default () => {
   const { id } = useParams();
   const alert = useAlert();
+
   let currentPlanId = 0;
   let colSpan = 0;
   const { enqueueSnackbar } = useSnackbar();
@@ -154,6 +155,11 @@ export default () => {
     });
   };
 
+  const days = utils.getDaysInMonthUTC(
+    progres.getQuery("month", moment().format("M")),
+    progres.getQuery("year", moment().format("Y"))
+  );
+
   return (
     <ProjectTemplate
       title="Progres"
@@ -270,29 +276,32 @@ export default () => {
             <TableHead>
               <TableRow>
                 <TableCell component="th">Nama</TableCell>
-                {...utils
-                  .getDaysInMonthUTC(
-                    progres.getQuery("month", moment().format("M")),
-                    progres.getQuery("year", moment().format("Y"))
-                  )
-                  .map((d) => (
-                    <TableCell
-                      component="th"
-                      key={d}
-                      align="center"
-                      sx={{
-                        borderRight: 1,
-                        borderLeft: 1,
-                        borderColor: "divider",
-                      }}
-                    >
-                      {moment(d).format("DD")}
-                    </TableCell>
-                  ))}
+                {days.map((d) => (
+                  <TableCell
+                    component="th"
+                    key={d}
+                    align="center"
+                    sx={{
+                      borderRight: 1,
+                      borderLeft: 1,
+                      borderColor: "divider",
+                    }}
+                  >
+                    {moment(d).format("DD")}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
 
             <TableBody>
+              {progres.data.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={days.length + 1} align="center">
+                    Data belum tersedia
+                  </TableCell>
+                </TableRow>
+              ) : null}
+
               {progres.data.map((value, i) => {
                 return (
                   <React.Fragment key={i}>
@@ -304,73 +313,68 @@ export default () => {
                           sx={{ m: 0 }}
                         />
                       </TableCell>
-                      {utils
-                        .getDaysInMonthUTC(
-                          progres.getQuery("month", moment().format("M")),
-                          progres.getQuery("year", moment().format("Y"))
-                        )
-                        .map((d) => {
-                          const find = value.data.find(
-                            (_v) => _v.day === +moment(d).format("D")
-                          );
-                          return (
-                            <TableCell
-                              key={d}
-                              sx={{
-                                borderRight: 1,
-                                borderLeft: 1,
-                                borderColor: "divider",
-                              }}
-                              padding="none"
-                              align="center"
-                            >
-                              {find ? (
-                                <Box
-                                  sx={{
-                                    backgroundColor: find.aproveName
-                                      ? "inherit"
-                                      : "warning.main",
-                                  }}
+                      {days.map((d) => {
+                        const find = value.data.find(
+                          (_v) => _v.day === +moment(d).format("D")
+                        );
+                        return (
+                          <TableCell
+                            key={d}
+                            sx={{
+                              borderRight: 1,
+                              borderLeft: 1,
+                              borderColor: "divider",
+                            }}
+                            padding="none"
+                            align="center"
+                          >
+                            {find ? (
+                              <Box
+                                sx={{
+                                  backgroundColor: find.aproveName
+                                    ? "inherit"
+                                    : "warning.main",
+                                }}
+                              >
+                                <Tooltip
+                                  placement="top-end"
+                                  open={trigger.tooltip}
+                                  arrow
+                                  title={
+                                    <ListItemText
+                                      primary={`Ditambahkan Oleh: ${
+                                        find.submitedName || "-"
+                                      }`}
+                                      primaryTypographyProps={{
+                                        variant: "body2",
+                                      }}
+                                      secondary={`Disetujui Oleh: ${
+                                        find.approveName || "-"
+                                      }`}
+                                      secondaryTypographyProps={{
+                                        variant: "body2",
+                                        color: "white",
+                                      }}
+                                    />
+                                  }
                                 >
-                                  <Tooltip
-                                    placement="top-end"
-                                    open={trigger.tooltip}
-                                    arrow
-                                    title={
-                                      <ListItemText
-                                        primary={`Ditambahkan Oleh: ${
-                                          find.submitedName || "-"
-                                        }`}
-                                        primaryTypographyProps={{
-                                          variant: "body2",
-                                        }}
-                                        secondary={`Disetujui Oleh: ${
-                                          find.approveName || "-"
-                                        }`}
-                                        secondaryTypographyProps={{
-                                          variant: "body2",
-                                          color: "white",
-                                        }}
-                                      />
-                                    }
+                                  <IconButton
+                                    aria-describedby={`row-${i}-col-${moment(
+                                      d
+                                    ).format("D")}`}
+                                    size="small"
+                                    onClick={handleClick(find)}
                                   >
-                                    <IconButton
-                                      aria-describedby={`row-${i}-col-${moment(
-                                        d
-                                      ).format("D")}`}
-                                      size="small"
-                                      onClick={handleClick(find)}
-                                    >
-                                      {find.progres}
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
-                              ) : (
-                                <>&nbsp;</>
-                              )}
-                            </TableCell>
-                          );
-                        })}
+                                    {find.progres}
+                                  </IconButton>
+                                </Tooltip>
+                              </Box>
+                            ) : (
+                              <>&nbsp;</>
+                            )}
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
 
                     <TableRow key={i}>

@@ -234,7 +234,7 @@ export default () => {
             startIcon={<ListAlt />}
             onClick={() => table.setQuery({ status: "APPROVED" })}
           >
-            Selesai
+            Konfirmasi
           </Button>
         </div>
         <div>
@@ -248,6 +248,20 @@ export default () => {
             onClick={() => table.setQuery({ status: "REJECTED" })}
           >
             Ditolak
+          </Button>
+        </div>
+
+         <div>
+          <Button
+            disableElevation
+            variant={
+              table.query("status") == "ARRIVED" ? "contained" : "outlined"
+            }
+            color={table.query("status") == "ARRIVED" ? "primary" : "inherit"}
+            startIcon={<ListAlt />}
+            onClick={() => table.setQuery({ status: "ARRIVED" })}
+          >
+            Tiba
           </Button>
         </div>
       </Stack>
