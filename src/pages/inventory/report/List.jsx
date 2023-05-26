@@ -109,7 +109,7 @@ export default () => {
             Material
           </Button>
         </div>
-        <div>
+        {/* <div>
           <Button
             disableElevation
             variant={table.query("type") == 'EQUIPMENT' ? "contained" : "outlined"}
@@ -119,7 +119,7 @@ export default () => {
           >
             Equipment
           </Button>
-        </div>
+        </div> */}
       </Stack>
 
       <Paper elevation={0} variant="outlined">

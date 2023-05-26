@@ -123,7 +123,7 @@ const MapTracking = () => {
 
               if (r === "clear") {
                 projects.clear();
-                tracks.clear()
+                tracks.clear();
                 setLink(apiRoute.tracking.index);
                 setCoordinate({
                   latitude: 0,
@@ -173,7 +173,8 @@ const MapTracking = () => {
       </Stack>
 
       <Paper elevation={0} variant="outlined" sx={{ minHeight: "500px" }}>
-        {tracks.query.projectId && tracks.query.date ? (
+        {(tracks.query.projectId && tracks.query.date) ||
+        (tracks.query.locationId && tracks.query.date) ? (
           <>
             {tracks.data.length > 0 ? (
               <Box>

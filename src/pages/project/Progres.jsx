@@ -268,6 +268,9 @@ export default () => {
 
         <Square sx={{ color: "gainsboro" }} />
         <div>Plan SPV</div>
+
+        <Square sx={{ color: "white" }} />
+        <div>Actual Plan</div>
       </Stack>
 
       <Paper elevation={0} variant="outlined">

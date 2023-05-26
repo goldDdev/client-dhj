@@ -87,7 +87,7 @@ const menu = [
       { canAccess: [], text: "Karyawan", link: "/settings/employee" },
       { canAccess: [], text: "BOQ", link: "/settings/boq" },
       { canAccess: [], text: "Umum", link: "/settings" },
-      { canAccess: [], text: "Center Lokasi", link: "/settings/center-location" },
+      { canAccess: [], text: "Pusat Lokasi", link: "/settings/center-location" },
     ],
   },
 ];

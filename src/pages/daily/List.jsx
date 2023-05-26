@@ -351,6 +351,7 @@ export default () => {
                               borderRight: _i === dates.length - 1 ? 0 : 1,
                               borderColor: "divider",
                               whiteSpace: "nowrap",
+                              backgroundColor: "#64cf70"
                             }}
                           >
                             {find.day === 0 ? (
