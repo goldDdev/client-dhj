@@ -139,7 +139,8 @@ const MapTracking = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Proyek"
+                label="Lokasi"
+                placeholder="Ketikkan Pusat Lokasi/Proyek"
                 value={tracks.query.project || undefined}
                 InputProps={{
                   ...params.InputProps,
