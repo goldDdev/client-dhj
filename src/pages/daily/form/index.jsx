@@ -136,7 +136,7 @@ export const Create = ({
             </FieldSet>
 
             {mutation.isNewRecord ? null : (
-              <FieldSet label="Hapus Plan Mingguan">
+              <FieldSet label="Hapus Plan Harian">
                 <Button
                   variant="outlined"
                   color="error"

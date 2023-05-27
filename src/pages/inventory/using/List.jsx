@@ -31,7 +31,7 @@ const columns = (onDetail, onConfirm) => [
     }
   },
   {
-    label: "Jumlah",
+    label: "Item",
     value: (value) => (
       <Button
         variant="text"
@@ -86,7 +86,7 @@ const columns = (onDetail, onConfirm) => [
             disableElevation
             onClick={onConfirm(value.id, "APPROVED")}
           >
-            Konfirmasi
+            Setujui
           </Button>
         </ButtonGroup>
       ) : (
@@ -234,7 +234,7 @@ export default () => {
             startIcon={<ListAlt />}
             onClick={() => table.setQuery({ status: "APPROVED" })}
           >
-            Konfirmasi
+            Disetujui
           </Button>
         </div>
         <div>
@@ -261,7 +261,7 @@ export default () => {
             startIcon={<ListAlt />}
             onClick={() => table.setQuery({ status: "ARRIVED" })}
           >
-            Tiba
+            Sudah Sampai
           </Button>
         </div>
       </Stack>

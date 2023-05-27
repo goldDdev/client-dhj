@@ -194,7 +194,7 @@ const MapTracking = () => {
                         tracks.data[0].project_latitude,
                         tracks.data[0].project_longitude,
                       ]}
-                      pathOptions={{ color: "red" }}
+                      pathOptions={{ fillColor: 'blue' }}
                       radius={100}
                     >
                       {/* <Tooltip>Radius 100m</Tooltip> */}

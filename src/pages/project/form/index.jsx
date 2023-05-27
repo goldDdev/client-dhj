@@ -167,7 +167,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
               <TextField
                 fullWidth
                 disabled={mutation.loading || mutation.processing}
-                label="Perusahaan"
+                label="Nama Team"
                 value={mutation.data.companyName || ""}
                 onChange={(e) =>
                   mutation.setData({ companyName: e.target.value })
@@ -188,7 +188,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
                 multiline
                 rows={2}
                 disabled={mutation.loading || mutation.processing}
-                label="Kontak"
+                label="Info Kontak Team"
                 value={mutation.data.contact || ""}
                 onChange={(e) => mutation.setData({ contact: e.target.value })}
                 sx={{ width: "100%" }}
