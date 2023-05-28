@@ -182,7 +182,7 @@ const MapTracking = () => {
                 <Box sx={{ height: "500px", width: "100%" }}>
                   <MapContainer
                     center={[coordinate.latitude, coordinate.longitude]}
-                    zoom={16}
+                    zoom={18}
                     scrollWheelZoom={false}
                     style={{ height: "500px", width: "100%" }}
                   >
