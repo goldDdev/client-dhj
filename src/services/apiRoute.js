@@ -1,6 +1,7 @@
 const apiRoute = {
   employee: {
     index: "/employee",
+    profile: "/employee/profile",
     all: "/employee/all",
     detail: "/employee/:id",
     project: "/employee/:id/project",

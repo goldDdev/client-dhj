@@ -31,6 +31,7 @@ const App = () => {
       phoneNumber: "",
       email: "",
       password: "",
+      role: ""
     },
     schema: (y) =>
       y.object().shape({
@@ -39,7 +40,6 @@ const App = () => {
         phoneNumber: y.string(),
         email: y.string().email(),
         password: y.string().nullable(),
-        caraId: y.string().nullable(),
         role: y.string().nullable(),
       }),
   });
@@ -50,7 +50,7 @@ const App = () => {
   });
 
   const onSubmit = () => {
-    mutation.put(apiRoute.employee.index, {
+    mutation.put(apiRoute.employee.profile, {
       validation: true,
       onSuccess: async () => {
         const data = await FRHooks.apiRoute()
@@ -80,7 +80,6 @@ const App = () => {
           phoneNumber: data?.employee?.phoneNumber || "",
           email: data?.email || "",
           role: data?.employee?.role || "",
-          cardID: data?.employee?.cardID || "",
           password: "",
         });
       }
