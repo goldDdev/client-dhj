@@ -465,7 +465,7 @@ export default () => {
               alignItems="center"
             >
               <Typography variant="subtitle1" fontWeight={500} gutterBottom>
-                Daftar Anggota
+                Daftar Anggota PIC
               </Typography>
 
               <Button
@@ -475,7 +475,7 @@ export default () => {
                 disableElevation
                 onClick={onOpenAddWorker("worker")}
               >
-                Tambah Anggota
+                Tambah Anggota PIC
               </Button>
             </Stack>
             <Divider />

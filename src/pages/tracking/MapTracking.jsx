@@ -14,7 +14,7 @@ import {
   MapContainer,
   Marker,
   TileLayer,
-  CircleMarker,
+  Circle,
   Tooltip,
 } from "react-leaflet";
 import MainTemplate from "@components/templates/MainTemplate";
@@ -139,7 +139,8 @@ const MapTracking = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Proyek"
+                label="Lokasi"
+                placeholder="Ketikkan Pusat Lokasi/Proyek"
                 value={tracks.query.project || undefined}
                 InputProps={{
                   ...params.InputProps,
@@ -181,24 +182,24 @@ const MapTracking = () => {
                 <Box sx={{ height: "500px", width: "100%" }}>
                   <MapContainer
                     center={[coordinate.latitude, coordinate.longitude]}
-                    zoom={15}
-                    scrollWheelZoom={true}
+                    zoom={18}
+                    scrollWheelZoom={false}
                     style={{ height: "500px", width: "100%" }}
                   >
                     <TileLayer
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    <CircleMarker
+                    <Circle
                       center={[
                         tracks.data[0].project_latitude,
                         tracks.data[0].project_longitude,
                       ]}
-                      pathOptions={{ color: "red" }}
+                      pathOptions={{ fillColor: 'blue' }}
                       radius={100}
                     >
                       {/* <Tooltip>Radius 100m</Tooltip> */}
-                    </CircleMarker>
+                    </Circle>
                     {tracks.data.map((track, i) => (
                       <Marker
                         key={i}
