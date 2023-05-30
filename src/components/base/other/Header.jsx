@@ -83,7 +83,7 @@ const Header = (props) => {
             label={<Avatar alt={user?.employee?.name || "A"} />}
             menu={[
               { text: `Hi, ${user?.employee?.name || ""}`, divider: true },
-              { text: "Profil", divider: true },
+              { text: "Profil", divider: true, onClick: props.onToggleProfile },
               {
                 text: "Keluar",
                 onClick: () => {

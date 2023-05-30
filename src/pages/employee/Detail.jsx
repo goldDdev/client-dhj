@@ -13,6 +13,7 @@ import {
   Tabs,
   Tab,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { IconButton, Button } from "@components/base";
 import { useSnackbar } from "notistack";
@@ -45,10 +46,12 @@ export default () => {
     form: false,
     editSalary: false,
   });
+
   const projects = FRHooks.useTable([apiRoute.employee.project, { id }], {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
+  
   const absents = FRHooks.useTable([apiRoute.employee.absent, { id }], {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
@@ -85,7 +88,7 @@ export default () => {
   }, [location]);
 
   return (
-    <SettingTemplate title={"Karyawan"} subtitle={"Detail Karyawam"}>
+    <SettingTemplate title={"Karyawan"} subtitle={"Detail Karyawan"}>
       <Grid container spacing={2}>
         <Grid item xs={3}>
           <Paper variant="outlined" sx={{ mb: 2 }}>
@@ -142,7 +145,6 @@ export default () => {
                       if (trigger.editSalary) {
                         mutation.put(apiRoute.employee.optional, {
                           only: ["salary", "id"],
-
                           onSuccess: ({ data }) => {
                             enqueueSnackbar("Gaji berhasil diperbaharui");
                             setEmployee((state) => ({
@@ -164,7 +166,11 @@ export default () => {
                     }}
                   >
                     {trigger.editSalary ? (
-                      <Check fontSize="inherit" />
+                      mutation.processing ? (
+                        <CircularProgress size={20} color="primary" />
+                      ) : (
+                        <Check fontSize="inherit" />
+                      )
                     ) : (
                       <Edit fontSize="inherit" />
                     )}
@@ -173,6 +179,7 @@ export default () => {
               >
                 {trigger.editSalary ? (
                   <TextField
+                    disabled={mutation.processing}
                     value={mutation.data.salary}
                     onChange={(e) => {
                       if (Number.isInteger(+e.target.value)) {
@@ -317,7 +324,7 @@ export default () => {
                               variant: "body2",
                               fontWeight: 500,
                             }}
-                            secondary={`${value.projectStatus || "-"}`}
+                            // secondary={`${value.projectStatus || "-"}`}
                             secondaryTypographyProps={{ variant: "body2" }}
                             sx={{ py: 0 }}
                           />

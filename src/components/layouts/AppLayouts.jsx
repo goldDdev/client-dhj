@@ -10,18 +10,61 @@ import { Header, SideBar, Copyright, Alert } from "@components/";
 import { Outlet } from "react-router-dom";
 import webTheme from "./webTheme";
 import * as FRHooks from "frhooks";
+import ProfileDialog from "../../pages/auth/ProfileDialog";
+import apiRoute from "@services/apiRoute";
+import { useSnackbar } from "notistack";
 
 const App = () => {
   const toket = localStorage.getItem("token");
+  const { enqueueSnackbar } = useSnackbar();
   const { user } = FRHooks.useSelector(["user"]);
   const [trigger, setTrigger] = React.useState({
     open: true,
     openMobile: false,
+    openProfile: false,
   });
+
+  const mutation = FRHooks.useMutation({
+    defaultValue: {
+      id: 0,
+      name: "",
+      phoneNumber: "",
+      email: "",
+      password: "",
+    },
+    schema: (y) =>
+      y.object().shape({
+        id: y.number(),
+        name: y.string(),
+        phoneNumber: y.string(),
+        email: y.string().email(),
+        password: y.string().nullable(),
+        caraId: y.string().nullable(),
+        role: y.string().nullable(),
+      }),
+  });
+
   const { dispatch, clearMutation } = FRHooks.useDispatch("user", {
     type: "mutation",
     defaultValue: {},
   });
+
+  const onSubmit = () => {
+    mutation.put(apiRoute.employee.index, {
+      validation: true,
+      onSuccess: async () => {
+        const data = await FRHooks.apiRoute()
+          .auth("current")
+          .get((resp) => resp.data);
+        dispatch("user", data);
+        setTrigger((state) => ({
+          ...state,
+          openProfile: !state.openProfile,
+        }));
+        enqueueSnackbar("Profile Berhasil diperaharui");
+      },
+    });
+  };
 
   React.useEffect(() => {
     (async () => {
@@ -31,6 +74,15 @@ const App = () => {
           .auth("current")
           .get((resp) => resp.data);
         dispatch("user", data);
+        mutation.setData({
+          id: data?.employee?.id || 0,
+          name: data?.employee?.name || "",
+          phoneNumber: data?.employee?.phoneNumber || "",
+          email: data?.email || "",
+          role: data?.employee?.role || "",
+          cardID: data?.employee?.cardID || "",
+          password: "",
+        });
       }
     })();
   }, []);
@@ -54,10 +106,19 @@ const App = () => {
             role: user?.role || "",
           }}
           onToggleDrawer={() => {
-            setTrigger((state) => ({ open: !state.open }));
+            setTrigger((state) => ({ ...state, open: !state.open }));
           }}
           onToggleMobileDrawer={() => {
-            setTrigger((state) => ({ openMobile: !state.openMobile }));
+            setTrigger((state) => ({
+              ...state,
+              openMobile: !state.openMobile,
+            }));
+          }}
+          onToggleProfile={() => {
+            setTrigger((state) => ({
+              ...state,
+              openProfile: !state.openProfile,
+            }));
           }}
         />
         <SideBar
@@ -105,6 +166,17 @@ const App = () => {
           >
             <Outlet />
             <Alert />
+            <ProfileDialog
+              open={trigger.openProfile}
+              mutation={mutation}
+              onClose={() => {
+                setTrigger((state) => ({
+                  ...state,
+                  openProfile: !state.openProfile,
+                }));
+              }}
+              onSubmit={onSubmit}
+            />
           </Container>
           <Copyright sx={{ py: 1 }} />
         </Box>
