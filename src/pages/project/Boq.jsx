@@ -398,7 +398,7 @@ export default () => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(worksheet, {
         defVal: null,
-        header: ["name", "typeUnit", "unit", "price", "totalPrice"],
+        header: ["name", "typeUnit", "unit", "price", "totalPrice", "type"],
         blankrows: null,
       });
 
@@ -413,6 +413,7 @@ export default () => {
               unit: parseFloat(vl.unit || 0),
               price: +vl.price,
               totalPrice: +(vl.totalPrice || 0),
+              type: vl.type || "",
               row: vl.__rowNum__ || i,
             }))
             .filter((v) => v !== null)
