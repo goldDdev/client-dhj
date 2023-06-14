@@ -12,6 +12,7 @@ import Search from "@mui/icons-material/Search";
 import * as utils from "@utils/";
 import _ from "lodash";
 import { Block, CheckCircle, Schedule, Work } from "@mui/icons-material";
+import { Select } from "@components/base";
 
 export const TableFilter = ({ t, table }) => {
   return (
@@ -98,19 +99,42 @@ export const ButtonFilter = ({ table }) => {
         width={"100%"}
         spacing={1}
       >
-        <Button
+        <Box>
+          <Button
+            fullWidth
+            key={99}
+            variant={!table.query("status") ? "contained" : "outlined"}
+            color={!table.query("status") ? "primary" : "inherit"}
+            onClick={() => {
+              table.setQuery({ status: "" });
+            }}
+            sx={{ whiteSpace: "nowrap", minWidth: "30%" }}
+          >
+            Semua Status
+          </Button>
+        </Box>
+
+        <Select
           fullWidth
-          key={99}
-          variant={!table.query("status") ? "contained" : "outlined"}
-          color={!table.query("status") ? "primary" : "inherit"}
-          onClick={() => {
-            table.setQuery({ status: "" });
+          name="status"
+          label="Status"
+          menu={[
+            { text: "Pilih Status", value: "00" },
+            ...Object.keys(utils.projectStatus).map((v) => ({
+              text: v,
+              value: v,
+            })),
+          ]}
+          value={table.query("status", "00")}
+          onChange={(e) => {
+            if (e.target.value === "00") {
+              table.clearOnly(["status"]);
+            } else {
+              table.setQuery({ status: e.target.value });
+            }
           }}
-          sx={{ whiteSpace: "nowrap", minWidth: "30%" }}
-        >
-          Semua Status
-        </Button>
-        {Object.keys(utils.projectStatus).map((v) => (
+        />
+        {/* {Object.keys(utils.projectStatus).map((v) => (
           <Button
             key={v}
             variant={table.query("status") === v ? "contained" : "outlined"}
@@ -121,7 +145,7 @@ export const ButtonFilter = ({ table }) => {
           >
             {utils.projectLabel(v)}
           </Button>
-        ))}
+        ))} */}
       </Stack>
 
       <TextField
