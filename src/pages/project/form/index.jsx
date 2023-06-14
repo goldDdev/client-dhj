@@ -1050,7 +1050,15 @@ export const BOQImport = ({
   filename,
 }) => {
   const failData = data.filter((v) =>
-    !v.name ? true : !v.typeUnit ? true : !v.unit ? true : false
+    !v.name
+      ? true
+      : !v.typeUnit
+      ? true
+      : !v.unit
+      ? true
+      : !v.type
+      ? true
+      : false
   );
 
   return (
