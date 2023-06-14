@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Divider,
@@ -10,37 +11,45 @@ import {
 import { Breadcrumb, IconButton } from "@components/";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { People, ListAlt, Close } from "@mui/icons-material";
+import { apiRoute } from "frhooks";
+import React from "react";
 
 const path = (id) => [
   {
     label: "Informasi Proyek",
     link: `/project/${id}/detail`,
     startIcon: <ListAlt />,
+    badge: "",
   },
   {
     label: "Milestone",
     link: `/project/${id}/event`,
     startIcon: <ListAlt />,
+    badge: "",
   },
   {
     label: "BOQ",
     link: `/project/${id}/boq`,
     startIcon: <ListAlt />,
+    badge: "",
   },
   {
     label: "Progress (Plan vs Actual)",
     link: `/project/${id}/progres`,
     startIcon: <ListAlt />,
+    badge: "",
   },
   {
     label: "Absen",
     link: `/project/${id}/absent`,
     startIcon: <ListAlt />,
+    badge: "",
   },
   {
     label: "Lembur",
     link: `/project/${id}/overtime`,
     startIcon: <ListAlt />,
+    badge: "overtime",
   },
 ];
 
@@ -56,6 +65,16 @@ const ProjectTemplate = ({
   const navigate = useNavigate();
   const { id } = useParams();
   const { pathname } = useLocation();
+  const [badge, setBadge] = React.useState({ overtime: 0 });
+
+  React.useEffect(() => {
+    if (!id) return;
+
+    (async () => {
+      const data = await apiRoute().project("badge", { id }).get();
+      setBadge(data);
+    })();
+  }, []);
 
   return (
     <Stack direction="column">
@@ -86,7 +105,9 @@ const ProjectTemplate = ({
           {breadcrumb && <Breadcrumb />}
         </Box>
 
-        {headRight ? <Box mt={{ xs: 1, sm: 1, md: 1, lg: 0, xl: 0 }}  {...headRight} /> : null}
+        {headRight ? (
+          <Box mt={{ xs: 1, sm: 1, md: 1, lg: 0, xl: 0 }} {...headRight} />
+        ) : null}
       </Stack>
 
       <Stack
@@ -104,16 +125,23 @@ const ProjectTemplate = ({
       >
         {path(id).map((v, i) => (
           <div key={"settings-" + i} style={{ whiteSpace: "nowrap" }}>
-            <Button
-              fullWidth
-              variant={pathname === v.link ? "contained" : "text"}
-              startIcon={v.startIcon}
-              onClick={() => navigate(v.link)}
-              disableElevation
-              color="inherit"
+            <Badge
+              invisible={
+                badge[v.badge] ? (badge[v.badge] > 0 ? false : true) : true
+              }
+              badgeContent={badge[v.badge]}
+              color="error"
             >
-              {v.label}
-            </Button>
+              <Button
+                variant={pathname === v.link ? "contained" : "text"}
+                startIcon={v.startIcon}
+                onClick={() => navigate(v.link)}
+                disableElevation
+                color="inherit"
+              >
+                {v.label}
+              </Button>
+            </Badge>
           </div>
         ))}
       </Stack>
@@ -126,11 +154,13 @@ const ProjectTemplate = ({
         ModalProps={{
           keepMounted: false,
         }}
-        PaperProps={{ sx: {  width: "30%" } }}
+        PaperProps={{ sx: { width: "30%" } }}
         {...drawer.drawerProps}
       >
         <Toolbar>
-          <Typography whiteSpace="nowrap" flexGrow={1}>{drawer.title || ""}</Typography>
+          <Typography whiteSpace="nowrap" flexGrow={1}>
+            {drawer.title || ""}
+          </Typography>
           <IconButton onClick={drawer.onClose}>
             <Close />
           </IconButton>

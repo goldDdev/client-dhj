@@ -280,7 +280,7 @@ export const Create = ({ open, mutation, onOpen, onSubmit }) => {
               <TextField
                 fullWidth
                 disabled={mutation.loading || mutation.processing}
-                label="Tanggal Berakhir"
+                label="Tanggal Final"
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -994,6 +994,25 @@ export const BOQCreateV2 = ({ trigger, onOpen, mutation, onSubmit }) => (
             }}
             error={mutation.error("totalPrice")}
             helperText={mutation.message("totalPrice")}
+          />
+
+          <Select
+            label={"Tipe"}
+            name="type"
+            menu={[
+              { text: "Pilih Tipe", value: "00" },
+              ...utils.boqTypes.map((v) => ({
+                text: v,
+                value: v,
+              })),
+            ]}
+            value={mutation.data.type || "00"}
+            onChange={(e) => {
+              mutation.setData({
+                type: e.target.value === "00" ? null : e.target.value,
+              });
+            }}
+            error={mutation.error("type")}
           />
         </Stack>
       ),

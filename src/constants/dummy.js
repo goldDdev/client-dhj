@@ -24,6 +24,7 @@ export const employee = {
   hourlyWages: 0,
   role: "WORKER",
   email: "",
+  type: "00",
 };
 
 export const project = {

@@ -47,9 +47,9 @@ const columns = (table, utils, onUpdate, onDelete) => [
   {
     label: "Nama",
     value: (value) => value.name,
-    sx:{
-      whiteSpace: "nowrap"
-    }
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
 
   {
@@ -81,6 +81,21 @@ const columns = (table, utils, onUpdate, onDelete) => [
   {
     label: "Role",
     value: (value) => utils.typesLabel(value.role),
+    align: "center",
+    head: {
+      align: "center",
+      sx: {
+        width: "10%",
+        whiteSpace: "nowrap",
+      },
+    },
+    sx: {
+      whiteSpace: "nowrap",
+    },
+  },
+  {
+    label: "Tipe",
+    value: (value) => value.type || "-",
     align: "center",
     head: {
       align: "center",
@@ -154,6 +169,7 @@ export default () => {
         }),
         role: y.string().required(),
         password: y.string().optional(),
+        type: y.string(),
       }),
     format: {
       phoneNumber: (value) => String(value),
@@ -173,7 +189,11 @@ export default () => {
         mutation.clearData();
       },
       onSuccess: (resp) => {
-        mutation.setData({ ...resp.data, email: resp.data.user?.email || "" });
+        mutation.setData({
+          ...resp.data,
+          email: resp.data.user?.email || "",
+          type: resp.data.type || "00",
+        });
       },
     });
   };
@@ -240,7 +260,12 @@ export default () => {
       headRight={{
         children: (
           <ButtonGroup>
-            <Button variant="contained" disableElevation startIcon={<PersonAdd />} onClick={onOpen}>
+            <Button
+              variant="contained"
+              disableElevation
+              startIcon={<PersonAdd />}
+              onClick={onOpen}
+            >
               Tambah Karyawan
             </Button>
             <LoadingButton

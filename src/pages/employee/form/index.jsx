@@ -114,6 +114,29 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
               error={mutation.error("role")}
               helperText={mutation.message("role")}
             />
+
+            {mutation.data.role === "MANDOR" ? (
+              <BASE.Select
+                id="empType"
+                label={"Tipe"}
+                name="type"
+                menu={[
+                  { text: "Pilih Tipe", value: "00" },
+                  ...utils.boqTypes.map((v) => ({
+                    text: v,
+                    value: v,
+                  })),
+                ]}
+                value={mutation.data.type || "00"}
+                onChange={(e) => {
+                  mutation.setData({
+                    type: e.target.value === "00" ? null : e.target.value,
+                  });
+                }}
+                error={mutation.error("type")}
+                helperText={mutation.message("type")}
+              />
+            ) : null}
           </Stack>
         ),
       }}

@@ -67,10 +67,11 @@ const apiRoute = {
     deleteWorker: "/project/:id/worker",
     detilAbsent: "/project/:id/:parent/absent",
     updateOvertime: "/project/overtime",
+    badge: "/project/:id/badge",
   },
   tracking: {
     index: "/tracking",
-    location:"/tracking/location"
+    location: "/tracking/location",
   },
   setting: {
     index: "/setting",

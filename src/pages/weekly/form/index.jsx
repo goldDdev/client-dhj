@@ -137,7 +137,7 @@ export const Create = ({
               />
               <TextField
                 disabled={mutation.loading || mutation.processing}
-                label="Tanggal Berakhir"
+                label="Tanggal Final"
                 InputLabelProps={{
                   shrink: true,
                 }}

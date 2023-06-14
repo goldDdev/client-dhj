@@ -296,7 +296,7 @@ export default () => {
                       </span>
 
                       <span>
-                        Tanggal Berakhir :{" "}
+                        Tanggal Final :{" "}
                         {moment(mutation.data.finishAt).format("DD-MM-yyyy")}
                       </span>
 
@@ -401,7 +401,7 @@ export default () => {
                 disableElevation
                 onClick={onOpenAddWorker("lead")}
               >
-                Tambah PIC
+                Tambah PIC (SPV, Mandor, QS, QC)
               </Button>
             </Stack>
             <Divider />
@@ -465,7 +465,7 @@ export default () => {
               alignItems="center"
             >
               <Typography variant="subtitle1" fontWeight={500} gutterBottom>
-                Daftar Anggota PIC
+                Daftar Anggota PIC (Mandor)
               </Typography>
 
               <Button

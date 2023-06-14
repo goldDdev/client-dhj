@@ -55,7 +55,7 @@ export const listYear = (value = 2022) => {
   const year = moment().year();
   const years = [];
   for (let i = value; i <= year; i++) {
-    years.push(i)
+    years.push(i);
   }
 
   return years;
@@ -166,6 +166,8 @@ export const workerMobileTypes = [
   "WORKER",
 ];
 
+export const boqTypes = ["PIPING", "CIVIL", "ELECTRICAL"];
+
 export const typesLabel = (type) => {
   const role = {
     OWNER: "Owner",
@@ -186,12 +188,18 @@ export const typesLabel = (type) => {
 };
 
 export const projectStatus = {
-  DRAFT: "Draft",
-  PENDING: "Tunda",
-  REVIEW: "Pratinjau",
-  PROGRESS: "Progress",
-  DONE: "Selesai",
-  CANCELLED: "Batal",
+  DRAFT: "DRAFT",
+  PENDING: "PENDING",
+  PROGRESS: "IN PPROGRESS",
+  DONE: "COMPLETE",
+  CANCELLED: "CANCEL",
+  WAP: "WAP",
+  SPK: "SPK",
+  KOM: "KOM",
+  SITE_KOM: "SITE-KOM",
+  RFD: "RFD",
+  POP: "POP",
+  CLOSE: "CLOSE",
 };
 
 export const projectLabel = (status) => {

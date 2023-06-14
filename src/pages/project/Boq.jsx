@@ -178,6 +178,26 @@ const columns = (
       },
     },
     {
+      label: "Plan",
+      value: (value) =>
+        postLoading.some((v) => v === value.boqId) ? (
+          <Skeleton width="100%" />
+        ) : (
+          value.planProgres
+        ),
+      align: "center",
+      padding: "checkbox",
+      head: {
+        align: "center",
+      },
+      sx: {
+        whiteSpace: "noWrap",
+        fontWeight: 700,
+        fontSize: "16px",
+        minWidth: "80px",
+      },
+    },
+    {
       label: "Progres",
       value: (value) =>
         postLoading.some((v) => v === value.boqId) ? (
@@ -193,26 +213,6 @@ const columns = (
       sx: {
         whiteSpace: "noWrap",
         ...borderPlan,
-        fontWeight: 700,
-        fontSize: "16px",
-        minWidth: "80px",
-      },
-    },
-    {
-      label: "Plan",
-      value: (value) =>
-        postLoading.some((v) => v === value.boqId) ? (
-          <Skeleton width="100%" />
-        ) : (
-          value.planProgres
-        ),
-      align: "center",
-      padding: "checkbox",
-      head: {
-        align: "center",
-      },
-      sx: {
-        whiteSpace: "noWrap",
         fontWeight: 700,
         fontSize: "16px",
         minWidth: "80px",
@@ -357,6 +357,7 @@ export default () => {
         price: y.number().nullable(),
         unit: y.number().nullable(),
         totalPrice: y.number().nullable(),
+        type: y.string(),
       }),
   });
 
@@ -379,7 +380,7 @@ export default () => {
   const onImport = () => {
     setTrigger((state) => ({ ...state, import: !state.import }));
     setJsonData([]);
-    setFileName("")
+    setFileName("");
   };
 
   const onUpload = (e) => {
