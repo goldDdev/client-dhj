@@ -40,6 +40,7 @@ const router = createBrowserRouter([
   },
 
   { path: "/payrol/:id", element: <Page.PayrolHtmlPdf /> },
+  { path: "*", element: <Page.NotFound /> },
 ]);
 
 export default router;

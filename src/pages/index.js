@@ -30,6 +30,7 @@ import UsingInventoryList from "./inventory/using/List";
 import ReportInventoryList from "./inventory/report/List";
 
 import CenterLocationList from "./settings/centerLocation/List"
+import NotFound from "./NotFoundPage";
 
 export {
   SignInSide,
@@ -56,5 +57,6 @@ export {
   UsingInventoryList,
   ReportInventoryList,
   SettingGeneral,
-  CenterLocationList
+  CenterLocationList,
+  NotFound
 };
