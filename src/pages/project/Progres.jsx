@@ -328,7 +328,7 @@ export default () => {
                         <TableCell rowSpan={2} sx={{ whiteSpace: "nowrap" }}>
                           <ListItemText
                             primary={value.name}
-                            secondary={value.typeUnit}
+                            secondary={`Tipe: ${value.type || "-"} | Satuan: ${value.typeUnit || "-"}`}
                             sx={{ m: 0 }}
                           />
                         </TableCell>

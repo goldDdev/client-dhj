@@ -77,11 +77,14 @@ const columns = (
             sx={{ mx: 1, my: 0 }}
             primary={value.name || "-"}
             primaryTypographyProps={{ variant: "body2", whiteSpace: "nowrap" }}
-            secondary={value.typeUnit || "-"}
+            secondary={`Tipe: ${value.type || "-"} | Satuan: ${value.typeUnit || "-"}`}
             secondaryTypographyProps={{ variant: "body2" }}
           />
         ),
       padding: "none",
+      sx: {
+        whiteSpace: "nowrap"
+      }
     },
     {
       label: "Harga",
