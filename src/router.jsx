@@ -3,6 +3,7 @@ import { AppLayouts } from "@components/layouts";
 import * as Page from "./pages";
 import RequireAuth from "@components/layouts/RequireAuth";
 
+
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
   },
 
   { path: "/payrol/:id", element: <Page.PayrolHtmlPdf /> },
+  { path: "/dowload", element: <Page.Download /> },
   { path: "*", element: <Page.NotFound /> },
 ]);
 
