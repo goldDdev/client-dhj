@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Container,
@@ -5,11 +6,86 @@ import {
   ThemeProvider,
   Toolbar,
 } from "@mui/material";
-import { Header, SideBar, Copyright } from "@components/";
+import { Header, SideBar, Copyright, Alert } from "@components/";
 import { Outlet } from "react-router-dom";
 import webTheme from "./webTheme";
+import * as FRHooks from "frhooks";
+import ProfileDialog from "../../pages/auth/ProfileDialog";
+import apiRoute from "@services/apiRoute";
+import { useSnackbar } from "notistack";
 
 const App = () => {
+  const toket = localStorage.getItem("token");
+  const { enqueueSnackbar } = useSnackbar();
+  const { user } = FRHooks.useSelector(["user"]);
+  const [trigger, setTrigger] = React.useState({
+    open: true,
+    openMobile: false,
+    openProfile: false,
+  });
+
+  const mutation = FRHooks.useMutation({
+    defaultValue: {
+      id: 0,
+      name: "",
+      phoneNumber: "",
+      email: "",
+      password: "",
+      role: ""
+    },
+    schema: (y) =>
+      y.object().shape({
+        id: y.number(),
+        name: y.string(),
+        phoneNumber: y.string(),
+        email: y.string().email(),
+        password: y.string().nullable(),
+        role: y.string().nullable(),
+      }),
+  });
+
+  const { dispatch, clearMutation } = FRHooks.useDispatch("user", {
+    type: "mutation",
+    defaultValue: {},
+  });
+
+  const onSubmit = () => {
+    mutation.put(apiRoute.employee.profile, {
+      validation: true,
+      onSuccess: async () => {
+        const data = await FRHooks.apiRoute()
+          .auth("current")
+          .get((resp) => resp.data);
+        dispatch("user", data);
+        setTrigger((state) => ({
+          ...state,
+          openProfile: !state.openProfile,
+        }));
+        enqueueSnackbar("Profile Berhasil diperaharui");
+      },
+    });
+  };
+
+  React.useEffect(() => {
+    (async () => {
+      clearMutation("user");
+      if (toket) {
+        const data = await FRHooks.apiRoute()
+          .auth("current")
+          .get((resp) => resp.data);
+        dispatch("user", data);
+        mutation.setData({
+          id: data?.employee?.id || 0,
+          name: data?.employee?.name || "",
+          phoneNumber: data?.employee?.phoneNumber || "",
+          email: data?.email || "",
+          role: data?.employee?.role || "",
+          password: "",
+        });
+      }
+    })();
+  }, []);
+
   return (
     <ThemeProvider theme={webTheme}>
       <CssBaseline />
@@ -23,17 +99,35 @@ const App = () => {
       >
         <CssBaseline />
         <Header
-          open={true}
-          headerRight={undefined}
-          onClickDrawer={function () {
-            throw new Error("Function not implemented.");
+          open={trigger.open}
+          headerRight={{
+            name: user?.name || "",
+            role: user?.role || "",
+          }}
+          onToggleDrawer={() => {
+            setTrigger((state) => ({ ...state, open: !state.open }));
+          }}
+          onToggleMobileDrawer={() => {
+            setTrigger((state) => ({
+              ...state,
+              openMobile: !state.openMobile,
+            }));
+          }}
+          onToggleProfile={() => {
+            setTrigger((state) => ({
+              ...state,
+              openProfile: !state.openProfile,
+            }));
           }}
         />
         <SideBar
-          open={true}
-          navItems={[]}
-          onClickDrawer={function () {
-            throw new Error("Function not implemented.");
+          open={trigger.open}
+          openMobile={trigger.openMobile}
+          onToggleDrawer={() => {
+            setTrigger((state) => ({ open: !state.open }));
+          }}
+          onToggleMobileDrawer={() => {
+            setTrigger((state) => ({ openMobile: !state.openMobile }));
           }}
         />
         <Box
@@ -45,8 +139,8 @@ const App = () => {
                   ? theme.palette.grey[100]
                   : theme.palette.grey[900],
               flexGrow: 1,
-              height: "100vh",
               minHeight: "100vh",
+              height: "100vh",
               overflow: "auto",
               display: "flex",
               flexDirection: "column",
@@ -62,15 +156,26 @@ const App = () => {
               mt: 2,
               mb: 1,
               [theme.breakpoints.between("xs", "md")]: {
-                pl: 0,
-                pr: 0,
-                mt: 0,
+                pl: 1,
+                pr: 1,
+                mt: 1,
                 mb: 0,
               },
             })}
           >
             <Outlet />
-            {/* <Alert /> */}
+            <Alert />
+            <ProfileDialog
+              open={trigger.openProfile}
+              mutation={mutation}
+              onClose={() => {
+                setTrigger((state) => ({
+                  ...state,
+                  openProfile: !state.openProfile,
+                }));
+              }}
+              onSubmit={onSubmit}
+            />
           </Container>
           <Copyright sx={{ py: 1 }} />
         </Box>

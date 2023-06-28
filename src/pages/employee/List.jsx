@@ -1,16 +1,22 @@
 import React from "react";
+import FRHooks from "frhooks";
 import SettingTemplate from "@components/templates/SettingTemplate";
-import * as icon from "@mui/icons-material";
-import * as MUI from "@mui/material";
+import PersonAdd from "@mui/icons-material/PersonAdd";
 import * as utils from "@utils/";
 import * as Filter from "./filter";
 import * as FORM from "./form";
 import * as Dummy from "../../constants/dummy";
-import * as Notistack from "notistack";
-import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
+import apiRoute from "@services/apiRoute";
+import { Link } from "react-router-dom";
+import { MoreVert, Refresh } from "@mui/icons-material";
+import { useAlert } from "@contexts/AlertContext";
+import { ButtonGroup, Paper } from "@mui/material";
+import { Button, BasicDropdown } from "@components/base";
+import { useSnackbar } from "notistack";
+import { LoadingButton } from "@mui/lab";
 
-const columns = (table, t, utils, onUpdate) => [
+const columns = (table, utils, onUpdate, onDelete) => [
   {
     label: "No",
     value: (_, idx) => {
@@ -25,42 +31,29 @@ const columns = (table, t, utils, onUpdate) => [
     size: "small",
   },
   {
-    label: "ID",
-    value: (value, idx) => {
-      return value.cardID;
-    },
+    label: "ID Karyawan",
+    value: (value, idx) => (
+      <Link to={`/employee/${value.id}/detail`}>{value.cardID}</Link>
+    ),
     head: {
       align: "center",
       padding: "checkbox",
+      noWrap: true,
     },
     align: "center",
     padding: "checkbox",
     size: "small",
   },
   {
-    label: t("name"),
+    label: "Nama",
     value: (value) => value.name,
-  },
-  {
-    label: t("status"),
-    value: (value) => (
-      <MUI.Chip
-        label={t(value.status)}
-        color={!value.invoiceAt ? "success" : "default"}
-        size="small"
-        variant="outlined"
-      />
-    ),
-    align: "center",
-    head: {
-      align: "center",
-      sx: {
-        width: "10%",
-      },
+    sx: {
+      whiteSpace: "nowrap",
     },
   },
+
   {
-    label: t("phoneNumber"),
+    label: "No HP",
     value: (value) => utils.ccFormat(value.phoneNumber) || "-",
     align: "center",
     head: {
@@ -74,24 +67,59 @@ const columns = (table, t, utils, onUpdate) => [
     },
   },
   {
-    label: t("role"),
-    value: (value) => t(value.role) || "-",
+    label: "Alamat Email",
+    value: (value) => value.email || "-",
     align: "center",
     head: {
       align: "center",
       sx: {
         width: "10%",
+        whiteSpace: "nowrap",
       },
+    },
+  },
+  {
+    label: "Role",
+    value: (value) => utils.typesLabel(value.role),
+    align: "center",
+    head: {
+      align: "center",
+      sx: {
+        width: "10%",
+        whiteSpace: "nowrap",
+      },
+    },
+    sx: {
+      whiteSpace: "nowrap",
+    },
+  },
+  {
+    label: "Tipe",
+    value: (value) => value.type || "-",
+    align: "center",
+    head: {
+      align: "center",
+      sx: {
+        width: "10%",
+        whiteSpace: "nowrap",
+      },
+    },
+    sx: {
+      whiteSpace: "nowrap",
     },
   },
   {
     label: "",
     value: (value) => (
-      <MUI.Tooltip title={t("edit")}>
-        <MUI.IconButton size="small" onClick={onUpdate(value.id)}>
-          <icon.Edit fontSize="small" />
-        </MUI.IconButton>
-      </MUI.Tooltip>
+      <BasicDropdown
+        type="icon"
+        size="small"
+        label={<MoreVert fontSize="inherit" />}
+        menu={[
+          { text: "Ubah", onClick: onUpdate(value.id), divider: true },
+          { text: "Hapus", onClick: onDelete(value.id) },
+        ]}
+      />
     ),
     align: "center",
     head: {
@@ -102,13 +130,25 @@ const columns = (table, t, utils, onUpdate) => [
 ];
 
 export default () => {
-  const { t, r } = FRHooks.useLang();
-  const { enqueueSnackbar } = Notistack.useSnackbar();
+  const alert = useAlert();
+  const { serve } = FRHooks.useServerValidation({
+    url: apiRoute.employee.validation,
+    param: {
+      path: "field",
+      type: "rule",
+    },
+    withErrorResponse: (resp) => resp.response.data.error.messages.errors,
+    option: {
+      unique: (param) => `Data ini sudah digunakan`,
+    },
+  });
+
+  const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
   });
 
-  const table = FRHooks.useTable(FRHooks.apiRoute().employee("index").link(), {
+  const table = FRHooks.useTable(apiRoute.employee.index, {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
@@ -121,7 +161,19 @@ export default () => {
         name: y.string().required().min(3),
         cardID: y.string().required(),
         phoneNumber: y.string().required().min(10).max(12),
+        email: y.string().when("role", {
+          is: (role) => {
+            return role !== "WORKER";
+          },
+          then: y.string().required(),
+        }),
+        role: y.string().required(),
+        password: y.string().optional(),
+        type: y.string(),
       }),
+    format: {
+      phoneNumber: (value) => String(value),
+    },
   });
 
   const onOpen = () => {
@@ -130,47 +182,121 @@ export default () => {
     mutation.clearError();
   };
 
-  const onUpdate = (id) => async () => {
-    mutation.get(FRHooks.apiRoute().employee("detail", { id }).link(), {
+  const onUpdate = (id) => () => {
+    mutation.get([apiRoute.employee.detail, { id }], {
       onBeforeSend: () => {
-        onOpen();
+        setTrigger((state) => ({ ...state, form: !state.form }));
+        mutation.clearData();
       },
       onSuccess: (resp) => {
-        mutation.setData(resp.data);
+        mutation.setData({
+          ...resp.data,
+          email: resp.data.user?.email || "",
+          type: resp.data.type || "00",
+        });
+      },
+    });
+  };
+
+  const onDelete = (id) => () => {
+    alert.set({
+      open: true,
+      title: "Mohon Perhatian",
+      message:
+        "Anda akan menghapus karyawan ini dari daftar, apakah anda yakin?",
+      type: "warning",
+      loading: false,
+      close: {
+        text: "Keluar",
+      },
+      confirm: {
+        text: "Ya, Saya Mengerti",
+        onClick: () => {
+          mutation.destroy([apiRoute.employee.detail, { id }], {
+            onBeforeSend: () => {
+              alert.set({ loading: true });
+            },
+            onSuccess: () => {
+              enqueueSnackbar("Karyawan berhasil dihapus dari daftar");
+              table.destroy((v) => v.id === id);
+              alert.reset();
+            },
+            onAlways: () => {
+              alert.set({ loading: false });
+            },
+          });
+        },
+      },
+    });
+  };
+
+  const onSubmit = () => {
+    mutation.post(apiRoute.employee.index, {
+      except: mutation.isNewRecord ? ["id"] : [],
+      method: mutation.isNewRecord ? "post" : "put",
+      validation: true,
+      serverValidation: {
+        serve,
+        method: "post",
+      },
+      onSuccess: ({ data }) => {
+        enqueueSnackbar("Karyawan baru berhasil disimpan");
+        if (mutation.isNewRecord) {
+          table.add(data, "start");
+        } else {
+          table.update((c) => c.id === data.id, data);
+        }
+        mutation.clearData();
+        mutation.clearError();
+        onOpen();
       },
     });
   };
 
   return (
     <SettingTemplate
-      title={t("employee")}
-      subtitle={t("employeeSubtitlePage")}
+      title={"Karyawan"}
+      subtitle={"Daftar semua karyawan karyawan"}
       headRight={{
         children: (
-          <MUI.Button startIcon={<icon.PersonAdd />} onClick={onOpen}>
-            {t(["add", "employee"])}
-          </MUI.Button>
+          <ButtonGroup>
+            <Button
+              variant="contained"
+              disableElevation
+              startIcon={<PersonAdd />}
+              onClick={onOpen}
+            >
+              Tambah Karyawan
+            </Button>
+            <LoadingButton
+              variant="outlined"
+              loading={table.loading}
+              disabled={table.loading}
+              onClick={table.reload}
+              color="primary"
+              startIcon={<Refresh />}
+            >
+              Muat Ulang
+            </LoadingButton>
+          </ButtonGroup>
         ),
       }}
     >
-      <Filter.TableFilter t={t} table={table} />
+      <Filter.TableFilter table={table} />
 
-      <MUI.Paper elevation={0} variant="outlined">
+      <Paper elevation={0} variant="outlined">
         <DataTable
           data={table.data}
           loading={table.loading}
-          column={columns(table, t, utils, onUpdate)}
+          column={columns(table, utils, onUpdate, onDelete)}
           pagination={utils.pagination(table.pagination)}
         />
-      </MUI.Paper>
+      </Paper>
 
       <FORM.Create
         open={trigger.form}
-        t={t}
-        r={r}
         mutation={mutation}
-        snackbar={enqueueSnackbar}
-        table={table}
+        onSubmit={onSubmit}
         onOpen={onOpen}
       />
     </SettingTemplate>

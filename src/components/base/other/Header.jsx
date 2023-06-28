@@ -1,118 +1,122 @@
-import { AppBar } from "@components/";
-import MenuIcon from "@mui/icons-material/Menu";
+import { AppBar, BasicDropdown } from "@components/";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
   Avatar,
   Badge,
   Box,
   IconButton,
-  Menu,
-  MenuItem,
   Toolbar,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import { useSelector, apiRoute } from "frhooks";
+import { useAlert } from "@contexts/AlertContext";
+import { useNavigate } from "react-router-dom";
+import { Menu } from "@mui/icons-material";
 
 const Header = (props) => {
+  const { user } = useSelector(["user"]);
+  const alert = useAlert();
+  const navigate = useNavigate();
   return (
-    <AppBar position="fixed" open={!props.isSmall && props.open}>
-      {!props.enableBack && (
-        <Toolbar
+    <AppBar position="fixed" open={props.open} elevation={0} color="inherit">
+      <Toolbar
+        sx={{
+          pr: {
+            xs: 0,
+            sm: 0,
+            md: 0,
+            lg: 0,
+            xl: 0,
+          },
+        }}
+      >
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="open drawer"
+          onClick={props.onToggleDrawer}
           sx={{
-            pr: "24px", // keep right padding when drawer closed
+            marginRight: "36px",
+            transform: "rotate(90deg)",
+            display: {
+              xs: "none",
+              sm: "none",
+              md: "none",
+              lg: "block",
+              xl: "block",
+            },
           }}
         >
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={props.onToggleDrawer}
-            sx={{
-              marginRight: "36px",
-              ...(!props.isSmall && props.open && { display: "none" }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            sx={{ flexGrow: 1 }}
-          >
-            {process.env.VITE_APP_NAME}
-          </Typography>
+          <BarChartIcon color="primary" />
+        </IconButton>
 
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-
-          <Box sx={{ flexGrow: 0, ml: 2 }}>
-            <Tooltip title="Open settings">
-              <IconButton sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={null}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(null)}
-            >
-              <MenuItem>
-                <Typography textAlign="center">Profil</Typography>
-              </MenuItem>
-
-              <MenuItem>
-                <Typography textAlign="center">Ubah Kata Sandi</Typography>
-              </MenuItem>
-
-              <MenuItem>
-                <Typography textAlign="center">Keluar</Typography>
-              </MenuItem>
-            </Menu>
-          </Box>
-        </Toolbar>
-      )}
-
-      {props.enableBack && (
-        <Toolbar
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="open drawer"
+          onClick={props.onToggleMobileDrawer}
           sx={{
-            pr: "24px", // keep right padding when drawer closed
+            marginRight: "36px",
+            display: {
+              xs: "block",
+              sm: "block",
+              md: "block",
+              lg: "none",
+              xl: "none",
+            },
           }}
         >
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={props.handleBack}
-          >
-            <ArrowBack />
-          </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            sx={{ flexGrow: 1 }}
-          >
-            {props.title || "Title"}
-          </Typography>
-        </Toolbar>
-      )}
+          <Menu color="primary" />
+        </IconButton>
+        <Typography
+          component="h1"
+          variant="h6"
+          color="inherit"
+          noWrap
+          sx={{ flexGrow: 1 }}
+        ></Typography>
+
+        <Box sx={{ ml: 2 }}>
+          <BasicDropdown
+            type="icon"
+            label={<Avatar alt={user?.employee?.name || "A"} />}
+            menu={[
+              { text: `Hi, ${user?.employee?.name || ""}`, divider: true },
+              { text: "Profil", divider: true, onClick: props.onToggleProfile },
+              {
+                text: "Keluar",
+                onClick: () => {
+                  alert.set({
+                    open: true,
+                    title: "Mohon Perhatian",
+                    message: "Anda keluar dari applikasi ini, anda yakin?",
+                    type: "warning",
+                    loading: false,
+                    close: {
+                      text: "Keluar",
+                    },
+                    confirm: {
+                      text: "Ya, Saya Mengerti",
+                      onClick: async () => {
+                        try {
+                          alert.set({ loading: true });
+                          await apiRoute().auth("logout").sendJson();
+                          localStorage.removeItem("token");
+                          navigate("/login");
+                        } catch (err) {
+                        } finally {
+                          alert.reset();
+                        }
+                      },
+                    },
+                  });
+                },
+              },
+            ]}
+          />
+        </Box>
+      </Toolbar>
     </AppBar>
   );
 };

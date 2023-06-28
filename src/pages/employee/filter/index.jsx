@@ -1,65 +1,86 @@
-import * as MUI from "@mui/material";
-import * as icon from "@mui/icons-material";
+import {
+  Stack,
+  Paper,
+  TextField,
+  MenuItem,
+  Typography,
+  Chip,
+  Box,
+} from "@mui/material";
+import Search from "@mui/icons-material/Search";
 import * as utils from "@utils/";
 import _ from "lodash";
 
-export const TableFilter = ({ t, table }) => {
+export const TableFilter = ({ table }) => {
   return (
-    <MUI.Stack mb={2} direction="column" spacing={1}>
-      <MUI.Stack direction="row" spacing={1} alignItems="center">
-        <MUI.Paper elevation={0}>
-          <MUI.TextField
+    <Stack mb={2} direction="column" spacing={1}>
+      <Stack
+        direction={{
+          xs: "column",
+          sm: "column",
+          md: "column",
+          lg: "row",
+          xl: "row",
+        }}
+        alignItems={{
+          xs: "flex-start",
+          sm: "flex-start",
+          md: "flex-start",
+          lg: "center",
+          xl: "center",
+        }}
+        spacing={1}
+      >
+        <Paper elevation={0}>
+          <TextField
+          fullWidth
             value={table.query("name", "")}
-            placeholder={t("search")}
+            placeholder="Cari"
             onChange={(e) => table.setQuery({ name: e.target.value })}
             InputProps={{
-              startAdornment: (
-                <MUI.InputAdornment position="start">
-                  <icon.Search />
-                </MUI.InputAdornment>
-              ),
+              startAdornment: <Search />,
             }}
           />
-        </MUI.Paper>
-        <MUI.Paper elevation={0} sx={{ width: { xs: "100%", sm: "10%" } }}>
-          <MUI.TextField
+        </Paper>
+        <Paper elevation={0} sx={{ width: { xs: "100%", sm: "10%" } }}>
+          <TextField
             value={table.query("status", "")}
             onChange={(e) => table.setQuery({ status: e.target.value })}
             select
           >
-            <MUI.MenuItem value="" selected>
-              {t("choose")}
-            </MUI.MenuItem>
-            <MUI.MenuItem value="ACTIVE">{t("ACTIVE")}</MUI.MenuItem>
-            <MUI.MenuItem value="INACTIVE">{t("INACTIVE")}</MUI.MenuItem>
-          </MUI.TextField>
-        </MUI.Paper>
-        <MUI.Paper elevation={0} sx={{ width: { xs: "100%", sm: "12%" } }}>
-          <MUI.TextField
+            <MenuItem value="" selected>
+              Pilih
+            </MenuItem>
+            <MenuItem value="ACTIVE">Aktif</MenuItem>
+            <MenuItem value="INACTIVE">Non Aktif</MenuItem>
+          </TextField>
+        </Paper>
+        <Paper elevation={0} sx={{ width: { xs: "100%", sm: "12%" } }}>
+          <TextField
             value={table.query("role", "")}
             onChange={(e) => table.setQuery({ role: e.target.value })}
             select
           >
-            <MUI.MenuItem value="" selected>
-              {t("choose")}
-            </MUI.MenuItem>
+            <MenuItem value="" selected>
+              Pilih
+            </MenuItem>
             {utils.types.map((v) => (
-              <MUI.MenuItem key={v} value={v}>
-                {t(v)}
-              </MUI.MenuItem>
+              <MenuItem key={v} value={v}>
+                {utils.typesLabel(v)}
+              </MenuItem>
             ))}
-          </MUI.TextField>
-        </MUI.Paper>
-      </MUI.Stack>
+          </TextField>
+        </Paper>
+      </Stack>
 
       {Object.keys(table.queryParams).length === 0 ? null : (
-        <MUI.Stack direction="row" mt={1} spacing={1} alignItems="center">
-          <MUI.Typography>{t("searchResult")} :</MUI.Typography>
-          <MUI.Box flexGrow={1}>
+        <Stack direction="row" mt={1} spacing={1} alignItems="center">
+          <Typography>Hasil Pencarian :</Typography>
+          <Box flexGrow={1}>
             {Object.entries(table.queryParams).map(([k, v]) => (
-              <MUI.Chip
+              <Chip
                 key={k}
-                label={t(v)}
+                label={v}
                 size="small"
                 variant="outlined"
                 color="primary"
@@ -68,9 +89,9 @@ export const TableFilter = ({ t, table }) => {
                 onDelete={() => table.clearOnly([k])}
               />
             ))}
-          </MUI.Box>
-        </MUI.Stack>
+          </Box>
+        </Stack>
       )}
-    </MUI.Stack>
+    </Stack>
   );
 };

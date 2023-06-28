@@ -1,3 +1,4 @@
 import Select from "./Select";
+import FieldSet from "./FieldSet";
 
-export { Select };
+export { Select, FieldSet };

@@ -13,17 +13,17 @@ const path = (t) => {
     },
     {
       label: t("user"),
-      link: "/settings/employee",
+      link: "/settings/user",
       startIcon: <icon.People />,
     },
     {
-      label: t("boc"),
-      link: "/settings/employee",
+      label: t("boq"),
+      link: "/settings/boq",
       startIcon: <icon.ListAlt />,
     },
     {
       label: t("general"),
-      link: "/settings/employee",
+      link: "/settings/general",
       startIcon: <icon.Settings />,
     },
   ];
@@ -37,11 +37,25 @@ const SettingTemplate = ({
   headRight,
 }) => {
   document.title = title;
-  const navigate = useNavigate();
-  const { t } = useLang();
   return (
     <Stack direction="column">
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack
+        direction={{
+          xs: "column",
+          sm: "column",
+          md: "column",
+          lg: "row",
+          xl: "row",
+        }}
+        justifyContent="space-between"
+        alignItems={{
+          xs: "flex-start",
+          sm: "flex-start",
+          md: "flex-start",
+          lg: "center",
+          xl: "center",
+        }}
+      >
         <Box sx={{ diplay: "flex", flexDirection: "column" }}>
           <Typography component="h5" variant="h5">
             {title}
@@ -52,10 +66,10 @@ const SettingTemplate = ({
           {breadcrumb && <Breadcrumb />}
         </Box>
 
-        {headRight ? <Box {...headRight} /> : null}
+        {headRight ? <Box mt={{ xs: 1, sm: 1, md: 1, lg: 0, xl: 0 }}  {...headRight} /> : null}
       </Stack>
 
-      <Stack direction="row" sx={{ mt: { xs: 2 } }} spacing={1} alignItems="center">
+      {/* <Stack direction="row" sx={{ mt: { xs: 2 } }} spacing={1} alignItems="center">
         <Typography fontWeight={700}>{t("page")}:</Typography>
         {path(t).map((v, i) => (
           <div key={"settings-" + i}>
@@ -68,7 +82,7 @@ const SettingTemplate = ({
             </Button>
           </div>
         ))}
-      </Stack>
+      </Stack> */}
 
       <Box sx={{ mt: "24px" }}>{children}</Box>
     </Stack>

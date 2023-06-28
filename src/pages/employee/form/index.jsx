@@ -1,23 +1,22 @@
-import * as MUI from "@mui/material";
+import _ from "lodash";
+import { Stack, TextField, Button, CircularProgress } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
-import * as icon from "@mui/icons-material";
-import { LoadingButton } from "@mui/lab";
-import _ from "lodash";
 
-export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
+export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
   return (
     <BASE.DialogForm
       open={open}
       onClose={onOpen}
-      title={t("titleEmployeeDialog")}
+      title={"Form Karyawan"}
       content={{
         children: (
-          <MUI.Stack spacing={2}>
-            <MUI.TextField
+          <Stack spacing={2}>
+            <TextField
               id="empName"
               disabled={mutation.loading}
-              label={t("name")}
+              label="Nama"
               value={mutation.data.name || ""}
               onChange={(e) => mutation.setData({ name: e.target.value })}
               onBlur={async () => mutation.validate("name")}
@@ -25,15 +24,15 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               helperText={mutation.message("name")}
               InputProps={{
                 endAdornment: mutation.loading ? (
-                  <MUI.CircularProgress size={20} />
+                  <CircularProgress size={20} />
                 ) : null,
               }}
             />
 
-            <MUI.TextField
+            <TextField
               id="empCard"
               disabled={mutation.loading}
-              label={t("cardID")}
+              label={"No. ID Karyawan"}
               value={mutation.data.cardID || ""}
               onChange={(e) => mutation.setData({ cardID: e.target.value })}
               onBlur={async () => mutation.validate("cardID")}
@@ -41,25 +40,26 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               helperText={mutation.message("cardID")}
               InputProps={{
                 endAdornment: mutation.loading ? (
-                  <MUI.CircularProgress size={20} />
+                  <CircularProgress size={20} />
                 ) : null,
               }}
             />
 
-            <MUI.TextField
+            <TextField
               id="empPN"
+              type="number"
               disabled={mutation.loading}
-              label={t("phoneNumber")}
+              label={"No HP"}
               value={mutation.data.phoneNumber || ""}
               onChange={(e) =>
-                mutation.setData({ phoneNumber: +e.target.value })
+                mutation.setData({ phoneNumber: e.target.value })
               }
               onBlur={async () => mutation.validate("phoneNumber")}
               error={mutation.error("phoneNumber")}
               helperText={mutation.message("phoneNumber")}
               InputProps={{
                 endAdornment: mutation.loading ? (
-                  <MUI.CircularProgress size={20} />
+                  <CircularProgress size={20} />
                 ) : null,
               }}
               inputProps={{
@@ -67,45 +67,93 @@ export const Create = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
               }}
             />
 
+            <TextField
+              id="empEmail"
+              disabled={mutation.loading}
+              label={"Alamat Email"}
+              value={mutation.data.email || ""}
+              onChange={(e) => mutation.setData({ email: e.target.value })}
+              onBlur={async () => mutation.validate("email")}
+              error={mutation.error("email")}
+              helperText={mutation.message("email")}
+              InputProps={{
+                endAdornment: mutation.loading ? (
+                  <CircularProgress size={20} />
+                ) : null,
+              }}
+              type="email"
+            />
+            <TextField
+              id="empPassword"
+              disabled={mutation.loading}
+              label={"Password"}
+              placeholder="Kosongkan maka password akan sama dengan No. HP"
+              value={mutation.data.password || ""}
+              onChange={(e) => mutation.setData({ password: e.target.value })}
+              onBlur={async () => mutation.validate("password")}
+              error={mutation.error("password")}
+              helperText={mutation.message("password")}
+              InputProps={{
+                endAdornment: mutation.loading ? (
+                  <CircularProgress size={20} />
+                ) : null,
+              }}
+              type="password"
+            />
+
             <BASE.Select
               id="empRole"
-              label={t("role")}
+              label={"Role"}
               name="role"
-              menu={utils.types.map((v) => ({ text: t(v), value: v }))}
+              menu={utils.workerMobileTypes.map((v) => ({
+                text: utils.typesLabel(v),
+                value: v,
+              }))}
               value={mutation.data.role === "" ? "WORKER" : mutation.data.role}
               setValue={mutation.setData}
               error={mutation.error("role")}
               helperText={mutation.message("role")}
             />
-          </MUI.Stack>
+
+            {mutation.data.role === "MANDOR" ? (
+              <BASE.Select
+                id="empType"
+                label={"Tipe"}
+                name="type"
+                menu={[
+                  { text: "Pilih Tipe", value: "00" },
+                  ...utils.boqTypes.map((v) => ({
+                    text: v,
+                    value: v,
+                  })),
+                ]}
+                value={mutation.data.type || "00"}
+                onChange={(e) => {
+                  mutation.setData({
+                    type: e.target.value === "00" ? null : e.target.value,
+                  });
+                }}
+                error={mutation.error("type")}
+                helperText={mutation.message("type")}
+              />
+            ) : null}
+          </Stack>
         ),
       }}
       actions={{
         children: (
           <>
-            <MUI.Button variant="outlined" onClick={onOpen}>
-              {t("cancel")}
-            </MUI.Button>
+            <Button variant="outlined" onClick={onOpen}>
+              Keluar
+            </Button>
             <LoadingButton
               loading={mutation.processing}
               disabled={mutation.processing}
               variant="contained"
               color="primary"
-              onClick={() => {
-                mutation.post("/employee", {
-                  method: mutation.isNewRecord ? "post" : "put",
-                  except: mutation.isNewRecord ? ["id"] : [],
-                  validation: true,
-                  onSuccess: (resp) => {
-                    snackbar(t("employeeSuccessCreate"));
-                    table.data.unshift(resp.data);
-                    mutation.clearData();
-                    mutation.clearError();
-                  },
-                });
-              }}
+              onClick={onSubmit}
             >
-              {t("save")}
+              Simpan
             </LoadingButton>
           </>
         ),

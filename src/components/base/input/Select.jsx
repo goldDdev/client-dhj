@@ -29,7 +29,9 @@ const Select = ({
           </MenuItem>
         ))}
       </TextField>
-      <FormHelperText error={message !== ""}>{message}</FormHelperText>
+      {message !== "" ? (
+        <FormHelperText error={message !== ""}>{message}</FormHelperText>
+      ) : null}
     </>
   );
 };
@@ -39,4 +41,5 @@ export default Select;
 Select.defaultProps = {
   label: "",
   menu: [],
+  message: ""
 };
