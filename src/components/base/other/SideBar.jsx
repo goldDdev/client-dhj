@@ -28,6 +28,7 @@ const menu = [
     link: "/projects/list",
     icon: icon.Add,
   },
+  { canAccess: [], text: "Karyawan", link: "/employee", icon: icon.People },
   {
     canAccess: [],
     text: "Pelacakan",
@@ -84,10 +85,13 @@ const menu = [
     icon: icon.Settings,
     children: [
       { canAccess: [], text: "Pengguna", link: "/settings/user" },
-      { canAccess: [], text: "Karyawan", link: "/settings/employee" },
       { canAccess: [], text: "BOQ", link: "/settings/boq" },
       { canAccess: [], text: "Umum", link: "/settings" },
-      { canAccess: [], text: "Pusat Lokasi", link: "/settings/center-location" },
+      {
+        canAccess: [],
+        text: "Pusat Lokasi",
+        link: "/settings/center-location",
+      },
     ],
   },
 ];

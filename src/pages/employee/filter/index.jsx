@@ -31,46 +31,45 @@ export const TableFilter = ({ table }) => {
         }}
         spacing={1}
       >
-        <Paper elevation={0}>
-          <TextField
+        <TextField
           fullWidth
-            value={table.query("name", "")}
-            placeholder="Cari"
-            onChange={(e) => table.setQuery({ name: e.target.value })}
-            InputProps={{
-              startAdornment: <Search />,
-            }}
-          />
-        </Paper>
-        <Paper elevation={0} sx={{ width: { xs: "100%", sm: "10%" } }}>
-          <TextField
-            value={table.query("status", "")}
-            onChange={(e) => table.setQuery({ status: e.target.value })}
-            select
-          >
-            <MenuItem value="" selected>
-              Pilih
+          value={table.query("name", "")}
+          placeholder="Cari"
+          onChange={(e) => table.setQuery({ name: e.target.value })}
+          InputProps={{
+            startAdornment: <Search />,
+          }}
+        />
+        <TextField
+          label="Status"
+          value={table.query("status", "")}
+          onChange={(e) => table.setQuery({ status: e.target.value })}
+          select
+          sx={{ width: "50%" }}
+        >
+          <MenuItem value="" selected>
+            Pilih
+          </MenuItem>
+          <MenuItem value="ACTIVE">Aktif</MenuItem>
+          <MenuItem value="INACTIVE">Non Aktif</MenuItem>
+        </TextField>
+
+        <TextField
+          label="Tipe"
+          value={table.query("role", "")}
+          onChange={(e) => table.setQuery({ role: e.target.value })}
+          select
+          sx={{ width: "50%" }}
+        >
+          <MenuItem value="" selected>
+            Pilih
+          </MenuItem>
+          {utils.types.map((v) => (
+            <MenuItem key={v} value={v}>
+              {utils.typesLabel(v)}
             </MenuItem>
-            <MenuItem value="ACTIVE">Aktif</MenuItem>
-            <MenuItem value="INACTIVE">Non Aktif</MenuItem>
-          </TextField>
-        </Paper>
-        <Paper elevation={0} sx={{ width: { xs: "100%", sm: "12%" } }}>
-          <TextField
-            value={table.query("role", "")}
-            onChange={(e) => table.setQuery({ role: e.target.value })}
-            select
-          >
-            <MenuItem value="" selected>
-              Pilih
-            </MenuItem>
-            {utils.types.map((v) => (
-              <MenuItem key={v} value={v}>
-                {utils.typesLabel(v)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Paper>
+          ))}
+        </TextField>
       </Stack>
 
       {Object.keys(table.queryParams).length === 0 ? null : (

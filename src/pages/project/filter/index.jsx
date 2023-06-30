@@ -121,7 +121,7 @@ export const ButtonFilter = ({ table }) => {
           menu={[
             { text: "Pilih Status", value: "00" },
             ...Object.keys(utils.projectStatus).map((v) => ({
-              text: v,
+              text: utils.projectStatus[v],
               value: v,
             })),
           ]}

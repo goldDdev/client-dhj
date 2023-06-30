@@ -188,18 +188,20 @@ export const typesLabel = (type) => {
 };
 
 export const projectStatus = {
-  DRAFT: "DRAFT",
-  PENDING: "PENDING",
-  PROGRESS: "IN PPROGRESS",
-  DONE: "COMPLETE",
-  CANCELLED: "CANCEL",
+  // DRAFT: "DRAFT",
+  // PENDING: "PENDING",
+  // PROGRESS: "IN PPROGRESS",
+  // DONE: "COMPLETE",
+  // CANCELLED: "CANCEL",
   WAP: "WAP",
   SPK: "SPK",
   KOM: "KOM",
   SITE_KOM: "SITE-KOM",
   RFD: "RFD",
   POP: "POP",
+  DONE: "MAC/COMPLETE",
   CLOSE: "CLOSE",
+  CANCELLED: "CANCEL",
 };
 
 export const projectLabel = (status) => {

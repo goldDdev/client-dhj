@@ -25,7 +25,7 @@ const DownloadPage = () => {
 
           <Box>
             <Link
-              to={"/"}
+              to={"https://api.app-dhj.com/download"}
               style={{
                 display: "flex",
                 flexDirection: "row",
