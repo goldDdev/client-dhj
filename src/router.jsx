@@ -41,7 +41,7 @@ const router = createBrowserRouter([
   },
 
   { path: "/payrol/:id", element: <Page.PayrolHtmlPdf /> },
-  { path: "/dowload", element: <Page.Download /> },
+  { path: "/download", element: <Page.Download /> },
   { path: "*", element: <Page.NotFound /> },
 ]);
 
