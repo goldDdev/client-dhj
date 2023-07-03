@@ -7,7 +7,7 @@ import {
   Toolbar,
 } from "@mui/material";
 import { Header, SideBar, Copyright, Alert } from "@components/";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation, useParams } from "react-router-dom";
 import webTheme from "./webTheme";
 import * as FRHooks from "frhooks";
 import ProfileDialog from "../../pages/auth/ProfileDialog";
@@ -15,6 +15,9 @@ import apiRoute from "@services/apiRoute";
 import { useSnackbar } from "notistack";
 
 const App = () => {
+  const location = useLocation();
+  const { id } = useParams();
+  const listUrl = [`/project/detail/${id}`];
   const toket = localStorage.getItem("token");
   const { enqueueSnackbar } = useSnackbar();
   const { user } = FRHooks.useSelector(["user"]);
@@ -31,7 +34,7 @@ const App = () => {
       phoneNumber: "",
       email: "",
       password: "",
-      role: ""
+      role: "",
     },
     schema: (y) =>
       y.object().shape({
@@ -85,6 +88,10 @@ const App = () => {
       }
     })();
   }, []);
+
+  React.useEffect(() => {
+    setTrigger((p) => ({ ...p, open: !listUrl.includes(location.pathname) }));
+  }, [location.pathname]);
 
   return (
     <ThemeProvider theme={webTheme}>
