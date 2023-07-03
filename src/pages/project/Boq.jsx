@@ -73,27 +73,32 @@ const columns = (
         postLoading.some((v) => v === value.boqId) ? (
           <Skeleton width="100%" />
         ) : (
-          <ListItemText
-            sx={{ mx: 1, my: 0 }}
-            primary={value.name || "-"}
-            primaryTypographyProps={{ variant: "body2", whiteSpace: "nowrap" }}
-            secondary={`Tipe: ${value.type || "-"} | Satuan: ${value.typeUnit || "-"}`}
-            secondaryTypographyProps={{ variant: "body2" }}
-          />
+          value.name
         ),
       padding: "none",
       sx: {
-        whiteSpace: "nowrap"
-      }
+        whiteSpace: "nowrap",
+      },
     },
     {
-      label: "Harga",
-      value: (value) => utils.formatCurrency(value.price),
-      align: "right",
+      label: "Satuan",
+      align: "center",
+      value: (value) => value.typeUnit || "-",
+      sx: {
+        whiteSpace: "nowrap",
+      },
     },
 
     {
-      label: "Jumlah Harga",
+      label: "Tipe",
+      value: (value) => value.type || "-",
+      align: "center",
+      sx: {
+        whiteSpace: "nowrap",
+      },
+    },
+    {
+      label: "Harga",
       value: (value) => utils.formatCurrency(value.price),
       align: "right",
     },
@@ -180,6 +185,16 @@ const columns = (
         ...borderPlan,
       },
     },
+
+    {
+      label: "Jumlah Harga",
+      value: (value) => utils.formatCurrency(value.price * value.unit),
+      align: "right",
+      sx: {
+        ...borderPlan,
+      },
+    },
+
     {
       label: "Plan",
       value: (value) =>
@@ -201,6 +216,15 @@ const columns = (
       },
     },
     {
+      label: "Jumlah Plan",
+      value: (value) => utils.formatCurrency(value.price * value.planProgres),
+      align: "right",
+      sx: {
+        ...borderPlan,
+      },
+    },
+
+    {
       label: "Progres",
       value: (value) =>
         postLoading.some((v) => v === value.boqId) ? (
@@ -221,6 +245,16 @@ const columns = (
         minWidth: "80px",
       },
     },
+
+    {
+      label: "Jumlah Progres",
+      value: (value) => utils.formatCurrency(value.price * value.totalProgres),
+      align: "right",
+      sx: {
+        ...borderPlan,
+      },
+    },
+
     {
       label: "Tanggal Progres",
       sortKey: "updated_at",
@@ -321,7 +355,7 @@ const columns = (
   ];
 };
 
-export default () => {
+const Boq = () => {
   const reader = new FileReader();
   const alert = useAlert();
   const navigate = useNavigate();
@@ -337,6 +371,7 @@ export default () => {
     pboid: 0,
     history: false,
   });
+  const [isSwitch, setSwitch] = React.useState(true);
 
   const table = FRHooks.useTable([apiRoute.project.listBoqs, { id }], {
     selector: (resp) => resp.data,
@@ -401,7 +436,7 @@ export default () => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(worksheet, {
         defVal: null,
-        header: ["name", "typeUnit", "unit", "price", "totalPrice", "type"],
+        header: ["name", "typeUnit", "unit", "price", "type"],
         blankrows: null,
       });
 
@@ -415,7 +450,6 @@ export default () => {
               typeUnit: vl.typeUnit ?? "",
               unit: parseFloat(vl.unit || 0),
               price: +vl.price,
-              totalPrice: +(vl.totalPrice || 0),
               type: vl.type || "",
               row: vl.__rowNum__ || i,
             }))
@@ -560,7 +594,13 @@ export default () => {
         ),
       }}
     >
-      <Stack direction="row" spacing={1} mb={2} alignItems="center">
+      <Stack
+        direction="row"
+        spacing={1}
+        mb={2}
+        alignItems="center"
+        justifyContent="space-between"
+      >
         <TextField
           placeholder="Cari"
           value={table.query("name", "")}
@@ -576,38 +616,49 @@ export default () => {
             },
           }}
         />
+
+        <ButtonGroup>
+          <Button
+            variant={isSwitch ? "contained" : "outlined"}
+            onClick={() => setSwitch(true)}
+          >
+            Daftar BOQ
+          </Button>
+          <Button
+            variant={!isSwitch ? "contained" : "outlined"}
+            onClick={() => setSwitch(false)}
+          >
+            Riwayat
+          </Button>
+        </ButtonGroup>
       </Stack>
 
-      <Grid container direction="row" spacing={1}>
-        <Grid item xs={12} sm={12} md={12} lg={9} xl={9}>
-          <Paper variant="outlined">
-            <DataTable
-              tableProps={{ size: "small" }}
-              data={table.data}
-              loading={table.loading}
-              column={columns(
-                onDelete,
-                onUpdate,
-                onHistory,
-                onBoqUpdate,
-                progres,
-                boq,
-                trigger.currentId,
-                apiRoute.project.boqValue,
-                trigger.postLoading,
-                enqueueSnackbar,
-                () => navigate(`/project/${id}/progres`)
-              )}
-              selected={(v) => v.id === +progres.getQuery("pboid")}
-              order={table.order}
-              orderBy={table.orderBy}
-              onOrder={table.onOrder}
-            />
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-          <Paper variant="outlined">
+      <Paper variant="outlined">
+        {isSwitch ? (
+          <DataTable
+            tableProps={{ size: "small" }}
+            data={table.data}
+            loading={table.loading}
+            column={columns(
+              onDelete,
+              onUpdate,
+              onHistory,
+              onBoqUpdate,
+              progres,
+              boq,
+              trigger.currentId,
+              apiRoute.project.boqValue,
+              trigger.postLoading,
+              enqueueSnackbar,
+              () => navigate(`/project/${id}/progres`)
+            )}
+            selected={(v) => v.id === +progres.getQuery("pboid")}
+            order={table.order}
+            orderBy={table.orderBy}
+            onOrder={table.onOrder}
+          />
+        ) : (
+          <>
             <Stack
               direction="row"
               justifyContent="space-between"
@@ -652,9 +703,9 @@ export default () => {
                 }}
               />
             </Box>
-          </Paper>
-        </Grid>
-      </Grid>
+          </>
+        )}
+      </Paper>
 
       <FORM.BOQCreateV2
         trigger={trigger}
@@ -676,3 +727,5 @@ export default () => {
     </ProjectTemplate>
   );
 };
+
+export default Boq;

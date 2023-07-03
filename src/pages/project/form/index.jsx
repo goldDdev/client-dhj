@@ -36,6 +36,7 @@ import moment from "moment";
 import _ from "lodash";
 import * as Filter from "../filter";
 import apiRoute from "@services/apiRoute";
+import { Link } from "react-router-dom";
 
 export const Create = ({ open, mutation, onOpen, onSubmit }) => {
   const duration =
@@ -964,7 +965,10 @@ export const BOQCreateV2 = ({ trigger, onOpen, mutation, onSubmit }) => (
               value={mutation.data.unit}
               onChange={(e) => {
                 if (Number.isInteger(+e.target.value)) {
-                  mutation.setData({ unit: +e.target.value });
+                  mutation.setData({
+                    unit: +e.target.value,
+                    totalPrice: +e.target.value * mutation.data.price,
+                  });
                 }
               }}
               error={mutation.error("unit")}
@@ -977,24 +981,17 @@ export const BOQCreateV2 = ({ trigger, onOpen, mutation, onSubmit }) => (
             value={mutation.data.price}
             onChange={(e) => {
               if (Number.isInteger(+e.target.value)) {
-                mutation.setData({ price: +e.target.value });
+                mutation.setData({
+                  price: +e.target.value,
+                  totalPrice: +e.target.value * mutation.data.unit,
+                });
               }
             }}
             error={mutation.error("price")}
             helperText={mutation.message("price")}
           />
 
-          <TextField
-            label="Jumlah Harga"
-            value={mutation.data.totalPrice}
-            onChange={(e) => {
-              if (Number.isInteger(+e.target.value)) {
-                mutation.setData({ totalPrice: +e.target.value });
-              }
-            }}
-            error={mutation.error("totalPrice")}
-            helperText={mutation.message("totalPrice")}
-          />
+          <TextField disabled value={mutation.data.totalPrice} />
 
           <Select
             label={"Tipe"}
@@ -1046,7 +1043,6 @@ export const BOQImport = ({
   onOpen,
   onUpload,
   onSubmit,
-  setJsonData,
   filename,
 }) => {
   const failData = data.filter((v) =>
@@ -1100,6 +1096,8 @@ export const BOQImport = ({
                       <TableCell>Nama</TableCell>
                       <TableCell align="center">Satuan</TableCell>
                       <TableCell align="center">Unit</TableCell>
+                      <TableCell align="center">Tipe</TableCell>
+                      <TableCell align="center">Harga</TableCell>
                     </TableRow>
                   </TableHead>
 
@@ -1117,6 +1115,14 @@ export const BOQImport = ({
                           <TableCell align="center">
                             {val.unit || "Kosong"}
                           </TableCell>
+
+                          <TableCell align="center">
+                            {val.type || "Kosong"}
+                          </TableCell>
+
+                          <TableCell align="center">
+                            {utils.formatCurrency(Number(val.price || 0))}
+                          </TableCell>
                         </TableRow>
                       );
                     })}
@@ -1128,21 +1134,32 @@ export const BOQImport = ({
         ),
       }}
       actions={{
+        sx: {
+          justifyContent: "space-between",
+        },
         children: (
           <>
-            <Button variant="outlined" onClick={onOpen}>
-              Batal
-            </Button>
-            <LoadingButton
-              disabled={data.length === 0 || failData.length > 0}
-              loading={loading}
-              disableElevation
-              variant="contained"
-              color="primary"
-              onClick={onSubmit}
-            >
-              Import BOQ
-            </LoadingButton>
+            <div style={{ marginRight: 2 }}>
+              <Link to={"https://api.app-dhj.com/web/boqs"}>
+                Unduh Format Import
+              </Link>
+            </div>
+
+            <Stack direction={"row"} spacing={1}>
+              <Button variant="outlined" onClick={onOpen}>
+                Batal
+              </Button>
+              <LoadingButton
+                disabled={data.length === 0 || failData.length > 0}
+                loading={loading}
+                disableElevation
+                variant="contained"
+                color="primary"
+                onClick={onSubmit}
+              >
+                Import BOQ
+              </LoadingButton>
+            </Stack>
           </>
         ),
       }}

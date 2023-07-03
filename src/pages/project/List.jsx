@@ -36,7 +36,7 @@ const columns = (table, onUpdate, onDelete) => [
     label: "Nama",
     value: (value) => (
       <Link
-        to={`/project/${value.id}/detail`}
+        to={`/project/detail/${value.id}`}
         style={{ textDecoration: "none", fontWeight: 500 }}
       >
         {value.name}

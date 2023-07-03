@@ -17,7 +17,7 @@ import React from "react";
 const path = (id) => [
   {
     label: "Informasi Proyek",
-    link: `/project/${id}/detail`,
+    link: `/project/detail/${id}`,
     startIcon: <ListAlt />,
     badge: "",
   },
