@@ -17,7 +17,14 @@ import { useSnackbar } from "notistack";
 const App = () => {
   const location = useLocation();
   const { id } = useParams();
-  const listUrl = [`/project/detail/${id}`];
+  const listUrl = [
+    `/project/detail/${id}`,
+    `/project/${id}/event`,
+    `/project/${id}/boq`,
+    `/project/${id}/progres`,
+    `/project/${id}/absent`,
+    `/project/${id}/overtime`,
+  ];
   const toket = localStorage.getItem("token");
   const { enqueueSnackbar } = useSnackbar();
   const { user } = FRHooks.useSelector(["user"]);
