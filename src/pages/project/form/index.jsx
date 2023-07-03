@@ -1100,6 +1100,8 @@ export const BOQImport = ({
                       <TableCell>Nama</TableCell>
                       <TableCell align="center">Satuan</TableCell>
                       <TableCell align="center">Unit</TableCell>
+                      <TableCell align="center">Tipe</TableCell>
+                      <TableCell align="center">Harga</TableCell>
                     </TableRow>
                   </TableHead>
 
@@ -1116,6 +1118,14 @@ export const BOQImport = ({
 
                           <TableCell align="center">
                             {val.unit || "Kosong"}
+                          </TableCell>
+
+                          <TableCell align="center">
+                            {val.type || "Kosong"}
+                          </TableCell>
+
+                          <TableCell align="center">
+                            {utils.formatCurrency(Number(val.price || 0))}
                           </TableCell>
                         </TableRow>
                       );
