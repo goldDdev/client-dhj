@@ -622,7 +622,7 @@ const Boq = () => {
             variant={isSwitch ? "contained" : "outlined"}
             onClick={() => setSwitch(true)}
           >
-            Daftar Boq
+            Daftar BOQ
           </Button>
           <Button
             variant={!isSwitch ? "contained" : "outlined"}
