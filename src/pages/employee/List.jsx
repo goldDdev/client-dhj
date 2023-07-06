@@ -167,8 +167,16 @@ export default () => {
           },
           then: y.string().required(),
         }),
-        role: y.string().required(),
-        password: y.string().optional(),
+        role: y.string().optional().required(),
+        email: y
+          .string()
+          .optional()
+          .when("role", {
+            is: (role) => {
+              return role !== "WORKER";
+            },
+            then: y.string().required(),
+          }),
         type: y.string(),
       }),
     format: {
@@ -231,8 +239,12 @@ export default () => {
   };
 
   const onSubmit = () => {
+    mutation.reformat((va) => ({
+      ...va,
+      ...(va.type === "00" ? { type: "" } : { type: va.type }),
+    }));
     mutation.post(apiRoute.employee.index, {
-      except: mutation.isNewRecord ? ["id"] : [],
+      except: mutation.isNewRecord ? ["id"] : ["user", "works", "updatedAt"],
       method: mutation.isNewRecord ? "post" : "put",
       validation: true,
       serverValidation: {

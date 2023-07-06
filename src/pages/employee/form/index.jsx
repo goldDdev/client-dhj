@@ -13,6 +13,43 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
       content={{
         children: (
           <Stack spacing={2}>
+            <BASE.Select
+              id="empRole"
+              label={"Role"}
+              name="role"
+              menu={utils.workerMobileTypes.map((v) => ({
+                text: utils.typesLabel(v),
+                value: v,
+              }))}
+              value={mutation.data.role === "" ? "WORKER" : mutation.data.role}
+              setValue={mutation.setData}
+              error={mutation.error("role")}
+              helperText={mutation.message("role")}
+            />
+
+            {mutation.data.role === "MANDOR" ? (
+              <BASE.Select
+                id="empType"
+                label={"Tipe"}
+                name="type"
+                menu={[
+                  { text: "Pilih Tipe", value: "00" },
+                  ...utils.boqTypes.map((v) => ({
+                    text: v,
+                    value: v,
+                  })),
+                ]}
+                value={mutation.data.type || "00"}
+                onChange={(e) => {
+                  mutation.setData({
+                    type: e.target.value === "00" ? null : e.target.value,
+                  });
+                }}
+                error={mutation.error("type")}
+                helperText={mutation.message("type")}
+              />
+            ) : null}
+
             <TextField
               id="empName"
               disabled={mutation.loading}
@@ -67,75 +104,55 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
               }}
             />
 
-            <TextField
-              id="empEmail"
-              disabled={mutation.loading}
-              label={"Alamat Email"}
-              value={mutation.data.email || ""}
-              onChange={(e) => mutation.setData({ email: e.target.value })}
-              onBlur={async () => mutation.validate("email")}
-              error={mutation.error("email")}
-              helperText={mutation.message("email")}
-              InputProps={{
-                endAdornment: mutation.loading ? (
-                  <CircularProgress size={20} />
-                ) : null,
-              }}
-              type="email"
-            />
-            <TextField
-              id="empPassword"
-              disabled={mutation.loading}
-              label={"Password"}
-              placeholder="Kosongkan maka password akan sama dengan No. HP"
-              value={mutation.data.password || ""}
-              onChange={(e) => mutation.setData({ password: e.target.value })}
-              onBlur={async () => mutation.validate("password")}
-              error={mutation.error("password")}
-              helperText={mutation.message("password")}
-              InputProps={{
-                endAdornment: mutation.loading ? (
-                  <CircularProgress size={20} />
-                ) : null,
-              }}
-              type="password"
-            />
+            {mutation.data.role !== "WORKER" ? (
+              <>
+                <BASE.FieldSet
+                  label={"Email(*) dan Password diperlukan jika bukan Pekerja"}
+                  labelProps={{ fontWeight: 500 }}
+                >
+                  <TextField
+                    id="empEmail"
+                    disabled={mutation.loading}
+                    label={"Alamat Email"}
+                    value={mutation.data.email || ""}
+                    onChange={(e) =>
+                      mutation.setData({ email: e.target.value })
+                    }
+                    onBlur={async () => mutation.validate("email")}
+                    error={mutation.error("email")}
+                    helperText={mutation.message("email")}
+                    InputProps={{
+                      endAdornment: mutation.loading ? (
+                        <CircularProgress size={20} />
+                      ) : null,
+                    }}
+                    type="email"
+                  />
+                </BASE.FieldSet>
 
-            <BASE.Select
-              id="empRole"
-              label={"Role"}
-              name="role"
-              menu={utils.workerMobileTypes.map((v) => ({
-                text: utils.typesLabel(v),
-                value: v,
-              }))}
-              value={mutation.data.role === "" ? "WORKER" : mutation.data.role}
-              setValue={mutation.setData}
-              error={mutation.error("role")}
-              helperText={mutation.message("role")}
-            />
-
-            {mutation.data.role === "MANDOR" ? (
-              <BASE.Select
-                id="empType"
-                label={"Tipe"}
-                name="type"
-                menu={[
-                  { text: "Pilih Tipe", value: "00" },
-                  ...utils.boqTypes.map((v) => ({
-                    text: v,
-                    value: v,
-                  })),
-                ]}
-                value={mutation.data.type || "00"}
-                onChange={(e) => {
-                  mutation.setData({
-                    type: e.target.value === "00" ? null : e.target.value,
-                  });
-                }}
-                error={mutation.error("type")}
-                helperText={mutation.message("type")}
-              />
+                {mutation.data.isNewRecord ||
+                (!mutation.isNewRecord && !mutation.data.user) ? (
+                  <TextField
+                    id="empPassword"
+                    disabled={mutation.loading}
+                    label={"Password"}
+                    placeholder="Kosongkan maka password akan sama dengan No. HP"
+                    value={mutation.data.password || ""}
+                    onChange={(e) =>
+                      mutation.setData({ password: e.target.value })
+                    }
+                    onBlur={async () => mutation.validate("password")}
+                    error={mutation.error("password")}
+                    helperText={mutation.message("password")}
+                    InputProps={{
+                      endAdornment: mutation.loading ? (
+                        <CircularProgress size={20} />
+                      ) : null,
+                    }}
+                    type="password"
+                  />
+                ) : null}
+              </>
             ) : null}
           </Stack>
         ),
