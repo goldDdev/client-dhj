@@ -192,7 +192,7 @@ export default () => {
         mutation.setData({
           ...resp.data,
           email: resp.data.user?.email || "",
-          type: resp.data.type || "00",
+          type: resp.data.type || "",
         });
       },
     });
