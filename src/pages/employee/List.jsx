@@ -168,15 +168,7 @@ export default () => {
           then: y.string().required(),
         }),
         role: y.string().optional().required(),
-        email: y
-          .string()
-          .optional()
-          .when("role", {
-            is: (role) => {
-              return role !== "WORKER";
-            },
-            then: y.string().required(),
-          }),
+        password: y.string().optional(),
         type: y.string(),
       }),
     format: {
