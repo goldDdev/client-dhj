@@ -130,8 +130,8 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
                   />
                 </BASE.FieldSet>
 
-                {mutation.data.isNewRecord ||
-                (!mutation.isNewRecord && !mutation.data.user) ? (
+                {mutation.isNewRecord ||
+                (!mutation.isNewRecord && mutation.data.role !== "WORKER") ? (
                   <TextField
                     id="empPassword"
                     disabled={mutation.loading}
