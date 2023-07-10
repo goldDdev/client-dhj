@@ -130,28 +130,25 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
                   />
                 </BASE.FieldSet>
 
-                {mutation.isNewRecord ||
-                (!mutation.isNewRecord && mutation.data.role !== "WORKER") ? (
-                  <TextField
-                    id="empPassword"
-                    disabled={mutation.loading}
-                    label={"Password"}
-                    placeholder="Kosongkan maka password akan sama dengan No. HP"
-                    value={mutation.data.password || ""}
-                    onChange={(e) =>
-                      mutation.setData({ password: e.target.value })
-                    }
-                    onBlur={async () => mutation.validate("password")}
-                    error={mutation.error("password")}
-                    helperText={mutation.message("password")}
-                    InputProps={{
-                      endAdornment: mutation.loading ? (
-                        <CircularProgress size={20} />
-                      ) : null,
-                    }}
-                    type="password"
-                  />
-                ) : null}
+                <TextField
+                  id="empPassword"
+                  disabled={mutation.loading}
+                  label={"Password"}
+                  placeholder="Kosongkan maka password akan sama dengan No. HP"
+                  value={mutation.data.password || ""}
+                  onChange={(e) =>
+                    mutation.setData({ password: e.target.value })
+                  }
+                  onBlur={async () => mutation.validate("password")}
+                  error={mutation.error("password")}
+                  helperText={mutation.message("password")}
+                  InputProps={{
+                    endAdornment: mutation.loading ? (
+                      <CircularProgress size={20} />
+                    ) : null,
+                  }}
+                  type="password"
+                />
               </>
             ) : null}
           </Stack>
