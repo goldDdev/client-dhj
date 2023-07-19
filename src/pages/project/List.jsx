@@ -253,6 +253,7 @@ export default () => {
               variant="contained"
               startIcon={<Add />}
               onClick={onOpen}
+              disabled={table.loading}
             >
               Tambah Proyek
             </Button>

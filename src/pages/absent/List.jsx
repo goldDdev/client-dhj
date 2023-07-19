@@ -10,7 +10,9 @@ import {
   Chip,
   Stack,
   Box,
-  IconButton,
+  ButtonGroup,
+  Button,
+  Collapse,
 } from "@mui/material";
 import moment from "moment";
 import MainTemplate from "@components/templates/MainTemplate";
@@ -18,22 +20,27 @@ import * as utils from "@utils/";
 import * as BASE from "@components/base";
 import apiRoute from "@services/apiRoute";
 import DataTable from "../../components/base/table/DataTable";
-import { Refresh } from "@mui/icons-material";
+import { FilterAlt, FilterAltOff, Refresh, Search } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 
-const columns = (table) => [
+const columns = (table, today) => [
   {
     label: "No",
     align: "center",
     padding: "checkbox",
-    value: (value, i) => i + 1,
+    size: "small",
+    value: (value, i) => table.pagination.from + i,
   },
   {
     label: "Nama",
+    size: "small",
     value: (value) => (
       <ListItemText
+        sx={{ m: 0, px: 0.5 }}
         primary={value.name}
+        primaryTypographyProps={{ variant: "body2" }}
         secondary={utils.typesLabel(value.role)}
+        secondaryTypographyProps={{ variant: "body2" }}
       />
     ),
     sx: {
@@ -47,6 +54,7 @@ const columns = (table) => [
     .getDaysInMonthUTC(moment().format("M"), moment().format("Y"))
     .map((v) => ({
       label: moment(v).format("DD"),
+      size: "small",
       value: (value) => {
         const find = value.data.find(
           (_v) => +_v.day === +moment(v).format("D")
@@ -90,13 +98,23 @@ const columns = (table) => [
         align: "center",
         sx: {
           width: "10px",
+          backgroundColor:
+            moment(v).format("DD-MM-Y") === today ? "info.main" : "#f4f4f4",
+          color: moment(v).format("DD-MM-Y") === today ? "white" : "inherit",
         },
+        id: moment(v).format("DD-MM-Y"),
       },
     })),
 ];
-export default () => {
+
+const List = () => {
+  const today = moment().format("DD-MM-Y");
   const table = FRHooks.useTable(apiRoute.absent.index, {
     selector: (resp) => resp.data,
+  });
+
+  const [trigger, setTrigger] = React.useState({
+    filter: false,
   });
 
   const projects = FRHooks.useFetch(apiRoute.project.index, {
@@ -105,40 +123,69 @@ export default () => {
     disabledOnDidMount: false,
   });
 
+  const onFilter = () => {
+    setTrigger((state) => ({ ...state, filter: !state.filter }));
+  };
+
+  React.useEffect(() => {
+    document.getElementById("table-absent").scrollTo({
+      left: document.getElementById(today).getBoundingClientRect().left,
+    });
+  }, []);
+
   return (
     <MainTemplate
       title="Absensi"
       subtitle={`Daftar semua data absensi karyawan`}
       headRight={{
-        sx: {
-          width: {
-            xs: "100%",
-            sm: "100%",
-            md: "100%",
-            lg: "60%",
-            xl: "60%",
-          },
-        },
         children: (
-          <Stack
-            spacing={1}
-            mb={2}
-            justifyContent="flex-start"
-            direction={{
-              xs: "column",
-              sm: "column",
-              md: "column",
-              lg: "row",
-              xl: "row",
-            }}
-            alignItems={{
-              xs: "flex-start",
-              sm: "flex-start",
-              md: "flex-start",
-              lg: "center",
-              xl: "center",
-            }}
-          >
+          <ButtonGroup>
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={trigger.filter ? <FilterAltOff /> : <FilterAlt />}
+              onClick={onFilter}
+              disabled={table.loading}
+            >
+              Filter
+            </Button>
+            <LoadingButton
+              onClick={() => {
+                table.clear();
+                table.reload();
+              }}
+              disabled={table.loading}
+              variant="outlined"
+              startIcon={<Refresh />}
+              sx={{ whiteSpace: "nowrap" }}
+            >
+              Muat Ulang
+            </LoadingButton>
+          </ButtonGroup>
+        ),
+      }}
+    >
+      <Collapse in={trigger.filter} unmountOnExit>
+        <Stack
+          spacing={1}
+          mb={2}
+          justifyContent="flex-start"
+          direction={{
+            xs: "column",
+            sm: "column",
+            md: "column",
+            lg: "row",
+            xl: "row",
+          }}
+          alignItems={{
+            xs: "flex-start",
+            sm: "flex-start",
+            md: "flex-start",
+            lg: "center",
+            xl: "center",
+          }}
+        >
+          <Box minWidth={"25%"}>
             <Autocomplete
               id="asynchronous-demo"
               freeSolo
@@ -160,11 +207,10 @@ export default () => {
               renderOption={(props, option) => (
                 <li {...props} key={option.id} children={option.name} />
               )}
-              sx={{ flexGrow: 1, minWidth: "40%" }}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Proyek"
+                  label="Pilih Proyek"
                   onChange={(e) => projects.setQuery({ name: e.target.value })}
                   InputProps={{
                     ...params.InputProps,
@@ -172,7 +218,9 @@ export default () => {
                       <React.Fragment>
                         {projects.loading ? (
                           <CircularProgress color="inherit" size={20} />
-                        ) : null}
+                        ) : (
+                          <Search color="disabled" />
+                        )}
                         {params.InputProps.endAdornment}
                       </React.Fragment>
                     ),
@@ -180,7 +228,8 @@ export default () => {
                 />
               )}
             />
-
+          </Box>
+          <Box minWidth={"15%"}>
             <BASE.Select
               value={table.query("month", +moment().month() + 1)}
               name="month"
@@ -200,29 +249,18 @@ export default () => {
               ]}
               setValue={table.setQuery}
             />
-
+          </Box>
+          <Box>
             <BASE.Select
               value={table.query("year", +moment().year())}
               name="year"
               menu={utils.listYear().map((v) => ({ text: v, value: v }))}
               setValue={table.setQuery}
             />
-            <LoadingButton
-              fullWidth
-              onClick={() => {
-                table.clear();
-                table.reload();
-              }}
-              variant="outlined"
-              startIcon={<Refresh />}
-              sx={{ whiteSpace: "nowrap" }}
-            >
-              Muat Ulang
-            </LoadingButton>
-          </Stack>
-        ),
-      }}
-    >
+          </Box>
+        </Stack>
+      </Collapse>
+
       {Object.keys(table.queryParams).length === 0 ? null : (
         <Stack direction="row" mb={2} spacing={1} alignItems="center">
           <Typography>Hasil Filter :</Typography>
@@ -245,12 +283,51 @@ export default () => {
 
       <Paper elevation={0} variant="outlined">
         <DataTable
-          tableProps={{ size: "small" }}
+          container={{ id: "table-absent" }}
+          headProps={{ sx: { backgroundColor: "#f4f4f4" } }}
+          tableProps={{
+            sx: {
+              "& > thead > tr > th:nth-of-type(1), & > thead > tr > th:nth-of-type(2)":
+                {
+                  position: "-webkit-sticky",
+                  position: "sticky",
+                  backgroundColor: "#f4f4f4",
+                  left: 0,
+                },
+
+              "& > tbody > tr > td:nth-of-type(1), & > tbody > tr > td:nth-of-type(2)":
+                {
+                  backgroundColor: "white",
+                  position: "-webkit-sticky",
+                  position: "sticky",
+                  left: 0,
+                  zIndex: 3,
+                },
+              "& > thead > tr > th:nth-of-type(2), & > tbody > tr > td:nth-of-type(2)":
+                {
+                  left: 50,
+                  zIndex: 389,
+                  borderRight: 1,
+                  borderColor: "divider",
+                  boxShadow: "inset -2px 0 1px -2px rgba(0,0,0,0.50)",
+                },
+              "& > tbody > tr > td:nth-of-type(1)": {
+                boxShadow: "inset -2px 0 1px -2px rgba(0,0,0,0.50)",
+              },
+              "& td:not(:nth-of-type(1)), & td:not(:nth-of-type(2))": {
+                borderRight: 1,
+                borderColor: "divider",
+              },
+              marginBottom: 1.5,
+            },
+          }}
           data={table.data}
           loading={table.loading}
-          column={columns(table)}
+          column={columns(table, today)}
         />
       </Paper>
     </MainTemplate>
   );
 };
+
+export default List;

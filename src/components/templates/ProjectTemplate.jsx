@@ -25,7 +25,7 @@ const path = (id) => [
     label: "Milestone",
     link: `/project/${id}/event`,
     startIcon: <ListAlt />,
-    badge: "",
+    badge: "milestone",
   },
   {
     label: "BOQ",
@@ -65,14 +65,13 @@ const ProjectTemplate = ({
   const navigate = useNavigate();
   const { id } = useParams();
   const { pathname } = useLocation();
-  const [badge, setBadge] = React.useState({ overtime: 0 });
-
+  const [badge, setBadge] = React.useState({ overtime: 0, milestone: 0 });
   React.useEffect(() => {
     if (!id) return;
 
     (async () => {
       const data = await apiRoute().project("badge", { id }).get();
-      setBadge(data);
+      setBadge((s) => ({ ...s, ...data }));
     })();
   }, []);
 

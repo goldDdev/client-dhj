@@ -9,9 +9,23 @@ import * as Dummy from "../../constants/dummy";
 import DataTable from "../../components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
 import { Link } from "react-router-dom";
-import { MoreVert, Refresh } from "@mui/icons-material";
+import {
+  Filter1,
+  FilterAlt,
+  FilterAltOff,
+  Key,
+  MoreVert,
+  Refresh,
+} from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
-import { ButtonGroup, Paper } from "@mui/material";
+import {
+  ButtonGroup,
+  Chip,
+  Collapse,
+  Paper,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { Button, BasicDropdown } from "@components/base";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
@@ -40,7 +54,6 @@ const columns = (table, utils, onUpdate, onDelete) => [
       padding: "checkbox",
       noWrap: true,
     },
-    align: "center",
     padding: "checkbox",
     size: "small",
   },
@@ -95,7 +108,12 @@ const columns = (table, utils, onUpdate, onDelete) => [
   },
   {
     label: "Tipe",
-    value: (value) => value.type || "-",
+    value: (value) =>
+      value.type ? (
+        <Chip label={value.type} variant="outlined" size="small" color="info" />
+      ) : (
+        "-"
+      ),
     align: "center",
     head: {
       align: "center",
@@ -131,21 +149,12 @@ const columns = (table, utils, onUpdate, onDelete) => [
 
 export default () => {
   const alert = useAlert();
-  const { serve } = FRHooks.useServerValidation({
-    url: apiRoute.employee.validation,
-    param: {
-      path: "field",
-      type: "rule",
-    },
-    withErrorResponse: (resp) => resp.response.data.error.messages.errors,
-    option: {
-      unique: (param) => `Data ini sudah digunakan`,
-    },
-  });
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.between("xs", "sm"));
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
+    filter: false,
   });
 
   const table = FRHooks.useTable(apiRoute.employee.index, {
@@ -160,7 +169,7 @@ export default () => {
       y.object().shape({
         name: y.string().required().min(3),
         cardID: y.string().required(),
-        phoneNumber: y.string().required().min(10).max(12),
+        phoneNumber: y.string().required().min(10),
         email: y.string().when("role", {
           is: (role) => {
             return role !== "WORKER";
@@ -176,10 +185,41 @@ export default () => {
     },
   });
 
+  const { serve, validate: serverValidate } = FRHooks.useServerValidation({
+    url: apiRoute.employee.validation,
+    param: {
+      path: "field",
+      type: "rule",
+    },
+    selector: (resp) => resp.response.data.error.messages.errors,
+    option: {
+      unique: (param) => `Data ini sudah digunakan`,
+    },
+    field: {
+      phoneNumber: {
+        selector: (resp, {}, option) => {
+          return option(resp.data?.error?.messages?.errors || []);
+        },
+      },
+      cardID: {
+        selector: (resp, {}, option) => {
+          return option(resp.data?.error?.messages?.errors || []);
+        },
+      },
+    },
+    callback: (er) => {
+      mutation.setError(er);
+    },
+  });
+
   const onOpen = () => {
     setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
+  };
+
+  const onOpenFilter = () => {
+    setTrigger((state) => ({ ...state, filter: !state.filter }));
   };
 
   const onUpdate = (id) => () => {
@@ -230,6 +270,17 @@ export default () => {
     });
   };
 
+  const validate = (id, key) => async (e) => {
+    const inv = await mutation.validate(key);
+    if (!inv) {
+      const data = { [key]: e.target.value.replace(/\s+/g, "") };
+      if (id > 0) {
+        Object.assign(data, { id });
+      }
+      await serverValidate(key, data);
+    }
+  };
+
   const onSubmit = () => {
     mutation.reformat((va) => ({
       ...va,
@@ -265,12 +316,13 @@ export default () => {
         children: (
           <ButtonGroup>
             <Button
-              variant="contained"
+              variant="outlined"
               disableElevation
-              startIcon={<PersonAdd />}
-              onClick={onOpen}
+              disabled={table.loading}
+              startIcon={trigger.filter ? <FilterAltOff /> : <FilterAlt />}
+              onClick={onOpenFilter}
             >
-              Tambah Karyawan
+              Filter
             </Button>
             <LoadingButton
               variant="outlined"
@@ -282,24 +334,37 @@ export default () => {
             >
               Muat Ulang
             </LoadingButton>
+            <Button
+              disabled={table.loading}
+              variant="contained"
+              disableElevation
+              startIcon={<PersonAdd />}
+              onClick={onOpen}
+            >
+              {isMobile ? "" : "Tambah"} Karyawan
+            </Button>
           </ButtonGroup>
         ),
       }}
     >
-      <Filter.TableFilter table={table} />
-
+      <Collapse in={trigger.filter} unmountOnExit>
+        <Filter.TableFilter table={table} />
+      </Collapse>
       <Paper elevation={0} variant="outlined">
         <DataTable
+          headProps={{ sx: { backgroundColor: "#f4f4f4" } }}
           data={table.data}
           loading={table.loading}
           column={columns(table, utils, onUpdate, onDelete)}
           pagination={utils.pagination(table.pagination)}
+          hover={true}
         />
       </Paper>
 
       <FORM.Create
         open={trigger.form}
         mutation={mutation}
+        validate={validate}
         onSubmit={onSubmit}
         onOpen={onOpen}
       />

@@ -502,8 +502,8 @@ export const EventCreate = ({
     <DialogForm
       open={open}
       onClose={onOpen}
-      title="Form Event"
-      maxWidth="md"
+      title="Milestone"
+      maxWidth={["actual", "revise1", "revise2"].includes(type) ? "xs" : "sm"}
       content={{
         children: (
           <Stack spacing={1.5} direction="column">
@@ -592,7 +592,7 @@ export const EventCreate = ({
             ) : null}
 
             {type === "revise1" ? (
-              <FieldSet disabledDivider label="Revise 1">
+              <FieldSet disabledDivider label="Tanggal Revise 1">
                 <TextField
                   fullWidth
                   InputLabelProps={{ shrink: true }}
@@ -644,7 +644,7 @@ export const EventCreate = ({
             ) : null}
 
             {type === "revise2" ? (
-              <FieldSet disabledDivider label="Revise 2">
+              <FieldSet disabledDivider label="Tanggal Revise 2">
                 <TextField
                   fullWidth
                   InputLabelProps={{ shrink: true }}
@@ -746,30 +746,33 @@ export const EventCreate = ({
                 />
               </FieldSet>
             ) : null}
-            <FieldSet
-              label="Status Event"
-              stackProps={{
-                direction: "row",
-                spacing: 1,
-                justifyContent: "flex-start",
-              }}
-            >
-              {Object.entries(utils.komStatus).map(([k, v]) => (
-                <Filter.ChipKom
-                  disableElevation
-                  size="small"
-                  key={k}
-                  status={k}
-                  color={mutation.data.status === k ? "primary" : "inherit"}
-                  variant={
-                    mutation.data.status === k ? "contained" : "outlined"
-                  }
-                  onClick={() => {
-                    mutation.setData({ status: k });
-                  }}
-                />
-              ))}
-            </FieldSet>
+
+            {type === "full" ? (
+              <FieldSet
+                label="Status Event"
+                stackProps={{
+                  direction: "row",
+                  spacing: 1,
+                  justifyContent: "flex-start",
+                }}
+              >
+                {Object.entries(utils.komStatus).map(([k, v]) => (
+                  <Filter.ChipKom
+                    disableElevation
+                    size="small"
+                    key={k}
+                    status={k}
+                    color={mutation.data.status === k ? "primary" : "inherit"}
+                    variant={
+                      mutation.data.status === k ? "contained" : "outlined"
+                    }
+                    onClick={() => {
+                      mutation.setData({ status: k });
+                    }}
+                  />
+                ))}
+              </FieldSet>
+            ) : null}
 
             {false ? (
               <FieldSet

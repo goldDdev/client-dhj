@@ -19,16 +19,16 @@ const columns = (onDetail, onConfirm) => [
       `${moment(value.startDate).format("DD-MM-yyyy")} s/d ${moment(
         value.endDate
       ).format("DD-MM-yyyy")}`,
-      sx:{
-        whiteSpace: "nowrap"
-      }
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
   {
     label: "Proyek",
     value: (value) => value.projectName,
-    sx:{
-      whiteSpace: "nowrap"
-    }
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
   {
     label: "Item",
@@ -50,16 +50,16 @@ const columns = (onDetail, onConfirm) => [
         whiteSpace: "nowrap",
       },
     },
-    sx:{
-      whiteSpace: "nowrap"
-    }
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
   {
     label: "Oleh",
     value: (value) => value.name,
-    sx:{
-      whiteSpace: "nowrap"
-    }
+    sx: {
+      whiteSpace: "nowrap",
+    },
   },
   {
     label: "Status",
@@ -155,8 +155,9 @@ export default () => {
               alert.set({ loading: true });
             },
             onSuccess: () => {
-              table.reload();
+              enqueueSnackbar("Data berhasil diperbaharui");
               alert.set({ loading: false, open: false });
+              table.reload();
             },
             onAlways: () => {
               alert.set({ loading: false });
@@ -206,7 +207,7 @@ export default () => {
             color={!table.query("status") ? "primary" : "inherit"}
             startIcon={<ListAlt />}
             onClick={() => table.setQuery({ status: "" })}
-            sx={{whiteSpace: "nowrap"}}
+            sx={{ whiteSpace: "nowrap" }}
           >
             Semua Status
           </Button>
@@ -251,7 +252,7 @@ export default () => {
           </Button>
         </div>
 
-         <div>
+        <div>
           <Button
             disableElevation
             variant={
@@ -268,6 +269,13 @@ export default () => {
 
       <Paper elevation={0} variant="outlined">
         <DataTable
+          tableProps={{
+            sx: {
+              "& th": {
+                backgroundColor: "#f4f4f4",
+              },
+            },
+          }}
           data={table.data}
           loading={table.loading}
           column={columns(onDetail, onConfirm)}

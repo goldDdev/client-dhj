@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Button,
   Stack,
@@ -7,8 +7,6 @@ import {
   Paper,
   Box,
   IconButton,
-  CircularProgress,
-  Grid,
   Typography,
   Divider,
   Badge,
@@ -29,9 +27,6 @@ import {
   MoreVert,
   Add,
   Search,
-  Edit,
-  Close,
-  Check,
   RefreshOutlined,
   Refresh,
   ImportExport,
@@ -39,26 +34,22 @@ import {
 import { useAlert } from "@contexts/AlertContext";
 import { LoadingButton } from "@mui/lab";
 import apiRoute from "@services/apiRoute";
+import BOQCreate from "./form/BOQCreate";
 
 const columns = (
   onDelete,
-  onUpdate,
   onHistory,
   onBoqUpdate,
-  table,
-  mutation,
-  currentId,
-  url,
   postLoading,
-  snackbar,
-  navigate
+  navigate,
+  from
 ) => {
-  const borderPlan = { borderRight: 1, borderLeft: 1, borderColor: "divider" };
+  const borderPlan = { borderRight: 1, borderColor: "divider" };
   return [
     {
       label: "No",
       padding: "checkbox",
-      value: (_, idx) => idx + 1,
+      value: (_, idx) => from + idx,
       align: "center",
       head: {
         padding: "checkbox",
@@ -75,7 +66,6 @@ const columns = (
         ) : (
           value.name
         ),
-      padding: "none",
       sx: {
         whiteSpace: "nowrap",
       },
@@ -105,77 +95,7 @@ const columns = (
 
     {
       label: "Jumlah",
-      value: (value) => (
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="center"
-          spacing={1}
-        >
-          <Box>
-            {currentId === value.id ? (
-              <TextField
-                size="small"
-                value={mutation.data.unit}
-                onChange={(e) => mutation.setData({ unit: +e.target.value })}
-                variant="standard"
-                error={mutation.error("unit")}
-                helperText={mutation.message("unit")}
-                InputProps={{
-                  inputProps: {
-                    style: { textAlign: "center" },
-                    maxLength: 5,
-                  },
-                  startAdornment: (
-                    <IconButton
-                      disabled={mutation.processing}
-                      onClick={onUpdate(value)}
-                      size="small"
-                    >
-                      <Close fontSize="inherit" />
-                    </IconButton>
-                  ),
-                  endAdornment: (
-                    <IconButton
-                      disabled={mutation.processing}
-                      onClick={() => {
-                        mutation.put(url, {
-                          onSuccess: ({ data }) => {
-                            snackbar("BOQ proyek berhasil diperbaharui", {
-                              variant: "success",
-                            });
-                            value.unit = data.unit;
-                            value.updatedAt = data.updatedAt;
-                            onUpdate(data)();
-                          },
-                        });
-                      }}
-                      size="small"
-                    >
-                      {mutation.processing ? (
-                        <CircularProgress size={20} />
-                      ) : (
-                        <Check fontSize="inherit" />
-                      )}
-                    </IconButton>
-                  ),
-                }}
-                sx={{ minWidth: "150px" }}
-              />
-            ) : (
-              value.unit
-            )}
-          </Box>
-
-          {currentId === value.id ? null : (
-            <Box display="flex" flexDirection="row" gap={1}>
-              <IconButton onClick={onUpdate(value)} size="small">
-                <Edit fontSize="inherit" />
-              </IconButton>
-            </Box>
-          )}
-        </Stack>
-      ),
+      value: (value) => value.unit,
       align: "center",
       padding: "checkbox",
       head: {
@@ -213,6 +133,7 @@ const columns = (
         fontWeight: 700,
         fontSize: "16px",
         minWidth: "80px",
+        ...borderPlan,
       },
     },
     {
@@ -375,6 +296,10 @@ const Boq = () => {
 
   const table = FRHooks.useTable([apiRoute.project.listBoqs, { id }], {
     selector: (resp) => resp.data,
+    total: (resp) => resp.meta.total,
+    pagination: {
+      perPage: 100,
+    },
   });
 
   const progres = FRHooks.useFetch([apiRoute.project.listProgress, { id }], {
@@ -399,21 +324,11 @@ const Boq = () => {
       }),
   });
 
-  const boq = FRHooks.useMutation({
-    defaultValue: { id: 0, unit: 0 },
-    isNewRecord: (data) => data.id === 0,
-    schema: (y) =>
-      y.object().shape({
-        id: y.number().nullable(),
-        unit: y.number().nullable(),
-      }),
-  });
-
-  const onOpen = () => {
+  const onOpen = React.useCallback(() => {
     setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
-  };
+  }, [mutation.data]);
 
   const onImport = () => {
     setTrigger((state) => ({ ...state, import: !state.import }));
@@ -424,8 +339,6 @@ const Boq = () => {
   const onUpload = (e) => {
     e.preventDefault();
     setJsonData([]);
-
-    // if(e.target.value.length === 0) return
 
     if (e.target.files.length > 0) {
       setFileName(e.target.files[0].name);
@@ -467,23 +380,15 @@ const Boq = () => {
     progres.setQuery({ pboid: value.id });
   };
 
-  const onUpdate = (value) => () => {
-    boq.clearError();
-    if (value.id === trigger.currentId) {
-      boq.clearData();
-    } else {
-      boq.setData({ id: value.id, unit: value.unit });
-    }
-    setTrigger((state) => {
-      state.currentId = state.currentId === value.id ? 0 : value.id;
-      return state;
-    });
-  };
-
-  const onBoqUpdate = (value) => () => {
-    onOpen();
-    mutation.setData(value);
-  };
+  const onBoqUpdate = useCallback(
+    (value) => () => {
+      setTrigger((state) => ({ ...state, form: !state.form }));
+      mutation.clearData();
+      mutation.clearError();
+      mutation.setData(value);
+    },
+    [mutation.data]
+  );
 
   const onDelete = (id) => () => {
     alert.set({
@@ -567,6 +472,7 @@ const Boq = () => {
               variant="contained"
               startIcon={<ImportExport />}
               onClick={onImport}
+              disabled={table.loading}
             >
               Import BOQ
             </Button>
@@ -576,6 +482,7 @@ const Boq = () => {
               variant="outlined"
               startIcon={<Add />}
               onClick={onOpen}
+              disabled={table.loading}
             >
               Tambah BOQ
             </Button>
@@ -599,24 +506,8 @@ const Boq = () => {
         spacing={1}
         mb={2}
         alignItems="center"
-        justifyContent="space-between"
+        justifyContent="flex-start"
       >
-        <TextField
-          placeholder="Cari"
-          value={table.query("name", "")}
-          onChange={(e) => table.setQuery({ name: e.target.value })}
-          InputProps={{ startAdornment: <Search color="disabled" /> }}
-          sx={{
-            width: {
-              xs: "100%",
-              sm: "100%",
-              md: "100%",
-              lg: "30%",
-              xl: "30%",
-            },
-          }}
-        />
-
         <ButtonGroup>
           <Button
             variant={isSwitch ? "contained" : "outlined"}
@@ -631,31 +522,77 @@ const Boq = () => {
             Riwayat
           </Button>
         </ButtonGroup>
+
+        <TextField
+          placeholder="Cari"
+          value={table.query("name", "")}
+          onChange={(e) => table.setQuery({ name: e.target.value })}
+          InputProps={{ endAdornment: <Search color="disabled" /> }}
+          sx={{
+            width: {
+              xs: "100%",
+              sm: "100%",
+              md: "100%",
+              lg: "30%",
+              xl: "30%",
+            },
+          }}
+        />
+
+        <Box>
+          <Typography variant="body2">{table.pagination.text}</Typography>
+        </Box>
       </Stack>
 
       <Paper variant="outlined">
         {isSwitch ? (
           <DataTable
-            tableProps={{ size: "small" }}
+            container={{ sx: { height: "500px" } }}
+            tableProps={{
+              size: "small",
+              stickyHeader: true,
+              sx: {
+                "& th": {
+                  backgroundColor: "#f4f4f4",
+                },
+                "& > thead > tr > th:nth-of-type(1), & > thead > tr > th:nth-of-type(2)":
+                  {
+                    position: "sticky",
+                    left: 0,
+                    zIndex: 3,
+                  },
+
+                "& > tbody > tr > td:nth-of-type(1), & > tbody > tr > td:nth-of-type(2)":
+                  {
+                    backgroundColor: "white",
+                    position: "sticky",
+                    left: 0,
+                    zIndex: 1,
+                  },
+                "& > thead > tr > th:nth-of-type(2), & > tbody > tr > td:nth-of-type(2)":
+                  {
+                    left: 46,
+                    borderRight: 1,
+                    borderColor: "divider",
+                    boxShadow: "inset -2px 0 1px -2px rgba(0,0,0,0.50)",
+                  },
+              },
+            }}
             data={table.data}
             loading={table.loading}
             column={columns(
               onDelete,
-              onUpdate,
               onHistory,
               onBoqUpdate,
-              progres,
-              boq,
-              trigger.currentId,
-              apiRoute.project.boqValue,
               trigger.postLoading,
-              enqueueSnackbar,
-              () => navigate(`/project/${id}/progres`)
+              () => navigate(`/project/${id}/progres`),
+              table.pagination.from
             )}
             selected={(v) => v.id === +progres.getQuery("pboid")}
             order={table.order}
             orderBy={table.orderBy}
             onOrder={table.onOrder}
+            pagination={utils.pagination(table.pagination)}
           />
         ) : (
           <>
@@ -707,7 +644,7 @@ const Boq = () => {
         )}
       </Paper>
 
-      <FORM.BOQCreateV2
+      <BOQCreate
         trigger={trigger}
         mutation={mutation}
         onOpen={onOpen}

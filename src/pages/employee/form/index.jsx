@@ -3,8 +3,9 @@ import { Stack, TextField, Button, CircularProgress } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
+import PhoneFormat from "@components/base/mask/PhoneFormat";
 
-export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
+export const Create = ({ open, mutation, onOpen, onSubmit, validate }) => {
   return (
     <BASE.DialogForm
       open={open}
@@ -72,7 +73,7 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
               label={"No. ID Karyawan"}
               value={mutation.data.cardID || ""}
               onChange={(e) => mutation.setData({ cardID: e.target.value })}
-              onBlur={async () => mutation.validate("cardID")}
+              onBlur={validate(mutation.data.id, "cardID")}
               error={mutation.error("cardID")}
               helperText={mutation.message("cardID")}
               InputProps={{
@@ -84,23 +85,24 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
 
             <TextField
               id="empPN"
-              type="number"
               disabled={mutation.loading}
               label={"No HP"}
               value={mutation.data.phoneNumber || ""}
               onChange={(e) =>
                 mutation.setData({ phoneNumber: e.target.value })
               }
-              onBlur={async () => mutation.validate("phoneNumber")}
+              onBlur={validate(mutation.data.id, "phoneNumber")}
               error={mutation.error("phoneNumber")}
               helperText={mutation.message("phoneNumber")}
               InputProps={{
+                inputProps: {
+                  maxLength: 12,
+                  minLength: 10,
+                },
                 endAdornment: mutation.loading ? (
                   <CircularProgress size={20} />
                 ) : null,
-              }}
-              inputProps={{
-                maxLength: 12,
+                inputComponent: PhoneFormat,
               }}
             />
 

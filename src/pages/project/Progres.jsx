@@ -21,6 +21,7 @@ import {
   Button,
   TextField,
   Skeleton,
+  TablePagination,
 } from "@mui/material";
 import moment from "moment";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
@@ -45,16 +46,18 @@ export default () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [currentProgres, setCurrentProgres] = React.useState({});
   const [boq, setBoq] = React.useState({});
-  const [keyword, setKeyword] = React.useState("");
   const [trigger, setTrigger] = React.useState({
     open: false,
     loading: false,
     tooltip: undefined,
   });
 
-  const progres = FRHooks.useFetch([apiRoute.progres.all, { id }], {
+  const progres = FRHooks.useTable([apiRoute.progres.all, { id }], {
     selector: (resp) => resp.data,
-    defaultValue: [],
+    total: (resp) => resp.total,
+    pagination:{
+      perPage: 100
+    }
   });
 
   const handleClick = (value) => (event) => {
@@ -159,8 +162,8 @@ export default () => {
   };
 
   const days = utils.getDaysInMonthUTC(
-    progres.getQuery("month", moment().format("M")),
-    progres.getQuery("year", moment().format("Y"))
+    progres.query("month", moment().format("M")),
+    progres.query("year", moment().format("Y"))
   );
 
   return (
@@ -168,70 +171,17 @@ export default () => {
       title="Progres"
       subtitle={`Daftar semua data progres`}
       headRight={{
-        sx: {
-          width: {
-            xs: "100%",
-            sm: "100%",
-            md: "100%",
-            lg: "50%",
-            xl: "50%",
-          },
-        },
         children: (
-          <Stack
-            spacing={2}
-            direction="row"
-            mb={2}
-            justifyContent="flex-start"
-            alignItems="center"
-            overflow={{
-              xs: "scroll",
-              sm: "scroll",
-              md: "scroll",
-              lg: "unset",
-              xl: "unset",
+          <Button
+            variant="outlined"
+            startIcon={<Refresh />}
+            onClick={() => {
+              progres.clear();
             }}
+            sx={{ whiteSpace: "nowrap" }}
           >
-            <BASE.Select
-              value={progres.getQuery("month", +moment().month() + 1)}
-              name="month"
-              menu={[
-                { text: "Januari", value: 1 },
-                { text: "Februari", value: 2 },
-                { text: "Maret", value: 3 },
-                { text: "April", value: 4 },
-                { text: "Mei", value: 5 },
-                { text: "Juni", value: 6 },
-                { text: "Juli", value: 7 },
-                { text: "Agustus", value: 8 },
-                { text: "September", value: 9 },
-                { text: "Oktober", value: 10 },
-                { text: "November", value: 11 },
-                { text: "Desember", value: 12 },
-              ]}
-              setValue={progres.setQuery}
-            />
-            <BASE.Select
-              value={progres.getQuery("year", +moment().year())}
-              name="year"
-              menu={[
-                { text: "2022", value: 2022 },
-                { text: "2023", value: 2023 },
-              ]}
-              setValue={progres.setQuery}
-            />
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<Refresh />}
-              onClick={() => {
-                progres.clear();
-              }}
-              sx={{ whiteSpace: "nowrap" }}
-            >
-              Muat Ulang
-            </Button>
-          </Stack>
+            Muat Ulang
+          </Button>
         ),
       }}
     >
@@ -272,21 +222,103 @@ export default () => {
         <Square sx={{ color: "gainsboro" }} />
         <div>Plan SPV</div>
 
-        <Square sx={{ color: "white" }} />
+        <Square sx={{ color: "white", border: 1, borderColor: "black" }} />
         <div>Actual Plan</div>
       </Stack>
 
-      <TextField
-        placeholder="Cari disini"
-        InputProps={{ startAdornment: <Search /> }}
-        sx={{ my: 2, maxWidth: "50%" }}
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-      />
+      <Stack
+        spacing={2}
+        direction="row"
+        mb={2}
+        justifyContent="flex-start"
+        alignItems="center"
+        overflow={{
+          xs: "scroll",
+          sm: "scroll",
+          md: "scroll",
+          lg: "unset",
+          xl: "unset",
+        }}
+      >
+        <Box minWidth={"25%"}>
+          <TextField
+            fullWidth
+            placeholder="Cari disini"
+            InputProps={{ startAdornment: <Search color="disabled" /> }}
+            value={progres.query("name", "")}
+            onChange={(e) => progres.setQuery({ name: e.target.value })}
+          />
+        </Box>
+
+        <Box minWidth={"15%"}>
+          <BASE.Select
+            value={progres.query("month", +moment().month() + 1)}
+            name="month"
+            menu={[
+              { text: "Januari", value: 1 },
+              { text: "Februari", value: 2 },
+              { text: "Maret", value: 3 },
+              { text: "April", value: 4 },
+              { text: "Mei", value: 5 },
+              { text: "Juni", value: 6 },
+              { text: "Juli", value: 7 },
+              { text: "Agustus", value: 8 },
+              { text: "September", value: 9 },
+              { text: "Oktober", value: 10 },
+              { text: "November", value: 11 },
+              { text: "Desember", value: 12 },
+            ]}
+            setValue={progres.setQuery}
+          />
+        </Box>
+
+        <Box>
+          <BASE.Select
+            value={progres.query("year", +moment().year())}
+            name="year"
+            menu={utils.listYear().map((v) => ({ text: v, value: v }))}
+            setValue={progres.setQuery}
+          />
+        </Box>
+
+        <Box flexGrow={1}>
+          <TablePagination
+            component={"div"}
+            {...utils.pagination(progres.pagination)}
+          />
+        </Box>
+      </Stack>
 
       <Paper elevation={0} variant="outlined">
         <TableContainer sx={{ maxHeight: 640 }}>
-          <Table size="small" stickyHeader>
+          <Table
+            size="small"
+            stickyHeader
+            sx={{
+              "& thead th": {
+                backgroundColor: "#f4f4f4",
+              },
+              "& thead > tr > th:first-of-type": {
+                position: "sticky",
+                left: 0,
+                zIndex: 3,
+                boxShadow: "inset -2px 0 1px -2px rgba(0,0,0,0.50)",
+              },
+              "& tbody > tr td:first-of-type[rowspan]": {
+                position: "sticky",
+                left: 0,
+                zIndex: 2,
+                boxShadow: "inset -2px 0 1px -2px rgba(0,0,0,0.50)",
+              },
+              "& tbody > tr > td:first-of-type[rowspan]": {
+                backgroundColor: "white",
+              },
+              "& th:last-of-type, & td:last-of-type": {
+                borderRight: 0,
+              },
+              marginBottom: 1,
+            }}
+          >
             <TableHead>
               <TableRow>
                 <TableCell component="th">Nama</TableCell>
@@ -297,7 +329,6 @@ export default () => {
                     align="center"
                     sx={{
                       borderRight: 1,
-                      borderLeft: 1,
                       borderColor: "divider",
                     }}
                   >
@@ -323,185 +354,176 @@ export default () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                progres.data
-                  .filter((v) => {
-                    return !!keyword
-                      ? v.name.toLowerCase().includes(keyword.toLowerCase())
-                      : true;
-                  })
-                  .map((value, i) => {
-                    return (
-                      <React.Fragment key={i}>
-                        <TableRow>
-                          <TableCell rowSpan={2} sx={{ whiteSpace: "nowrap" }}>
-                            <ListItemText
-                              primary={value.name}
-                              secondary={`Tipe: ${
-                                value.type || "-"
-                              } | Satuan: ${value.typeUnit || "-"}`}
-                              sx={{ m: 0 }}
-                            />
-                          </TableCell>
+                progres.data.map((value, i) => {
+                  return (
+                    <React.Fragment key={i}>
+                      <TableRow>
+                        <TableCell rowSpan={2} sx={{ whiteSpace: "nowrap" }}>
+                          <ListItemText
+                            primary={value.name}
+                            secondary={`Tipe: ${value.type || "-"} | Satuan: ${
+                              value.typeUnit || "-"
+                            }`}
+                            sx={{ m: 0 }}
+                          />
+                        </TableCell>
 
-                          {utils
-                            .getDaysInMonthUTC(
-                              progres.getQuery("month", moment().format("M")),
-                              progres.getQuery("year", moment().format("Y"))
-                            )
-                            .map((d) => {
-                              const tmp = currentPlanId;
-                              const find = value.plans.find(
-                                (_v) => _v.day === +moment(d).format("D")
-                              );
-
-                              if (find) {
-                                currentPlanId =
-                                  currentPlanId === find.id
-                                    ? currentPlanId
-                                    : find.id;
-                                colSpan = value.plans.filter(
-                                  (f) => f.id === find.id
-                                ).length;
-                              } else {
-                                currentPlanId = 0;
-                                colSpan = 0;
-                              }
-
-                              return find ? (
-                                find.id === tmp ? null : (
-                                  <TableCell
-                                    key={d}
-                                    colSpan={colSpan}
-                                    sx={{
-                                      borderRight: 1,
-                                      borderLeft: 1,
-                                      borderColor: "divider",
-                                      backgroundColor: "whitesmoke",
-                                      fontWeight: 700,
-                                    }}
-                                    padding="none"
-                                  >
-                                    <Tooltip
-                                      arrow
-                                      title={
-                                        <ListItemText
-                                          primary={`${moment(
-                                            find.startDate
-                                          ).format("DD/MM/yyyy")} - ${moment(
-                                            find.endDate
-                                          ).format("DD/MM/yyyy")}`}
-                                          secondary={`Dibuat Oleh: ${
-                                            find.planBy || "-"
-                                          }`}
-                                          primaryTypographyProps={{
-                                            variant: "body2",
-                                          }}
-                                          secondaryTypographyProps={{
-                                            variant: "body2",
-                                            color: "white",
-                                          }}
-                                        />
-                                      }
-                                    >
-                                      {find ? (
-                                        <div
-                                          style={{
-                                            flexGrow: 1,
-                                            backgroundColor: "gainsboro",
-                                            textAlign: "right",
-                                            padding: "4px",
-                                          }}
-                                        >
-                                          {colSpan === 1 ? "" : "Plan "}
-                                          {find.progress}
-                                        </div>
-                                      ) : null}
-                                    </Tooltip>
-                                  </TableCell>
-                                )
-                              ) : (
-                                <TableCell
-                                  key={d}
-                                  sx={{
-                                    borderRight: 1,
-                                    borderLeft: 1,
-                                    borderColor: "divider",
-                                    backgroundColor: "whitesmoke",
-                                  }}
-                                >
-                                  &nbsp;
-                                </TableCell>
-                              );
-                            })}
-                        </TableRow>
-
-                        <TableRow key={i}>
-                          {days.map((d) => {
-                            const find = value.data.find(
+                        {utils
+                          .getDaysInMonthUTC(
+                            progres.query("month", moment().format("M")),
+                            progres.query("year", moment().format("Y"))
+                          )
+                          .map((d) => {
+                            const tmp = currentPlanId;
+                            const find = value.plans.find(
                               (_v) => _v.day === +moment(d).format("D")
                             );
-                            return (
+
+                            if (find) {
+                              currentPlanId =
+                                currentPlanId === find.id
+                                  ? currentPlanId
+                                  : find.id;
+                              colSpan = value.plans.filter(
+                                (f) => f.id === find.id
+                              ).length;
+                            } else {
+                              currentPlanId = 0;
+                              colSpan = 0;
+                            }
+
+                            return find ? (
+                              find.id === tmp ? null : (
+                                <TableCell
+                                  key={d}
+                                  colSpan={colSpan}
+                                  sx={{
+                                    borderRight: 1,
+                                    borderColor: "divider",
+                                    backgroundColor: "whitesmoke",
+                                    fontWeight: 700,
+                                  }}
+                                  padding="none"
+                                >
+                                  <Tooltip
+                                    arrow
+                                    title={
+                                      <ListItemText
+                                        primary={`${moment(
+                                          find.startDate
+                                        ).format("DD/MM/yyyy")} - ${moment(
+                                          find.endDate
+                                        ).format("DD/MM/yyyy")}`}
+                                        secondary={`Dibuat Oleh: ${
+                                          find.planBy || "-"
+                                        }`}
+                                        primaryTypographyProps={{
+                                          variant: "body2",
+                                        }}
+                                        secondaryTypographyProps={{
+                                          variant: "body2",
+                                          color: "white",
+                                        }}
+                                      />
+                                    }
+                                  >
+                                    {find ? (
+                                      <div
+                                        style={{
+                                          flexGrow: 1,
+                                          backgroundColor: "gainsboro",
+                                          textAlign: "right",
+                                          padding: "4px",
+                                        }}
+                                      >
+                                        {colSpan === 1 ? "" : "Plan "}
+                                        {find.progress}
+                                      </div>
+                                    ) : null}
+                                  </Tooltip>
+                                </TableCell>
+                              )
+                            ) : (
                               <TableCell
                                 key={d}
                                 sx={{
                                   borderRight: 1,
-                                  borderLeft: 1,
                                   borderColor: "divider",
+                                  backgroundColor: "whitesmoke",
                                 }}
-                                padding="none"
-                                align="center"
                               >
-                                {find ? (
-                                  <Box
-                                    sx={{
-                                      backgroundColor: find.aproveName
-                                        ? "inherit"
-                                        : "warning.main",
-                                    }}
-                                  >
-                                    <Tooltip
-                                      placement="top-end"
-                                      open={trigger.tooltip}
-                                      arrow
-                                      title={
-                                        <ListItemText
-                                          primary={`Ditambahkan Oleh: ${
-                                            find.submitedName || "-"
-                                          }`}
-                                          primaryTypographyProps={{
-                                            variant: "body2",
-                                          }}
-                                          secondary={`Disetujui Oleh: ${
-                                            find.approveName || "-"
-                                          }`}
-                                          secondaryTypographyProps={{
-                                            variant: "body2",
-                                            color: "white",
-                                          }}
-                                        />
-                                      }
-                                    >
-                                      <IconButton
-                                        aria-describedby={`row-${i}-col-${moment(
-                                          d
-                                        ).format("D")}`}
-                                        size="small"
-                                        onClick={handleClick(find)}
-                                      >
-                                        {find.progres}
-                                      </IconButton>
-                                    </Tooltip>
-                                  </Box>
-                                ) : (
-                                  <>&nbsp;</>
-                                )}
+                                &nbsp;
                               </TableCell>
                             );
                           })}
-                        </TableRow>
-                      </React.Fragment>
-                    );
-                  })
+                      </TableRow>
+
+                      <TableRow key={i}>
+                        {days.map((d) => {
+                          const find = value.data.find(
+                            (_v) => _v.day === +moment(d).format("D")
+                          );
+                          return (
+                            <TableCell
+                              key={d}
+                              sx={{
+                                borderRight: 1,
+                                borderColor: "divider",
+                              }}
+                              padding="none"
+                              align="center"
+                            >
+                              {find ? (
+                                <Box
+                                  sx={{
+                                    backgroundColor: find.aproveName
+                                      ? "inherit"
+                                      : "warning.main",
+                                  }}
+                                >
+                                  <Tooltip
+                                    placement="top-end"
+                                    open={trigger.tooltip}
+                                    arrow
+                                    title={
+                                      <ListItemText
+                                        primary={`Ditambahkan Oleh: ${
+                                          find.submitedName || "-"
+                                        }`}
+                                        primaryTypographyProps={{
+                                          variant: "body2",
+                                        }}
+                                        secondary={`Disetujui Oleh: ${
+                                          find.approveName || "-"
+                                        }`}
+                                        secondaryTypographyProps={{
+                                          variant: "body2",
+                                          color: "white",
+                                        }}
+                                      />
+                                    }
+                                  >
+                                    <IconButton
+                                      aria-describedby={`row-${i}-col-${moment(
+                                        d
+                                      ).format("D")}`}
+                                      size="small"
+                                      onClick={handleClick(find)}
+                                    >
+                                      {find.progres}
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
+                              ) : (
+                                <>&nbsp;</>
+                              )}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    </React.Fragment>
+                  );
+                })
               )}
             </TableBody>
           </Table>
