@@ -2,9 +2,8 @@ import _ from "lodash";
 import { Stack, TextField, Button, CircularProgress } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
-import * as utils from "@utils/";
 
-export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
+const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
   return (
     <BASE.DialogForm
       open={open}
@@ -53,7 +52,6 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
                   },
                 }}
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-              
                 value={mutation.data.latitude || ""}
                 onChange={(e) => mutation.setData({ latitude: e.target.value })}
                 InputLabelProps={{ shrink: true }}
@@ -73,7 +71,6 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
                   },
                 }}
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-              
                 value={mutation.data.longitude || ""}
                 onChange={(e) =>
                   mutation.setData({ longitude: e.target.value })
@@ -118,3 +115,5 @@ export const Create = ({ open, t, mutation, onOpen, onSubmit }) => {
     />
   );
 };
+
+export default Create;

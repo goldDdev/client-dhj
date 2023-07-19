@@ -3,19 +3,18 @@ import FRHooks from "frhooks";
 import SettingTemplate from "@components/templates/SettingTemplate";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import * as utils from "@utils/";
-import * as Filter from "./filter";
-import * as FORM from "./form";
+import Create from "./form/Create";
 import * as Dummy from "@constants/dummy";
 import DataTable from "@components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
-import { MoreVert, Refresh } from "@mui/icons-material";
+import { MoreVert, Refresh, Search } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
-import { ButtonGroup, Paper } from "@mui/material";
+import { ButtonGroup, Paper, Stack, TextField } from "@mui/material";
 import { Button, BasicDropdown } from "@components/base";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
 
-const columns = (table, utils, onUpdate, onDelete) => [
+const columns = (table, onUpdate, onDelete) => [
   {
     label: "No",
     value: (_, idx) => {
@@ -43,7 +42,7 @@ const columns = (table, utils, onUpdate, onDelete) => [
     value: (value) => value.latitude,
     align: "right",
     head: {
-      align: "center",
+      align: "right",
     },
     sx: {
       whiteSpace: "nowrap",
@@ -55,7 +54,7 @@ const columns = (table, utils, onUpdate, onDelete) => [
     value: (value) => value.longitude,
     align: "right",
     head: {
-      align: "center",
+      align: "right",
     },
     sx: {
       whiteSpace: "nowrap",
@@ -146,7 +145,7 @@ export default () => {
             },
             onSuccess: () => {
               enqueueSnackbar("Center Lokasi berhasil dihapus dari daftar");
-              table.reload()
+              table.reload();
               alert.reset();
             },
             onAlways: () => {
@@ -202,18 +201,55 @@ export default () => {
         ),
       }}
     >
-      <Filter.TableFilter table={table} />
+      <Stack mb={2} direction="column" spacing={1}>
+        <Stack
+          direction={{
+            xs: "column",
+            sm: "column",
+            md: "column",
+            lg: "row",
+            xl: "row",
+          }}
+          alignItems={{
+            xs: "flex-start",
+            sm: "flex-start",
+            md: "flex-start",
+            lg: "center",
+            xl: "center",
+          }}
+          spacing={1}
+        >
+          <TextField
+            fullWidth
+            value={table.query("name", "")}
+            placeholder="Cari lokasi"
+            onChange={(e) => table.setQuery({ name: e.target.value })}
+            InputProps={{
+              endAdornment: <Search color="disabled" />,
+            }}
+            sx={{ width: "50%" }}
+          />
+        </Stack>
+      </Stack>
 
       <Paper elevation={0} variant="outlined">
         <DataTable
+          tableProps={{
+            size: "small",
+            sx: {
+              "& thead th": {
+                backgroundColor: "#f4f4f4",
+              },
+            },
+          }}
           data={table.data}
           loading={table.loading}
-          column={columns(table, utils, onUpdate, onDelete)}
+          column={columns(table, onUpdate, onDelete)}
           pagination={utils.pagination(table.pagination)}
         />
       </Paper>
 
-      <FORM.Create
+      <Create
         open={trigger.form}
         mutation={mutation}
         onSubmit={onSubmit}

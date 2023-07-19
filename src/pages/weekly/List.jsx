@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Collapse,
   IconButton,
   ListItemText,
   Paper,
@@ -15,6 +16,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import moment from "moment";
@@ -23,12 +25,21 @@ import * as utils from "@utils/";
 import * as FORM from "./form";
 import * as Dummy from "../../constants/dummy";
 import * as BASE from "@components/base";
-import { Add, Edit, Refresh } from "@mui/icons-material";
+import {
+  Add,
+  Edit,
+  FilterAlt,
+  FilterAltOff,
+  Refresh,
+  Search,
+} from "@mui/icons-material";
 import apiRoute from "@services/apiRoute";
 import { useAlert } from "@contexts/AlertContext";
+import { useTheme } from "@emotion/react";
 
 export default () => {
   const alert = useAlert();
+  const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const days = {
     1: [1, 2, 3, 4, 5, 6, 7],
@@ -39,9 +50,11 @@ export default () => {
   };
   const [filter, setFilter] = React.useState({
     week: 1,
+    name: "",
   });
   const [trigger, setTrigger] = React.useState({
     form: false,
+    filter: false,
   });
 
   const validation = FRHooks.useServerValidation({
@@ -179,14 +192,41 @@ export default () => {
     });
   };
 
+  const onFilter = () => {
+    setTrigger((state) => ({ ...state, filter: !state.filter }));
+  };
+
   return (
     <MainTemplate
       title="Weekly Plan"
-      subtitle={`Daftar semua rencana mingguan karyawan (QC Team, Material Team, Equipment Team)`}
+      subtitle={`Rencana mingguan karyawan (QC Team, Material Team, Equipment Team)`}
       headRight={{
         children: (
-          <ButtonGroup>
+          <ButtonGroup
+            sx={{
+              "& button": {
+                whiteSpace: "nowrap",
+              },
+            }}
+          >
             <Button
+              disabled={table.loading}
+              variant="outlined"
+              onClick={onFilter}
+              startIcon={trigger.filter ? <FilterAltOff /> : <FilterAlt />}
+            >
+              Filter
+            </Button>
+            <Button
+              disabled={table.loading}
+              variant="outlined"
+              onClick={table.refresh}
+              startIcon={<Refresh />}
+            >
+              Muat Ulang
+            </Button>
+            <Button
+              disabled={table.loading}
               variant="contained"
               disableElevation
               startIcon={<Add />}
@@ -194,89 +234,156 @@ export default () => {
             >
               Tambah Plan
             </Button>
-            <Button
-              variant="outlined"
-              onClick={table.refresh}
-              startIcon={<Refresh />}
-            >
-              Muat Ulang
-            </Button>
           </ButtonGroup>
         ),
       }}
     >
-      <Stack
-        direction={{
-          xs: "column",
-          sm: "column",
-          md: "column",
-          lg: "row",
-          xl: "row",
-        }}
-        alignItems={{
-          xs: "flex-start",
-          sm: "flex-start",
-          md: "flex-start",
-          lg: "center",
-          xl: "center",
-        }}
-        spacing={1}
-        sx={{ mb: 2 }}
-      >
-        <BASE.Select
-          label="Minggu"
-          value={filter.week}
-          menu={[
-            { text: "Minggu ke-1", value: 1 },
-            { text: "Minggu ke-2", value: 2 },
-            { text: "Minggu ke-3", value: 3 },
-            { text: "Minggu ke-4", value: 4 },
-            { text: "Tanggal Lainya", value: 0 },
-          ]}
-          onChange={(e) => {
-            setFilter((state) => ({ ...state, week: +e.target.value }));
+      <Collapse in={trigger.filter} unmountOnExit>
+        <Stack
+          direction={{
+            xs: "column",
+            sm: "column",
+            md: "column",
+            lg: "row",
+            xl: "row",
           }}
-        />
-        <BASE.Select
-          label="Bulan"
-          value={table.getQuery("month", moment().month() + 1)}
-          menu={[
-            { text: "Januari", value: 1 },
-            { text: "Februari", value: 2 },
-            { text: "Maret", value: 3 },
-            { text: "April", value: 4 },
-            { text: "Mei", value: 5 },
-            { text: "Juni", value: 6 },
-            { text: "Juli", value: 7 },
-            { text: "Agustus", value: 8 },
-            { text: "September", value: 9 },
-            { text: "Oktober", value: 10 },
-            { text: "November", value: 11 },
-            { text: "Desember", value: 12 },
-          ]}
-          onChange={(e) => {
-            table.setQuery({ month: +e.target.value });
+          alignItems={{
+            xs: "flex-start",
+            sm: "flex-start",
+            md: "flex-start",
+            lg: "center",
+            xl: "center",
           }}
-        />
-        <BASE.Select
-          label="Tahun"
-          value={table.getQuery("year", moment().year())}
-          menu={utils.listYear().map((v) => ({ text: v, value: v }))}
-          onChange={(e) => {
-            table.setQuery({ year: +e.target.value });
+          justifyContent={{
+            xs: "flex-start",
+            sm: "flex-start",
+            md: "flex-start",
+            lg: "space-between",
+            xl: "space-between",
           }}
-        />
-      </Stack>
+          spacing={1}
+          sx={{ mb: 2 }}
+        >
+          <ButtonGroup>
+            {[
+              { text: "Minggu ke-1", value: 1 },
+              { text: "Minggu ke-2", value: 2 },
+              { text: "Minggu ke-3", value: 3 },
+              { text: "Minggu ke-4", value: 4 },
+              { text: "Lainya", value: 0 },
+            ].map((v) => (
+              <Button
+                key={v.value + 1}
+                color="primary"
+                variant={filter.week === v.value ? "contained" : "outlined"}
+                onClick={() => {
+                  setFilter((state) => ({
+                    ...state,
+                    week: v.value,
+                  }));
+                }}
+              >
+                {v.text}
+              </Button>
+            ))}
+          </ButtonGroup>
+
+          <Stack
+            direction={"row"}
+            flexGrow={1}
+            justifyContent={"flex-end"}
+            spacing={1}
+          >
+            <Box sx={{ minWidth: "25%" }}>
+              <TextField
+                placeholder="Cari nama disini"
+                InputProps={{ endAdornment: <Search color="disabled" /> }}
+                value={filter.name || ""}
+                onChange={(e) => {
+                  setFilter((st) => ({ ...st, name: e.target.value }));
+                }}
+              />
+            </Box>
+
+            <Box sx={{ minWidth: "20%" }}>
+              <BASE.Select
+                label="Bulan"
+                fullWidth={true}
+                value={table.getQuery("month", moment().month() + 1)}
+                menu={[
+                  { text: "Januari", value: 1 },
+                  { text: "Februari", value: 2 },
+                  { text: "Maret", value: 3 },
+                  { text: "April", value: 4 },
+                  { text: "Mei", value: 5 },
+                  { text: "Juni", value: 6 },
+                  { text: "Juli", value: 7 },
+                  { text: "Agustus", value: 8 },
+                  { text: "September", value: 9 },
+                  { text: "Oktober", value: 10 },
+                  { text: "November", value: 11 },
+                  { text: "Desember", value: 12 },
+                ]}
+                onChange={(e) => {
+                  table.setQuery({ month: +e.target.value });
+                }}
+              />
+            </Box>
+            <Box sx={{ minWidth: "15%" }}>
+              <BASE.Select
+                label="Tahun"
+                value={table.getQuery("year", moment().year())}
+                menu={utils.listYear().map((v) => ({ text: v, value: v }))}
+                onChange={(e) => {
+                  table.setQuery({ year: +e.target.value });
+                }}
+              />
+            </Box>
+          </Stack>
+        </Stack>
+      </Collapse>
 
       <Paper elevation={0} variant="outlined">
         <TableContainer>
-          <Table>
+          <Table
+            sx={{
+              "& thead th": {
+                backgroundColor: "#f4f4f4",
+                borderRight: 1,
+                borderColor: "divider",
+              },
+              // "& thead > tr > th:first-of-type[rowspan], & tbody > tr > td:first-of-type[rowspan]":
+              //   {
+              //     position: "-webkit-sticky",
+              //     position: "sticky",
+              //     left: 0,
+              //     zIndex: 1,
+              //     top: "auto",
+              //     boxShadow: "inset -2px 0 1px -2px rgba(0,0,0,0.50)",
+              //   },
+              // "& tbody > tr > td:first-of-type[rowspan]": {
+              //   backgroundColor: "white",
+              // },
+              marginBottom: 1,
+            }}
+          >
             <TableHead>
               <TableRow>
-                <TableCell component="th">Nama</TableCell>
+                <TableCell size="small" rowSpan={1} component="th">
+                  Nama
+                </TableCell>
+
                 {days[filter.week].map((v, i) => (
-                  <TableCell key={i} align="center">
-                    {v > 0 ? v : "-"}
+                  <TableCell size="small" key={i} align="center" component="th">
+                    {v > 0 ? String(v).padStart(2, "0") : "-"}
+                    {v > 0 ? "/" : "-"}
+                    {v > 0 ? (
+                      <sub>
+                        {String(
+                          table.getQuery("month", moment().month() + 1)
+                        ).padStart(2, "0")}
+                      </sub>
+                    ) : null}
                   </TableCell>
                 ))}
               </TableRow>
@@ -290,7 +397,7 @@ export default () => {
                 )
               ).length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} align="center">
+                  <TableCell colSpan={10} align="left" sx={{ borderBottom: 0 }}>
                     Plan Belum Tersedia
                   </TableCell>
                 </TableRow>
@@ -325,6 +432,11 @@ export default () => {
                 </TableRow>
               ) : (
                 table.data
+                  .filter((v) =>
+                    v.name
+                      .toLocaleLowerCase()
+                      .includes(filter.name.toLocaleLowerCase())
+                  )
                   .filter((fl) =>
                     fl.projects.filter((_fl) =>
                       _fl.plans.some((d) => days[filter.week].includes(d.day))
@@ -364,15 +476,33 @@ export default () => {
                               size="small"
                               rowSpan={value.projects.length}
                               sx={{
+                                p: 0.8,
                                 borderRight: 1,
                                 borderColor: "divider",
                                 whiteSpace: "nowrap",
                               }}
                             >
                               <ListItemText
-                                sx={{ p: 0, m: 0 }}
+                                sx={{
+                                  p: 0,
+                                  m: 0,
+                                }}
                                 primary={value.name || "-"}
                                 secondary={utils.typesLabel(value.role)}
+                                primaryTypographyProps={{
+                                  variant: "body2",
+                                  align: "left",
+                                  sx: {
+                                    whiteSpace: "nowrap",
+                                  },
+                                }}
+                                secondaryTypographyProps={{
+                                  variant: "body2",
+                                  align: "left",
+                                  sx: {
+                                    whiteSpace: "nowrap",
+                                  },
+                                }}
                               />
                             </TableCell>
                           </>
@@ -408,47 +538,71 @@ export default () => {
                               align="center"
                               size="small"
                               sx={{
-                                borderRight: _i === 6 ? 0 : 1,
-
+                                p: 0,
+                                borderRight: 1,
                                 borderColor: "divider",
                                 whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                maxWidth: 0,
+                                position: "relative",
+                                "&:hover > div": {
+                                  border: 1,
+                                  borderColor: "primary.main",
+                                  zIndex: 3,
+                                  top: 0,
+                                  left: 0,
+                                  backgroundColor: "white",
+                                  boxShadow: theme.shadows[10],
+                                  position: "relative",
+                                  backgroundColor: "white",
+                                  width: "fit-content",
+                                },
+                                "&:hover": {
+                                  overflow: "unset",
+                                },
                               }}
                             >
                               {_v.day === 0 ? (
                                 "-"
                               ) : (
-                                <Stack direction="row" alignItems="center">
-                                  <div>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => {
-                                        const find = value.data.find(
-                                          (fn) => fn.id === _v.id
-                                        );
-                                        if (find) {
-                                          onUpdate(find);
-                                        }
-                                      }}
-                                    >
-                                      <Edit fontSize="inherit" />
-                                    </IconButton>
-                                  </div>
-                                  <ListItemText
-                                    sx={{ p: 0, m: 0 }}
-                                    primary={_v.projectName || "-"}
-                                    primaryTypographyProps={{
-                                      variant: "body2",
-                                    }}
-                                    secondary={`${moment(_v.startDate).format(
-                                      "DD-MM-yyyy"
-                                    )} - ${moment(_v.endDate).format(
-                                      "DD-MM-yyyy"
-                                    )}`}
-                                    secondaryTypographyProps={{
-                                      variant: "body2",
-                                    }}
-                                  />
-                                </Stack>
+                                <ListItemText
+                                  sx={{
+                                    m: 0,
+                                    py: 0.5,
+                                    px: 0.8,
+                                    cursor: "pointer",
+                                    "&:hover > p:first-of-type": {
+                                      color: "primary.main",
+                                    },
+                                    top: 0,
+                                  }}
+                                  onClick={() => {
+                                    const find = value.data.find(
+                                      (fn) => fn.id === _v.id
+                                    );
+                                    if (find) {
+                                      onUpdate(find);
+                                    }
+                                  }}
+                                  primary={_v.projectName || "-"}
+                                  primaryTypographyProps={{
+                                    variant: "body2",
+                                    align: "left",
+                                    textOverflow: "ellipsis",
+                                    overflow: "hidden",
+                                  }}
+                                  secondary={`${moment(_v.startDate).format(
+                                    "DD/MM/yyyy"
+                                  )} - ${moment(_v.endDate).format(
+                                    "DD/MM/yyyy"
+                                  )}`}
+                                  secondaryTypographyProps={{
+                                    variant: "body2",
+                                    align: "left",
+                                    textOverflow: "ellipsis",
+                                    overflow: "hidden",
+                                  }}
+                                />
                               )}
                             </TableCell>
                           ))}

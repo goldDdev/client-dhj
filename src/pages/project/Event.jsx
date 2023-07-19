@@ -6,12 +6,13 @@ import {
   Typography,
   TextField,
   ButtonGroup,
+  Paper,
+  Tooltip,
 } from "@mui/material";
 import { BasicDropdown, IconButton, Select } from "@components/base";
 import { useSnackbar } from "notistack";
 import * as utils from "@utils/";
 import * as Dummy from "../../constants/dummy";
-import * as FORM from "./form";
 import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
@@ -21,7 +22,6 @@ import {
   ArrowRight,
   MoreVert,
   Add,
-  Notes,
   Search,
   Check,
   ArrowUpward,
@@ -29,223 +29,433 @@ import {
   Block,
   Schedule,
   Refresh,
+  CalendarMonth,
 } from "@mui/icons-material";
 import { useAlert } from "@contexts/AlertContext";
 import { LoadingButton } from "@mui/lab";
+import EventCreate from "./form/EventCreate";
 
-const columns = (onDelete, onUpdate) => [
+/**
+ * Note: Backup
   {
-    value: (value) => (
-      <Box px={0.8} py={0.4}>
-        <Typography variant="h6">
-          {moment(value.datePlan).format("DD")}
-        </Typography>
-        <Typography variant="caption">
-          {utils.getMonth(moment(value.datePlan).format("M")-1)}
-        </Typography>
-      </Box>
-    ),
-    align: "center",
-    padding: "none",
-    sx: {
-      width: "1%",
-      whiteSpace: "noWrap",
-      borderLeft: 1,
-      borderRight: 1,
-      borderTop: 1,
-      borderColor: "divider",
+      label: "Tanggal Plan",
+      value: (value) => {
+        const date = moment(value.datePlan).format("DD-MM-Y");
+
+        return (
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <div>
+              <Typography variant="caption">Plan</Typography>
+              <Typography variant="body2">
+                {date} {value.timePlan}
+              </Typography>
+            </div>
+
+            {value.revise1 || value.reviseTime1 ? (
+              <>
+                <div>
+                  <ArrowRight />
+                </div>
+
+                <div>
+                  <Typography
+                    variant="caption"
+                    color="success.main"
+                    fontWeight={600}
+                  >
+                    Revise 1
+                  </Typography>
+                  <Typography variant="body2">
+                    {moment(value.revise1).format("DD-MM-Y")}{" "}
+                    {value.reviseTime1}
+                  </Typography>
+                </div>
+              </>
+            ) : null}
+
+            {value.revise2 || value.reviseTime2 ? (
+              <>
+                <div>
+                  <ArrowRight />
+                </div>
+
+                <div>
+                  <Typography
+                    variant="caption"
+                    color="success.main"
+                    fontWeight={600}
+                  >
+                    Revise 2
+                  </Typography>
+                  <Typography variant="body2">
+                    {moment(value.revise2).format("DD-MM-Y")}{" "}
+                    {value.reviseTime2}
+                  </Typography>
+                </div>
+              </>
+            ) : null}
+
+            {value.actualDate || value.actualTime ? (
+              <>
+                <div>
+                  <ArrowRight />
+                </div>
+
+                <div>
+                  <Typography
+                    variant="caption"
+                    color="success.main"
+                    fontWeight={600}
+                  >
+                    Aktual
+                  </Typography>
+                  <Typography variant="body2">
+                    {value.actualDate
+                      ? moment(value.actualDate).format("DD-MM-Y")
+                      : date}{" "}
+                    {value.actualTime || value.timePlan}
+                  </Typography>
+                </div>
+              </>
+            ) : null}
+          </Stack>
+        );
+      },
+      align: "left",
+      sx: {
+        whiteSpace: "noWrap",
+        width: "1%",
+        borderTop: 1,
+      },
+      head: {
+        align: "center",
+      },
+      size: "small",
     },
-  },
-  {
-    value: (value) => (
-      <Stack direction="column">
-        <Typography variant="body2">
-          {value.title}
-        </Typography>
-        <Stack direction="row" alignItems="center" spacing={0.25}>
-          {value.status === "PLAN" ? (
-            <Schedule fontSize="inherit" sx={{ verticalAlign: "center" }} />
-          ) : value.status === "CANCEL" ? (
-            <Block fontSize="inherit" sx={{ verticalAlign: "center" }} />
-          ) : (
-            <Check fontSize="inherit" sx={{ verticalAlign: "center" }} />
-          )}
-          <div>
-            <Typography variant="caption">
-              {utils.komStatusLabel(value.status)}
-            </Typography>
-          </div>
+
+       {
+      label: "Aksi",
+      value: (value) => {
+        let menu = [
+          {
+            text: "Revise 1",
+            divider: true,
+            onClick: onUpdate(value.id, "revise1"),
+          },
+          {
+            text: "Ubah Data",
+            divider: true,
+            onClick: onUpdate(value.id, "full"),
+          },
+          { text: "Hapus Milestone", onClick: onDelete(value.id) },
+        ];
+
+        if (!!value.revise1 || !!value.reviseTime1) {
+          menu[0] = {
+            text: "Revise 2",
+            divider: true,
+            onClick: onUpdate(value.id, "revise2"),
+          };
+        }
+
+        if (!!value.revise2 || !!value.reviseTime2) {
+          menu[0] = {
+            text: "Aktual",
+            divider: true,
+            onClick: onUpdate(value.id, "actual"),
+          };
+        }
+
+        if (!!value.actualDate || !!value.actualTime) {
+          delete menu[0];
+        }
+
+        return (
+          <BasicDropdown
+            size="small"
+            type="icon"
+            menu={menu}
+            label={<MoreVert fontSize="inherit" />}
+          />
+        );
+      },
+      size: "small",
+      align: "center",
+      padding: "checkbox",
+      sx: {
+        borderRight: 1,
+        borderTop: 1,
+        borderLeft: 1,
+        borderColor: "divider",
+      },
+    }
+*/
+
+const columns = (onDelete, onUpdate, today) => {
+  let isToday = false;
+
+  return [
+    {
+      label: "Tanggal",
+      value: (value) => {
+        isToday = false;
+        isToday = moment(value.datePlan).format("DD-MM-Y") === today;
+        return (
+          <Tooltip
+            title={`Event berlangsung ${
+              isToday ? "hari ini" : moment(value.datePlan).format("DD-MM-Y")
+            }`}
+            arrow
+          >
+            <Box
+              px={0.8}
+              py={0.4}
+              sx={{
+                backgroundColor: isToday ? "info.main" : "white",
+                color: isToday ? "white" : "inherit",
+              }}
+            >
+              <Typography variant="h6">
+                {moment(value.datePlan).format("DD")}
+              </Typography>
+              <Typography variant="caption">
+                {utils.getMonth(moment(value.datePlan).format("M") - 1)}
+              </Typography>
+            </Box>
+          </Tooltip>
+        );
+      },
+      align: "center",
+      padding: "none",
+      sx: {
+        width: "1%",
+        whiteSpace: "noWrap",
+        borderRight: 1,
+        borderTop: 1,
+        borderColor: "divider",
+      },
+      size: "small",
+    },
+    {
+      label: "Event",
+      value: (value) => (
+        <Stack direction="column">
+          <Typography variant="body2">{value.title}</Typography>
+          <Stack direction="row" alignItems="center" spacing={0.25}>
+            {value.status === "PLAN" ? (
+              <Schedule fontSize="inherit" sx={{ verticalAlign: "center" }} />
+            ) : value.status === "CANCEL" ? (
+              <Block fontSize="inherit" sx={{ verticalAlign: "center" }} />
+            ) : (
+              <Check fontSize="inherit" sx={{ verticalAlign: "center" }} />
+            )}
+            <div>
+              <Typography variant="caption">
+                {utils.komStatusLabel(value.status)}
+              </Typography>
+            </div>
+          </Stack>
         </Stack>
-      </Stack>
-    ),
-    sx: {
-      borderTop: 1,
-      borderColor: "divider",
+      ),
+      sx: {
+        borderTop: 1,
+        borderRight: 1,
+        borderColor: "divider",
+      },
+      size: "small",
     },
-  },
-  {
-    value: (value) => {
-      const date = moment(value.datePlan).format("DD-MM-Y");
-
-      return (
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <div>
-            <Typography variant="caption">Tanggal Plan</Typography>
-            <Typography variant="body2">
-              {date} {value.timePlan}
-            </Typography>
-          </div>
-
-          {value.revise1 || value.reviseTime1 ? (
-            <>
-              <div>
-                <ArrowRight />
-              </div>
-
-              <div>
-                <Typography
-                  variant="caption"
-                  color="success.main"
-                  fontWeight={600}
-                >
-                  Tanggal Revise 1
-                </Typography>
-                <Typography variant="body2">
-                  {moment(value.revise1).format("DD-MM-Y")} {value.reviseTime1}
-                </Typography>
-              </div>
-            </>
-          ) : null}
-
-          {value.revise2 || value.reviseTime2 ? (
-            <>
-              <div>
-                <ArrowRight />
-              </div>
-
-              <div>
-                <Typography
-                  variant="caption"
-                  color="success.main"
-                  fontWeight={600}
-                >
-                  Tanggal Revise 2
-                </Typography>
-                <Typography variant="body2">
-                  {moment(value.revise2).format("DD-MM-Y")} {value.reviseTime2}
-                </Typography>
-              </div>
-            </>
-          ) : null}
-
-          {value.actualDate || value.actualTime ? (
-            <>
-              <div>
-                <ArrowRight />
-              </div>
-
-              <div>
-                <Typography
-                  variant="caption"
-                  color="success.main"
-                  fontWeight={600}
-                >
-                  Tanggal Aktual
-                </Typography>
-                <Typography variant="body2">
-                  {value.actualDate
-                    ? moment(value.actualDate).format("DD-MM-Y")
-                    : date}{" "}
-                  {value.actualTime || value.timePlan}
-                </Typography>
-              </div>
-            </>
-          ) : null}
-        </Stack>
-      );
+    {
+      label: "Plan",
+      value: (value) => {
+        const date = moment(value.datePlan).format("DD-MM-Y");
+        return (
+          <Typography variant="body2">
+            {date} {value.timePlan}
+          </Typography>
+        );
+      },
+      align: "left",
+      sx: {
+        whiteSpace: "noWrap",
+        width: "1%",
+        borderTop: 1,
+        px: 1,
+      },
+      head: {
+        align: "center",
+      },
+      size: "small",
     },
-    align: "left",
-    padding: "none",
-    sx: {
-      whiteSpace: "noWrap",
-      width: "1%",
-      borderTop: 1,
-      borderColor: "divider",
+    {
+      label: "Revise 1",
+      value: (value) => {
+        return value.revise1 || value.reviseTime1 ? (
+          <Stack direction={"row"} alignItems={"center"}>
+            <div>
+              <ArrowRight />
+            </div>
+
+            <div>
+              <Typography variant="body2">
+                {moment(value.revise1).format("DD-MM-Y")} {value.reviseTime1}
+              </Typography>
+            </div>
+          </Stack>
+        ) : (
+          <Tooltip title="Ubah Tanggal (Revise 1)">
+            <Button
+              fullWidth
+              size="small"
+              variant="text"
+              color="primary"
+              endIcon={<CalendarMonth fontSize="inherit" />}
+              onClick={onUpdate(value.id, "revise1")}
+            >
+              Revise 1
+            </Button>
+          </Tooltip>
+        );
+      },
+      align: "left",
+      sx: {
+        whiteSpace: "noWrap",
+        width: "1%",
+        borderTop: 1,
+        px: 1,
+      },
+      head: {
+        align: "center",
+      },
+      size: "small",
     },
-  },
-  // {
-  //   value: (value) => (
-  //     <IconButton title="Lihat Detail">
-  //       <Notes />
-  //     </IconButton>
-  //   ),
-  //   align: "center",
-  //   padding: "checkbox",
-  //   sx: { borderTop: 1, borderColor: "divider" },
-  // },
+    {
+      label: "Revise 2",
+      value: (value) => {
+        return value.revise2 || value.reviseTime2 ? (
+          <Stack direction={"row"} alignItems={"center"}>
+            <div>
+              <ArrowRight />
+            </div>
 
-  {
-    value: (value) => {
-      let menu = [
-        {
-          text: "Revise 1",
-          divider: true,
-          onClick: onUpdate(value.id, "revise1"),
-        },
-        {
-          text: "Ubah Data",
-          divider: true,
-          onClick: onUpdate(value.id, "full"),
-        },
-        { text: "Hapus Milestone", onClick: onDelete(value.id) },
-      ];
-
-      if (!!value.revise1 || !!value.reviseTime1) {
-        menu[0] = {
-          text: "Revise 2",
-          divider: true,
-          onClick: onUpdate(value.id, "revise2"),
-        };
-      }
-
-      if (!!value.revise2 || !!value.reviseTime2) {
-        menu[0] = {
-          text: "Aktual",
-          divider: true,
-          onClick: onUpdate(value.id, "actual"),
-        };
-      }
-
-      if (!!value.actualDate || !!value.actualTime) {
-        delete menu[0];
-      }
-
-      return (
-        <BasicDropdown
-          size="small"
-          type="icon"
-          menu={menu}
-          label={<MoreVert fontSize="inherit" />}
-        />
-      );
+            <div>
+              <Typography variant="body2">
+                {moment(value.revise2).format("DD-MM-Y")} {value.reviseTime2}
+              </Typography>
+            </div>
+          </Stack>
+        ) : (
+          <Tooltip title="Ubah Tanggal (Revise 2)">
+            <Button
+              fullWidth
+              size="small"
+              variant="text"
+              color="primary"
+              endIcon={<CalendarMonth fontSize="inherit" />}
+              onClick={onUpdate(value.id, "revise2")}
+            >
+              Revise 2
+            </Button>
+          </Tooltip>
+        );
+      },
+      align: "left",
+      sx: {
+        whiteSpace: "noWrap",
+        width: "1%",
+        borderTop: 1,
+        px: 1,
+      },
+      head: {
+        align: "center",
+      },
+      size: "small",
     },
-    align: "center",
-    padding: "checkbox",
-    sx: {
-      borderRight: 1,
-      borderTop: 1,
-      borderColor: "divider",
-    },
-  },
-];
+    {
+      label: "Aktual",
+      value: (value) => {
+        return value.actualDate || value.actualTime ? (
+          <Stack direction={"row"} alignItems={"center"}>
+            <div>
+              <ArrowRight />
+            </div>
 
-export default () => {
+            <div>
+              <Typography variant="body2">
+                {moment(value.actualDate).format("DD-MM-Y")} {value.actualTime}
+              </Typography>
+            </div>
+          </Stack>
+        ) : (
+          <Tooltip title="Tambah Tanggal Aktual">
+            <Button
+              fullWidth
+              size="small"
+              variant="text"
+              color="primary"
+              endIcon={<CalendarMonth fontSize="inherit" />}
+              onClick={onUpdate(value.id, "actual")}
+            >
+              Aktual
+            </Button>
+          </Tooltip>
+        );
+      },
+      align: "left",
+      sx: {
+        whiteSpace: "noWrap",
+        width: "1%",
+        borderTop: 1,
+        px: 1,
+      },
+      head: {
+        align: "center",
+      },
+      size: "small",
+    },
+
+    {
+      label: "",
+      value: (value) => {
+        return (
+          <BasicDropdown
+            size="small"
+            type="icon"
+            menu={[
+              {
+                text: "Ubah Data",
+                divider: true,
+                onClick: onUpdate(value.id, "full"),
+              },
+              { text: "Hapus Milestone", onClick: onDelete(value.id) },
+            ]}
+            label={<MoreVert fontSize="inherit" />}
+          />
+        );
+      },
+      size: "small",
+      align: "center",
+      head: {
+        padding: "checkbox",
+      },
+      sx: {
+        borderTop: 1,
+        borderColor: "divider",
+        px: 1,
+      },
+    },
+  ];
+};
+
+const Event = () => {
   const { id } = useParams();
   const alert = useAlert();
+  const today = moment().format("DD-MM-Y");
+  const [listToday, setToday] = React.useState([]);
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
     type: "full",
+    filter: false,
   });
 
   const table = FRHooks.useTable(
@@ -254,9 +464,9 @@ export default () => {
       selector: (resp) => resp.data,
       total: (resp) => resp.meta.total,
       sort: {
-        orderBy: 'date_plan',
-        order: 'asc',
-      }
+        orderBy: "date_plan",
+        order: "asc",
+      },
     }
   );
 
@@ -355,6 +565,7 @@ export default () => {
               variant="contained"
               startIcon={<Add />}
               onClick={onOpen}
+              disabled={table.loading}
             >
               Tambah Milestone
             </Button>
@@ -395,8 +606,9 @@ export default () => {
           placeholder="Cari"
           value={table.query("title", "")}
           onChange={(e) => table.setQuery({ title: e.target.value })}
-          InputProps={{ startAdornment: <Search color="disabled" /> }}
+          InputProps={{ endAdornment: <Search color="disabled" /> }}
         />
+
         <Select
           label="Urutkan"
           menu={[
@@ -418,7 +630,7 @@ export default () => {
               paddingLeft: 0.8,
             },
           }}
-          value={table.orderBy || 'date_plan'}
+          value={table.orderBy || "date_plan"}
           onChange={(e) => {
             table.onOrder(e.target.value);
           }}
@@ -428,7 +640,7 @@ export default () => {
                 title={"urutkan"}
                 size="small"
                 onClick={() => table.onOrder(table.orderBy)}
-                sx={{ mr: 1 }}
+                sx={{ mr: 1, border: 1, borderColor: "divider" }}
               >
                 {table.order === "asc" ? (
                   <ArrowUpward fontSize="inherit" />
@@ -439,6 +651,7 @@ export default () => {
             ),
           }}
         />
+
         <Select
           label="Status"
           name="status"
@@ -468,19 +681,25 @@ export default () => {
         />
       </Stack>
 
-      <DataTable
-        disableHeader
-        data={table.data}
-        loading={table.loading}
-        column={columns(onDelete, onUpdate)}
-        tableProps={{
-          size: "small",
-          sx: { borderCollapse: "separate", borderSpacing: "0 8px" },
-        }}
-        row={{ sx: { backgroundColor: "white" } }}
-      />
+      <Paper variant="outlined">
+        <DataTable
+          tableProps={{
+            sx: {
+              "& th": {
+                backgroundColor: "#f4f4f4",
+              },
+              "& tbody > tr:last-child td": {
+                borderBottom: 0,
+              },
+            },
+          }}
+          data={table.data}
+          loading={table.loading}
+          column={columns(onDelete, onUpdate, today)}
+        />
+      </Paper>
 
-      <FORM.EventCreate
+      <EventCreate
         open={trigger.form}
         mutation={mutation}
         route={FRHooks.apiRoute}
@@ -492,3 +711,5 @@ export default () => {
     </ProjectTemplate>
   );
 };
+
+export default Event;

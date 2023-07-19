@@ -1,8 +1,10 @@
 import React from "react";
 import FRHooks from "frhooks";
 import {
+  Box,
   Button,
   ButtonGroup,
+  Collapse,
   IconButton,
   ListItemText,
   Paper,
@@ -14,6 +16,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import moment from "moment";
@@ -22,17 +25,29 @@ import * as utils from "@utils/";
 import * as FORM from "./form";
 import * as Dummy from "../../constants/dummy";
 import * as BASE from "@components/base";
-import { Add, Edit, Refresh } from "@mui/icons-material";
+import {
+  Add,
+  Edit,
+  FilterAlt,
+  FilterAltOff,
+  Refresh,
+  Search,
+} from "@mui/icons-material";
 import apiRoute from "@services/apiRoute";
 import { useAlert } from "@contexts/AlertContext";
 
 export default () => {
   const alert = useAlert();
+  const today = moment().format("DD-MM-Y");
+
   const { enqueueSnackbar } = useSnackbar();
 
   const [trigger, setTrigger] = React.useState({
     form: false,
+    filter: false,
   });
+
+  const [name, setName] = React.useState("");
 
   const validation = FRHooks.useServerValidation({
     url: apiRoute.dailyPlan.validation,
@@ -92,6 +107,10 @@ export default () => {
     mutation.clearError();
     projects.data = [];
     employees.data = [];
+  };
+
+  const onFilter = () => {
+    setTrigger((state) => ({ ...state, filter: !state.filter }));
   };
 
   const onSubmit = () => {
@@ -174,6 +193,12 @@ export default () => {
     });
   };
 
+  React.useEffect(() => {
+    document.getElementById("table-daily").scrollTo({
+      left: document.getElementById(today).getBoundingClientRect().left,
+    });
+  }, []);
+
   return (
     <MainTemplate
       title="Daily Plan"
@@ -182,93 +207,165 @@ export default () => {
         children: (
           <ButtonGroup>
             <Button
-              variant="contained"
-              disableElevation
-              startIcon={<Add />}
-              onClick={onOpen}
+              disabled={table.loading}
+              variant="outlined"
+              onClick={onFilter}
+              startIcon={trigger.filter ? <FilterAltOff /> : <FilterAlt />}
             >
-              Tambah Plan
+              Filter
             </Button>
+
             <Button
               variant="outlined"
               onClick={table.refresh}
               startIcon={<Refresh />}
+              disabled={table.loading}
             >
               Muat Ulang
+            </Button>
+
+            <Button
+              variant="contained"
+              disableElevation
+              startIcon={<Add />}
+              onClick={onOpen}
+              disabled={table.loading}
+            >
+              Tambah Plan
             </Button>
           </ButtonGroup>
         ),
       }}
     >
-      <Stack
-        direction={{
-          xs: "column",
-          sm: "column",
-          md: "column",
-          lg: "row",
-          xl: "row",
-        }}
-        alignItems={{
-          xs: "flex-start",
-          sm: "flex-start",
-          md: "flex-start",
-          lg: "center",
-          xl: "center",
-        }}
-        spacing={1}
-        sx={{ mb: 2 }}
-      >
-        <BASE.Select
-          label="Bulan"
-          value={table.getQuery("month", moment().month() + 1)}
-          menu={[
-            { text: "Januari", value: 1 },
-            { text: "Februari", value: 2 },
-            { text: "Maret", value: 3 },
-            { text: "April", value: 4 },
-            { text: "Mei", value: 5 },
-            { text: "Juni", value: 6 },
-            { text: "Juli", value: 7 },
-            { text: "Agustus", value: 8 },
-            { text: "September", value: 9 },
-            { text: "Oktober", value: 10 },
-            { text: "November", value: 11 },
-            { text: "Desember", value: 12 },
-          ]}
-          onChange={(e) => {
-            table.setQuery({ month: +e.target.value });
+      <Collapse in={trigger.filter} unmountOnExit>
+        <Stack
+          direction={{
+            xs: "column",
+            sm: "column",
+            md: "column",
+            lg: "row",
+            xl: "row",
           }}
-        />
-        <BASE.Select
-          label="Tahun"
-          value={table.getQuery("year", moment().year())}
-          menu={utils.listYear().map((v) => ({ text: v, value: v }))}
-          onChange={(e) => {
-            table.setQuery({ year: +e.target.value });
+          alignItems={{
+            xs: "flex-start",
+            sm: "flex-start",
+            md: "flex-start",
+            lg: "center",
+            xl: "center",
           }}
-        />
-      </Stack>
+          spacing={1}
+          sx={{ mb: 2 }}
+        >
+          <Box
+            sx={{
+              width: {
+                md: "25%",
+              },
+            }}
+          >
+            <TextField
+              placeholder="Cari nama disini"
+              InputProps={{ endAdornment: <Search color="disabled" /> }}
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
+            />
+          </Box>
+          <Box
+            sx={{
+              width: {
+                md: "15%",
+              },
+            }}
+          >
+            <BASE.Select
+              label="Bulan"
+              fullWidth={true}
+              value={table.getQuery("month", moment().month() + 1)}
+              menu={[
+                { text: "Januari", value: 1 },
+                { text: "Februari", value: 2 },
+                { text: "Maret", value: 3 },
+                { text: "April", value: 4 },
+                { text: "Mei", value: 5 },
+                { text: "Juni", value: 6 },
+                { text: "Juli", value: 7 },
+                { text: "Agustus", value: 8 },
+                { text: "September", value: 9 },
+                { text: "Oktober", value: 10 },
+                { text: "November", value: 11 },
+                { text: "Desember", value: 12 },
+              ]}
+              onChange={(e) => {
+                table.setQuery({ month: +e.target.value });
+              }}
+            />
+          </Box>
+          <div>
+            <BASE.Select
+              label="Tahun"
+              value={table.getQuery("year", moment().year())}
+              menu={utils.listYear().map((v) => ({ text: v, value: v }))}
+              onChange={(e) => {
+                table.setQuery({ year: +e.target.value });
+              }}
+            />
+          </div>
+        </Stack>
+      </Collapse>
 
       <Paper elevation={0} variant="outlined">
-        <TableContainer>
-          <Table>
+        <TableContainer id="table-daily">
+          <Table
+            sx={{
+              "& thead > tr > th:first-of-type, & tbody > tr > td:first-of-type[rowspan]":
+                {
+                  position: "-webkit-sticky",
+                  position: "sticky",
+                  left: 0,
+                  zIndex: 2,
+                  top: "auto",
+                  boxShadow: "inset -2px 0 1px -2px rgba(0,0,0,0.50)",
+                },
+              "& tbody > tr > td:first-of-type[rowspan]": {
+                backgroundColor: "white",
+              },
+              marginBottom: 1.5,
+            }}
+          >
             <TableHead>
               <TableRow>
-                <TableCell component="th" sx={{ whiteSpace: "nowrap" }}>
+                <TableCell
+                  size="small"
+                  component="th"
+                  sx={{ whiteSpace: "nowrap", backgroundColor: "#f4f4f4" }}
+                >
                   Nama
                 </TableCell>
                 {dates.map((d, _i) => (
                   <TableCell
+                    id={moment(d).format("DD-MM-Y")}
                     component="th"
                     key={d}
                     align="center"
+                    size="small"
                     sx={{
                       borderRight: _i === dates.length - 1 ? 0 : 1,
                       borderLeft: 1,
                       borderColor: "divider",
+                      whiteSpace: "nowrap",
+                      backgroundColor:
+                        moment(d).format("DD-MM-Y") === today
+                          ? "info.main"
+                          : "#f4f4f4",
+                      color:
+                        moment(d).format("DD-MM-Y") === today
+                          ? "white"
+                          : "inherit",
                     }}
                   >
-                    {moment(d).format("DD")}
+                    {moment(d).format("DD")}/
+                    <sub>{moment(d).format("M").padStart(2, "0")}</sub>
                   </TableCell>
                 ))}
               </TableRow>
@@ -277,7 +374,7 @@ export default () => {
             <TableBody>
               {!table.loading && table.data.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} align="center">
+                  <TableCell colSpan={10} align="left" sx={{ borderBottom: 0 }}>
                     Plan Belum Tersedia
                   </TableCell>
                 </TableRow>
@@ -296,124 +393,171 @@ export default () => {
                   ))}
                 </TableRow>
               ) : (
-                table.data.map((value, idx) =>
-                  value.employees.map((val, idx) => (
-                    <TableRow key={idx}>
-                      {idx === 0 ? (
-                        <>
-                          <TableCell
-                            size="small"
-                            rowSpan={value.employees.length}
-                            sx={{
-                              borderRight: 1,
-                              borderColor: "divider",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            <ListItemText
-                              sx={{ p: 0, m: 0 }}
-                              primary={value.name || "-"}
-                              secondary={utils.typesLabel(value.role)}
-                            />
-                          </TableCell>
-                        </>
-                      ) : null}
+                table.data
+                  .filter((v) =>
+                    v.name
+                      .toLocaleLowerCase()
+                      .includes(name.toLocaleLowerCase())
+                  )
+                  .map((value, idx) =>
+                    value.employees.map((val, idx) => (
+                      <TableRow key={idx}>
+                        {idx === 0 ? (
+                          <>
+                            <TableCell
+                              size="small"
+                              rowSpan={value.employees.length}
+                              sx={{
+                                borderRight: 1,
+                                borderColor: "divider",
+                                whiteSpace: "nowrap",
+                                p: 0,
+                                px: 1,
+                              }}
+                            >
+                              <ListItemText
+                                sx={{ p: 0, m: 0 }}
+                                primary={value.name || "-"}
+                                primaryTypographyProps={{ variant: "body2" }}
+                                secondary={utils.typesLabel(value.role)}
+                                secondaryTypographyProps={{
+                                  variant: "caption",
+                                }}
+                              />
+                            </TableCell>
+                          </>
+                        ) : null}
 
-                      {dates.map((d, _i) => {
-                        const find = val.plans.find(
-                          (f) => f.day === d.getDate()
-                        );
+                        {dates.map((d, _i) => {
+                          const isToday = moment(d).format("DD-MM-Y") === today;
+                          const find = val.plans.find(
+                            (f) => f.day === d.getDate()
+                          );
 
-                        if (!find) {
+                          if (!find) {
+                            return (
+                              <TableCell
+                                key={`day-${_i}`}
+                                align="center"
+                                size="small"
+                                sx={{
+                                  borderRight: _i === dates.length - 1 ? 0 : 1,
+                                  borderColor: "divider",
+                                  whiteSpace: "nowrap",
+                                  p: 0.5,
+                                }}
+                              >
+                                -
+                              </TableCell>
+                            );
+                          }
+
                           return (
                             <TableCell
                               key={`day-${_i}`}
                               align="center"
                               size="small"
-                              sx={{
+                              sx={(theme) => ({
                                 borderRight: _i === dates.length - 1 ? 0 : 1,
                                 borderColor: "divider",
                                 whiteSpace: "nowrap",
-                                backgroundColor: "divider",
-                              }}
+                                p: 0.5,
+                                overflow: "hidden",
+                                position: "relative",
+                                "&:hover > div": {
+                                  border: 1,
+                                  borderColor: "success",
+                                  zIndex: 1,
+                                  top: 0,
+                                  left: 0,
+                                  backgroundColor: "white",
+                                  boxShadow: theme.shadows[10],
+                                },
+                                "&:hover": {
+                                  overflow: "unset",
+                                },
+                                "&:hover > div > div:nth-of-type(1) > p:not(:first-of-type)":
+                                  {
+                                    display: "block",
+                                  },
+                              })}
                             >
-                              -
+                              {find.day === 0 ? (
+                                "-"
+                              ) : (
+                                <Stack
+                                  className="test"
+                                  direction="row"
+                                  alignItems="center"
+                                  spacing={1.5}
+                                  sx={{
+                                    px: 0.5,
+                                    position: "absolute",
+                                    top: 0,
+                                  }}
+                                >
+                                  <ListItemText
+                                    sx={{
+                                      p: 0,
+                                      m: 0,
+                                      flexGrow: 1,
+                                    }}
+                                    primary={find.projectName || "-"}
+                                    primaryTypographyProps={{
+                                      variant: "body2",
+                                      align: "left",
+                                      sx: {
+                                        whiteSpace: "nowrap",
+                                      },
+                                    }}
+                                    secondary={
+                                      <>
+                                        {find.locationAt ? (
+                                          <span>
+                                            <a
+                                              href={`https://www.google.com/maps/search/?api=1&query=${find.latitude}%2C${find.longitude}`}
+                                              target="_blank"
+                                            >
+                                              Lihat Map ({find.locationAt})
+                                            </a>
+                                          </span>
+                                        ) : null}
+                                      </>
+                                    }
+                                    secondaryTypographyProps={{
+                                      variant: "body2",
+                                      align: "left",
+                                      sx: {
+                                        whiteSpace: "nowrap",
+                                        display: "none",
+                                      },
+                                    }}
+                                  />
+
+                                  <div>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => {
+                                        const fnd = value.data.find(
+                                          (fn) => fn.id === find.id
+                                        );
+
+                                        if (fnd) {
+                                          onUpdate(fnd);
+                                        }
+                                      }}
+                                    >
+                                      <Edit fontSize="inherit" />
+                                    </IconButton>
+                                  </div>
+                                </Stack>
+                              )}
                             </TableCell>
                           );
-                        }
-
-                        return (
-                          <TableCell
-                            key={`day-${_i}`}
-                            align="center"
-                            size="small"
-                            sx={{
-                              borderRight: _i === dates.length - 1 ? 0 : 1,
-                              borderColor: "divider",
-                              whiteSpace: "nowrap",
-                              backgroundColor: "#64cf70"
-                            }}
-                          >
-                            {find.day === 0 ? (
-                              "-"
-                            ) : (
-                              <Stack
-                                direction="row"
-                                alignItems="center"
-                                spacing={1}
-                              >
-                                <div>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => {
-                                      const fnd = value.data.find(
-                                        (fn) => fn.id === find.id
-                                      );
-
-                                      if (fnd) {
-                                        onUpdate(fnd);
-                                      }
-                                    }}
-                                  >
-                                    <Edit fontSize="inherit" />
-                                  </IconButton>
-                                </div>
-                                <ListItemText
-                                  sx={{ p: 0, m: 0 }}
-                                  primary={find.projectName || "-"}
-                                  primaryTypographyProps={{
-                                    variant: "body2",
-                                  }}
-                                  secondary={
-                                    <>
-                                      <span>
-                                        {moment(find.date).format("DD-MM-yyyy")}
-                                      </span>
-
-                                      {find.locationAt ? (
-                                        <span style={{ marginLeft: "8px" }}>
-                                          <a
-                                            href={`https://www.google.com/maps/search/?api=1&query=${find.latitude}%2C${find.longitude}`}
-                                            target="_blank"
-                                          >
-                                            Lihat Map ({find.locationAt})
-                                          </a>
-                                        </span>
-                                      ) : null}
-                                    </>
-                                  }
-                                  secondaryTypographyProps={{
-                                    variant: "body2",
-                                  }}
-                                />
-                              </Stack>
-                            )}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))
-                )
+                        })}
+                      </TableRow>
+                    ))
+                  )
               )}
             </TableBody>
           </Table>

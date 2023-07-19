@@ -5,7 +5,7 @@ import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
 
-export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen }) => {
+const InventoryForm = ({ open, mutation, snackbar, table, onOpen }) => {
   return (
     <BASE.DialogForm
       open={open}
@@ -14,7 +14,6 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
       content={{
         children: (
           <Stack spacing={2}>
-
             <Stack spacing={2} direction={{ xs: "column", sm: "row" }}>
               <TextField
                 id="name"
@@ -45,7 +44,7 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
                     <CircularProgress size={20} />
                   ) : null,
                 }}
-                sx={{ width: '30%' }}
+                sx={{ width: "30%" }}
               />
             </Stack>
 
@@ -54,11 +53,9 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
                 id="qty"
                 type="number"
                 disabled={mutation.loading}
-                label='Quantity'
+                label="Quantity"
                 value={mutation.data.qty || "0"}
-                onChange={(e) =>
-                  mutation.setData({ qty: e.target.value })
-                }
+                onChange={(e) => mutation.setData({ qty: e.target.value })}
                 onBlur={async () => mutation.validate("qty")}
                 error={mutation.error("qty")}
                 helperText={mutation.message("qty")}
@@ -75,11 +72,9 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
                 id="minQty"
                 type="number"
                 disabled={mutation.loading}
-                label='Minimal Quantity Pemberitahuan'
+                label="Minimal Quantity Pemberitahuan"
                 value={mutation.data.minQty || "0"}
-                onChange={(e) =>
-                  mutation.setData({ minQty: e.target.value })
-                }
+                onChange={(e) => mutation.setData({ minQty: e.target.value })}
                 onBlur={async () => mutation.validate("minQty")}
                 error={mutation.error("minQty")}
                 helperText={mutation.message("minQty")}
@@ -110,17 +105,19 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
               onClick={() => {
                 const isNew = mutation.isNewRecord;
                 const editId = mutation.data.id;
-                const route = isNew ? FRHooks.apiRoute().inventory("index") : FRHooks.apiRoute().inventory("detail", { id: editId })
+                const route = isNew
+                  ? FRHooks.apiRoute().inventory("index")
+                  : FRHooks.apiRoute().inventory("detail", { id: editId });
                 mutation.post(route.link(), {
                   method: mutation.isNewRecord ? "post" : "put",
                   except: mutation.isNewRecord ? ["id"] : [],
                   validation: true,
                   onSuccess: (resp) => {
-                    snackbar(t("commonSuccessCreate"));
+                    snackbar("Data berhasil ditambahkan");
                     if (isNew) {
                       table.data.unshift(resp.data);
                     } else {
-                      const idx = table.data.findIndex(d => d.id === editId)
+                      const idx = table.data.findIndex((d) => d.id === editId);
                       table.data[idx] = resp.data;
                     }
                     mutation.clearData();
@@ -138,3 +135,5 @@ export const InventoryForm = ({ open, t, r, mutation, snackbar, table, onOpen })
     />
   );
 };
+
+export default InventoryForm;

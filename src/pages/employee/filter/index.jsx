@@ -34,10 +34,10 @@ export const TableFilter = ({ table }) => {
         <TextField
           fullWidth
           value={table.query("name", "")}
-          placeholder="Cari"
+          placeholder="Cari disini..."
           onChange={(e) => table.setQuery({ name: e.target.value })}
           InputProps={{
-            startAdornment: <Search />,
+            endAdornment: <Search color="disabled" />,
           }}
         />
         <TextField
@@ -55,7 +55,7 @@ export const TableFilter = ({ table }) => {
         </TextField>
 
         <TextField
-          label="Tipe"
+          label="Role"
           value={table.query("role", "")}
           onChange={(e) => table.setQuery({ role: e.target.value })}
           select
@@ -67,6 +67,23 @@ export const TableFilter = ({ table }) => {
           {utils.types.map((v) => (
             <MenuItem key={v} value={v}>
               {utils.typesLabel(v)}
+            </MenuItem>
+          ))}
+        </TextField>
+
+        <TextField
+          label="Tipe"
+          value={table.query("boq_type", "")}
+          onChange={(e) => table.setQuery({ boq_type: e.target.value })}
+          select
+          sx={{ width: "50%" }}
+        >
+          <MenuItem value="" selected>
+            Pilih
+          </MenuItem>
+          {utils.boqTypes.map((v) => (
+            <MenuItem key={v} value={v}>
+              {v}
             </MenuItem>
           ))}
         </TextField>

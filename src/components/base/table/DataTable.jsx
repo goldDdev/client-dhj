@@ -1,3 +1,4 @@
+import React from "react";
 import HeadCell from "./HeadCell";
 import RowLoading from "./RowLoading";
 import {
@@ -10,6 +11,8 @@ import {
   Table,
 } from "@mui/material";
 import _ from "lodash";
+
+const Row = React.memo((props) => <TableRow {...props} />)
 
 const DataTable = ({
   loading,
@@ -25,7 +28,7 @@ const DataTable = ({
   container,
   row,
   disableHeader,
-  headProps
+  headProps,
 }) => {
   return (
     <div>
@@ -34,7 +37,7 @@ const DataTable = ({
           {disableHeader ? null : (
             <TableHead {...headProps}>
               <TableRow>
-                {column.map(({sortKey, ...props }, i) => (
+                {column.map(({ sortKey, ...props }, i) => (
                   <HeadCell
                     key={`th-${i}`}
                     order={order}
@@ -67,19 +70,21 @@ const DataTable = ({
               {!loading &&
                 data.length > 0 &&
                 data.map((_data, i) => (
-                  <TableRow
+                  <Row
                     key={`row-${i}`}
                     component="tr"
                     hover={hover}
                     selected={selected ? selected(_data) : undefined}
                     {...row}
                   >
-                    {column.map(({ value, sortKey, head, label, ...col }, j) => (
-                      <TableCell key={`row-${i}-cell-${j}`} {...col}>
-                        {value(_data, i)}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                    {column.map(
+                      ({ value, sortKey, head, label, ...col }, j) => (
+                        <TableCell key={`row-${i}-cell-${j}`} {...col}>
+                          {value(_data, i)}
+                        </TableCell>
+                      )
+                    )}
+                  </Row>
                 ))}
             </>
           </TableBody>
@@ -92,7 +97,7 @@ const DataTable = ({
   );
 };
 
-export default DataTable;
+export default React.memo(DataTable);
 
 DataTable.defaultProps = {
   loading: false,
