@@ -15,10 +15,15 @@ const BOQCreate = ({ trigger, onOpen, mutation, onSubmit }) => (
         <Stack spacing={2} direction="column">
           <TextField
             label="Nama"
+            placeholder="Nama "
             value={mutation.data.name || ""}
             onChange={(e) => mutation.setData({ name: e.target.value })}
             error={mutation.error("name")}
             helperText={mutation.message("name")}
+            sx={{ minWidth: "75%" }}
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
 
           <FieldSet disabledDivider>
@@ -28,6 +33,7 @@ const BOQCreate = ({ trigger, onOpen, mutation, onSubmit }) => (
               onChange={(e) => mutation.setData({ typeUnit: e.target.value })}
               error={mutation.error("typeUnit")}
               helperText={mutation.message("typeUnit")}
+              sx={{ minWidth: "75%" }}
             />
 
             <TextField
@@ -46,22 +52,28 @@ const BOQCreate = ({ trigger, onOpen, mutation, onSubmit }) => (
             />
           </FieldSet>
 
-          <TextField
-            label="Harga"
-            value={mutation.data.price}
-            onChange={(e) => {
-              if (Number.isInteger(+e.target.value)) {
-                mutation.setData({
-                  price: +e.target.value,
-                  totalPrice: +e.target.value * mutation.data.unit,
-                });
-              }
-            }}
-            error={mutation.error("price")}
-            helperText={mutation.message("price")}
-          />
-
-          <TextField disabled value={mutation.data.totalPrice} />
+          <FieldSet disabledDivider>
+            <TextField
+              label="Harga"
+              value={mutation.data.price}
+              onChange={(e) => {
+                if (Number.isInteger(+e.target.value)) {
+                  mutation.setData({
+                    price: +e.target.value,
+                    totalPrice: +e.target.value * mutation.data.unit,
+                  });
+                }
+              }}
+              error={mutation.error("price")}
+              helperText={mutation.message("price")}
+              sx={{ minWidth: "60%" }}
+            />
+            <TextField
+              label="Jumlah Harga"
+              disabled
+              value={mutation.data.totalPrice}
+            />
+          </FieldSet>
 
           <Select
             label={"Tipe"}
@@ -80,6 +92,7 @@ const BOQCreate = ({ trigger, onOpen, mutation, onSubmit }) => (
               });
             }}
             error={mutation.error("type")}
+            helperText={mutation.message("type")}
           />
         </Stack>
       ),

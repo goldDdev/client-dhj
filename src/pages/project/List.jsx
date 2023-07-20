@@ -13,10 +13,10 @@ import * as Dummy from "../../constants/dummy";
 import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
 import MainTemplate from "@components/templates/MainTemplate";
-import * as FORM from "./form";
 import moment from "moment";
 import apiRoute from "@services/apiRoute";
 import { LoadingButton } from "@mui/lab";
+import ProjectCreate from "./form/ProjectCreate";
 
 const columns = (table, onUpdate, onDelete) => [
   {
@@ -155,9 +155,9 @@ export default () => {
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
-        name: y.string().required(),
-        companyName: y.string().required(),
-        noSpk: y.string().required(),
+        name: y.string().required().label("Nama"),
+        companyName: y.string().required().label("Team"),
+        noSpk: y.string().required().label("No SPK"),
         contact: y.string().nullable(),
         location: y.string().nullable(),
         latitude: y.number().nullable(),
@@ -282,7 +282,7 @@ export default () => {
         />
       </Paper>
 
-      <FORM.Create
+      <ProjectCreate
         open={trigger.form}
         mutation={mutation}
         onOpen={onOpen}
