@@ -5,7 +5,7 @@ import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
 
-export const UserForm = ({ open, mutation, snackbar, table, onOpen }) => {
+const UserCreate = ({ open, mutation, server, snackbar, table, onOpen }) => {
   return (
     <BASE.DialogForm
       open={open}
@@ -27,7 +27,7 @@ export const UserForm = ({ open, mutation, snackbar, table, onOpen }) => {
               error={mutation.error("role")}
               helperText={mutation.message("role")}
             />
-            
+
             <TextField
               id="empName"
               disabled={mutation.loading}
@@ -46,23 +46,30 @@ export const UserForm = ({ open, mutation, snackbar, table, onOpen }) => {
 
             <TextField
               id="empPN"
-              type="number"
               disabled={mutation.loading}
               label={"No HP"}
               value={mutation.data.phoneNumber || ""}
               onChange={(e) =>
                 mutation.setData({ phoneNumber: e.target.value })
               }
-              onBlur={async () => mutation.validate("phoneNumber")}
+              onBlur={async () => {
+                const inv = await mutation.validate("phoneNumber");
+                if (!inv) {
+                  await server.validate("phoneNumber", {
+                    phoneNumber: mutation.data.phoneNumber,
+                    id: mutation.data.id,
+                  });
+                }
+              }}
               error={mutation.error("phoneNumber")}
               helperText={mutation.message("phoneNumber")}
               InputProps={{
+                inputProps: {
+                  maxLength: 12,
+                },
                 endAdornment: mutation.loading ? (
                   <CircularProgress size={20} />
                 ) : null,
-              }}
-              inputProps={{
-                maxLength: 12,
               }}
             />
 
@@ -72,7 +79,15 @@ export const UserForm = ({ open, mutation, snackbar, table, onOpen }) => {
               label={"Alamat Email"}
               value={mutation.data.email || ""}
               onChange={(e) => mutation.setData({ email: e.target.value })}
-              onBlur={async () => mutation.validate("email")}
+              onBlur={async () => {
+                const inv = await mutation.validate("email");
+                if (!inv) {
+                  await server.validate("email", {
+                    email: mutation.data.email,
+                    id: mutation.data.id,
+                  });
+                }
+              }}
               error={mutation.error("email")}
               helperText={mutation.message("email")}
               InputProps={{
@@ -82,19 +97,6 @@ export const UserForm = ({ open, mutation, snackbar, table, onOpen }) => {
               }}
               type="email"
             />
-
-            {/* <TextField
-              type="password"
-              id="password"
-              label="Password"
-              disabled={mutation.loading}
-            />
-            <TextField
-              type="password"
-              id="password"
-              label="Konfirmasi Password"
-              disabled={mutation.loading}
-            /> */}
           </Stack>
         ),
       }}
@@ -142,3 +144,5 @@ export const UserForm = ({ open, mutation, snackbar, table, onOpen }) => {
     />
   );
 };
+
+export default UserCreate;

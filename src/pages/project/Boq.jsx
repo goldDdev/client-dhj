@@ -16,7 +16,6 @@ import {
 import { BasicDropdown, Timeline } from "@components/base";
 import { useSnackbar } from "notistack";
 import * as Dummy from "../../constants/dummy";
-import * as FORM from "./form";
 import * as utils from "@utils/";
 import FRHooks from "frhooks";
 import DataTable from "../../components/base/table/DataTable";
@@ -35,6 +34,7 @@ import { useAlert } from "@contexts/AlertContext";
 import { LoadingButton } from "@mui/lab";
 import apiRoute from "@services/apiRoute";
 import BOQCreate from "./form/BOQCreate";
+import BOQImport from "./form/BOQImport";
 
 const columns = (
   onDelete,
@@ -299,6 +299,7 @@ const Boq = () => {
     total: (resp) => resp.meta.total,
     pagination: {
       perPage: 100,
+      perPageOptions: [50, 100, 200]
     },
   });
 
@@ -315,12 +316,12 @@ const Boq = () => {
       y.object().shape({
         id: y.number(),
         projectId: y.number().nullable(),
-        name: y.string().required(),
-        typeUnit: y.string().required(),
-        price: y.number().nullable(),
-        unit: y.number().nullable(),
+        name: y.string().required().label("Nama"),
+        typeUnit: y.string().required().label("Satuan"),
+        price: y.number().nullable().label("Harga"),
+        unit: y.number().nullable().label("Unit"),
         totalPrice: y.number().nullable(),
-        type: y.string(),
+        type: y.string().required().label("Tipe"),
       }),
   });
 
@@ -510,12 +511,14 @@ const Boq = () => {
       >
         <ButtonGroup>
           <Button
+            disabled={table.loading}
             variant={isSwitch ? "contained" : "outlined"}
             onClick={() => setSwitch(true)}
           >
             Daftar BOQ
           </Button>
           <Button
+            disabled={table.loading}
             variant={!isSwitch ? "contained" : "outlined"}
             onClick={() => setSwitch(false)}
           >
@@ -651,7 +654,7 @@ const Boq = () => {
         onSubmit={onCreate}
       />
 
-      <FORM.BOQImport
+      <BOQImport
         data={jsonData}
         loading={mutation.processing}
         trigger={trigger}

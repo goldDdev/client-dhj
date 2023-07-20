@@ -1,7 +1,6 @@
 import React from "react";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import FRHooks from "frhooks";
-import * as FORM from "./form";
 import * as utils from "@utils/";
 import * as Dummy from "../../constants/dummy";
 import _ from "lodash";
@@ -31,6 +30,8 @@ import {
   Typography,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import ProjectCreate from "./form/ProjectCreate";
+import WorkerCreate from "./form/WorkerCreate";
 
 export default () => {
   const { id } = useParams();
@@ -513,14 +514,14 @@ export default () => {
         </Grid>
       </Grid>
 
-      <FORM.Create
+      <ProjectCreate
         open={trigger.form}
         mutation={mutation}
         onOpen={onOpen}
         onSubmit={onSubmit}
       />
 
-      <FORM.WorkerCreate
+      <WorkerCreate
         trigger={trigger}
         searchWorkers={searchWorkers}
         onOpen={onOpenAddWorker}

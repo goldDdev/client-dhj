@@ -34,6 +34,7 @@ import {
 import { useAlert } from "@contexts/AlertContext";
 import { LoadingButton } from "@mui/lab";
 import EventCreate from "./form/EventCreate";
+import apiRoute from "@services/apiRoute";
 
 /**
  * Note: Backup
@@ -450,7 +451,6 @@ const Event = () => {
   const { id } = useParams();
   const alert = useAlert();
   const today = moment().format("DD-MM-Y");
-  const [listToday, setToday] = React.useState([]);
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
@@ -459,7 +459,7 @@ const Event = () => {
   });
 
   const table = FRHooks.useTable(
-    FRHooks.apiRoute().project("listKoms").params({ projectId: id }).link(),
+    [apiRoute.project.listKoms, { projectId: id }],
     {
       selector: (resp) => resp.data,
       total: (resp) => resp.meta.total,
@@ -475,7 +475,7 @@ const Event = () => {
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
-        title: y.string().required(),
+        title: y.string().required().label("Event"),
         description: y.string().nullable(),
         datePlan: y.string().nullable(),
         timePlan: y.string().nullable(),

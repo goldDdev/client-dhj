@@ -21,6 +21,7 @@ const apiRoute = {
   user: {
     index: "/user",
     detail: "/user/:id",
+    validation: "/user/validation",
   },
   absent: {
     index: "/absent",
