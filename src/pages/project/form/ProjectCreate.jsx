@@ -1,15 +1,18 @@
 import React from "react";
 import { DialogForm, FieldSet, Select } from "@components/base";
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, CircularProgress, Stack, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Collapse,
+  Stack,
+  TextField,
+} from "@mui/material";
 import * as utils from "@utils/";
 import moment from "moment";
 
-const ProjectCreate = ({ open, mutation, onOpen, onSubmit }) => {
-  const duration =
-    mutation.data.startAt && mutation.data.finishAt
-      ? moment(mutation.data.finishAt).diff(mutation.data.startAt, "day")
-      : 0;
+const ProjectCreate = ({ isCurr, open, mutation, onOpen, onSubmit }) => {
   return (
     <DialogForm
       open={open}
@@ -306,18 +309,26 @@ const ProjectCreate = ({ open, mutation, onOpen, onSubmit }) => {
         children: (
           <>
             <Button variant="outlined" onClick={onOpen}>
-              Batal
+              Keluar
             </Button>
-            <LoadingButton
-              loading={mutation.processing}
-              disabled={mutation.processing || mutation.loading}
-              disableElevation
-              variant="contained"
-              color="primary"
-              onClick={onSubmit}
+            <Collapse
+              in={isCurr}
+              unmountOnExit
+              sx={{ ml: 1 }}
+              orientation="horizontal"
             >
-              {mutation.isNewRecord ? "Tambah Baru" : "Simpan Perubahan"}
-            </LoadingButton>
+              <LoadingButton
+                loading={mutation.processing}
+                disabled={mutation.processing || mutation.loading}
+                disableElevation
+                variant="contained"
+                color="primary"
+                onClick={onSubmit}
+                sx={{ whiteSpace: "nowrap" }}
+              >
+                {mutation.isNewRecord ? "Tambah Baru" : "Simpan Perubahan"}
+              </LoadingButton>
+            </Collapse>
           </>
         ),
       }}
@@ -325,4 +336,4 @@ const ProjectCreate = ({ open, mutation, onOpen, onSubmit }) => {
   );
 };
 
-export default ProjectCreate;
+export default React.memo(ProjectCreate);

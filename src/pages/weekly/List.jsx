@@ -23,7 +23,7 @@ import moment from "moment";
 import MainTemplate from "@components/templates/MainTemplate";
 import * as utils from "@utils/";
 import * as FORM from "./form";
-import * as Dummy from "../../constants/dummy";
+import * as Dummy from "@constants/dummy";
 import * as BASE from "@components/base";
 import {
   Add,

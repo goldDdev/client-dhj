@@ -7,7 +7,7 @@ import { Button, BasicDropdown } from "@components/base";
 import { useAlert } from "@contexts/AlertContext";
 import MainTemplate from "@components/templates/MainTemplate";
 import apiRoute from "@services/apiRoute";
-import * as Dummy from "../../../constants/dummy";
+import * as Dummy from "@constants/dummy";
 import * as utils from "@utils/";
 import DataTable from "../../../components/base/table/DataTable";
 import InventoryForm from "./InventoryForm";

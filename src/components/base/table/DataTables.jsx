@@ -95,7 +95,11 @@ const DataTable = ({
   );
 };
 
-export default DataTable;
+export default React.memo(DataTable, (prevProps, nextProps) => {
+  return (
+    prevProps.data === nextProps.data && prevProps.loading === nextProps.loading
+  );
+});
 
 DataTable.defaultProps = {
   loading: false,

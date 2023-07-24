@@ -7,7 +7,7 @@ import * as BASE from "@components/base";
 import { Add, MoreVert, Refresh } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import apiRoute from "@services/apiRoute";
-import DataTable from "../../components/base/table/DataTable";
+import DataTable from"@components/base/table/DataTable";
 import moment from "moment";
 import { LoadingButton } from "@mui/lab";
 

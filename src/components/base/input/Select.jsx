@@ -1,3 +1,4 @@
+import React from "react";
 import { FormHelperText, TextField } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 
@@ -9,9 +10,14 @@ const Select = ({
   message,
   ...selectProps
 }) => {
+  const id = React.useId();
   return (
     <>
       <TextField
+        InputLabelProps={{
+          htmlFor: id,
+        }}
+        inputProps={{ id: id }}
         select
         value={value}
         onChange={
@@ -41,5 +47,5 @@ export default Select;
 Select.defaultProps = {
   label: "",
   menu: [],
-  message: ""
+  message: "",
 };

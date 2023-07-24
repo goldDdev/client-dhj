@@ -18,7 +18,7 @@ import {
   Tooltip,
 } from "react-leaflet";
 import MainTemplate from "@components/templates/MainTemplate";
-import DataTable from "../../components/base/table/DataTable";
+import DataTable from"@components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
 import * as utils from "@utils";
 

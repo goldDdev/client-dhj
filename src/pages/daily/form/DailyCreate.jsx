@@ -1,9 +1,17 @@
+import React from "react";
 import { DialogForm, FieldSet } from "@components/base";
 import { Delete } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { Autocomplete, Button, Stack, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  Collapse,
+  Stack,
+  TextField,
+} from "@mui/material";
 
-export const Create = ({
+const DailyCreate = ({
+  isCurr,
   open,
   mutation,
   onOpen,
@@ -153,22 +161,27 @@ export const Create = ({
       actions={{
         children: (
           <>
-            <Button variant="outlined" onClick={onOpen}>
+            <Button variant="outlined" onClick={onOpen} sx={{ mr: 1 }}>
               Batal
             </Button>
-            <LoadingButton
-              loading={mutation.processing}
-              disabled={mutation.processing || mutation.loading}
-              disableElevation
-              variant="contained"
-              color="primary"
-              onClick={onSubmit}
-            >
-              {mutation.isNewRecord ? "Tambah Baru" : "Simpan Perubahan"}
-            </LoadingButton>
+            <Collapse in={isCurr} unmountOnExit orientation="horizontal">
+              <LoadingButton
+                loading={mutation.processing}
+                disabled={mutation.processing || mutation.loading}
+                disableElevation
+                variant="contained"
+                color="primary"
+                onClick={onSubmit}
+                sx={{ whiteSpace: "nowrap" }}
+              >
+                {mutation.isNewRecord ? "Tambah Baru" : "Simpan Perubahan"}
+              </LoadingButton>
+            </Collapse>
           </>
         ),
       }}
     />
   );
 };
+
+export default React.memo(DailyCreate);

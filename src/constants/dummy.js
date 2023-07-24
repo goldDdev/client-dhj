@@ -40,7 +40,8 @@ export const project = {
   location: "",
   latitude: 0,
   longitude: 0,
-  status: "DRAFT",
+  targetDate: null,
+  status: "WAP",
   note: "",
 };
 
@@ -55,16 +56,20 @@ export const kom = {
   revise2: "",
   reviseTime1: "",
   reviseTime2: "",
+  actualDate: "",
+  actualTime: "",
   status: "PLAN",
 };
 
 export const projectBoq = {
   id: 0,
   projectId: 0,
+  name: "",
   typeUnit: "",
   unit: 0,
   price: 0,
   totalPrice: 0,
+  type: "",
 };
 
 export const inventory = {

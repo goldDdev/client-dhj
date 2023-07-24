@@ -9,9 +9,9 @@ import { Link } from "react-router-dom";
 import Add from "@mui/icons-material/Add";
 import * as utils from "@utils/";
 import * as Filter from "./filter";
-import * as Dummy from "../../constants/dummy";
+import * as Dummy from "@constants/dummy";
 import FRHooks from "frhooks";
-import DataTable from "../../components/base/table/DataTable";
+import DataTable from "@components/base/table/DataTable";
 import MainTemplate from "@components/templates/MainTemplate";
 import moment from "moment";
 import apiRoute from "@services/apiRoute";
@@ -126,11 +126,12 @@ const columns = (table, onUpdate, onDelete) => [
   },
 ];
 
-export default () => {
+const List = () => {
   const alert = useAlert();
   const { enqueueSnackbar } = useSnackbar();
   const [trigger, setTrigger] = React.useState({
     form: false,
+    curr: "",
   });
 
   const validation = FRHooks.useServerValidation({
@@ -155,34 +156,65 @@ export default () => {
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
+        id: y.number().optional(),
         name: y.string().required().label("Nama"),
-        companyName: y.string().required().label("Team"),
         noSpk: y.string().required().label("No SPK"),
-        contact: y.string().nullable(),
-        location: y.string().nullable(),
-        latitude: y.number().nullable(),
-        longitude: y.number().nullable(),
-        startAt: y.date().nullable(),
-        finishAt: y.date().nullable(),
-        targetDate: y.date().nullable(),
+        companyName: y.string().required().label("Team"),
+        contact: y.string().optional(),
+        startAt: y.date().optional(),
+        finishAt: y.date().optional(),
+        duration: y.number().optional(),
+        price: y.number().optional(),
+        location: y.string().optional(),
+        latitude: y.number().optional(),
+        longitude: y.number().optional(),
+        targetDate: y.date().optional(),
         status: y.string().required(),
-        duration: y.number().nullable(),
+        note: y.string().optional(),
       }),
   });
 
   const onOpen = () => {
-    setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
+    setTrigger((state) => ({
+      ...state,
+      form: !state.form,
+      curr: btoa(JSON.stringify(Dummy.project)),
+    }));
   };
 
   const onUpdate = (id) => () => {
     mutation.get([apiRoute.project.detail, { id }], {
       onBeforeSend: () => {
-        onOpen();
+        setTrigger((state) => ({
+          ...state,
+          form: !state.form,
+        }));
       },
       onSuccess: (resp) => {
-        mutation.setData(resp.data);
+        const data = {
+          id: resp.data.id,
+          name: resp.data.name,
+          noSpk: resp.data.noSpk,
+          companyName: resp.data.companyName,
+          contact: resp.data.contact || "",
+          startAt: resp.data.startAt,
+          finishAt: resp.data.finishAt,
+          duration: resp.data.duration,
+          price: resp.data.price,
+          location: resp.data.location || "",
+          latitude: resp.data.latitude,
+          longitude: resp.data.longitude,
+          targetDate: resp.data.targetDate,
+          status: resp.data.status,
+          note: resp.data.note || "",
+        };
+        setTrigger((state) => ({
+          ...state,
+          curr: btoa(JSON.stringify(data)),
+        }));
+        mutation.setData(data);
       },
     });
   };
@@ -241,6 +273,11 @@ export default () => {
     });
   };
 
+  const isCurr = React.useMemo(
+    () => trigger.curr !== btoa(JSON.stringify(mutation.data)),
+    [trigger.curr, mutation.data]
+  );
+
   return (
     <MainTemplate
       title="Proyek"
@@ -283,6 +320,7 @@ export default () => {
       </Paper>
 
       <ProjectCreate
+        isCurr={isCurr}
         open={trigger.form}
         mutation={mutation}
         onOpen={onOpen}
@@ -291,3 +329,5 @@ export default () => {
     </MainTemplate>
   );
 };
+
+export default List;

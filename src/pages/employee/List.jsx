@@ -4,16 +4,13 @@ import SettingTemplate from "@components/templates/SettingTemplate";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import * as utils from "@utils/";
 import * as Filter from "./filter";
-import * as FORM from "./form";
-import * as Dummy from "../../constants/dummy";
-import DataTable from "../../components/base/table/DataTable";
+import * as Dummy from "@constants/dummy";
+import DataTable from "@components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
 import { Link } from "react-router-dom";
 import {
-  Filter1,
   FilterAlt,
   FilterAltOff,
-  Key,
   MoreVert,
   Refresh,
 } from "@mui/icons-material";
@@ -29,6 +26,7 @@ import {
 import { Button, BasicDropdown } from "@components/base";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
+import EmployeeCreate from "./form/EmployeeCreate";
 
 const columns = (table, utils, onUpdate, onDelete) => [
   {
@@ -147,7 +145,7 @@ const columns = (table, utils, onUpdate, onDelete) => [
   },
 ];
 
-export default () => {
+const List = () => {
   const alert = useAlert();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.between("xs", "sm"));
@@ -155,6 +153,7 @@ export default () => {
   const [trigger, setTrigger] = React.useState({
     form: false,
     filter: false,
+    curr: "",
   });
 
   const table = FRHooks.useTable(apiRoute.employee.index, {
@@ -167,21 +166,24 @@ export default () => {
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
-        name: y.string().required().min(3),
-        cardID: y.string().required(),
-        phoneNumber: y.string().required().min(10),
+        id: y.number().optional(),
+        name: y.string().required().min(3).label("Nama"),
+        cardID: y.string().required().label("ID Karyawan"),
+        phoneNumber: y.string().required().min(10).label("No Handphone"),
+        salary: y.number().optional().label("Gaji"),
+        hourlyWages: y.number().optional().label("Upah Perjam"),
+        role: y.string().required().label("Role"),
         email: y.string().when("role", {
           is: (role) => {
             return role !== "WORKER";
           },
           then: y.string().required(),
         }),
-        role: y.string().optional().required(),
         password: y.string().optional(),
-        type: y.string(),
+        type: y.string().optional().label("Tipe"),
       }),
     format: {
-      phoneNumber: (value) => String(value),
+      phoneNumber: (value) => String(value).replaceAll(" ", ""),
     },
   });
 
@@ -213,9 +215,14 @@ export default () => {
   });
 
   const onOpen = () => {
-    setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
+
+    setTrigger((state) => ({
+      ...state,
+      form: !state.form,
+      curr: btoa(JSON.stringify(Dummy.employee)),
+    }));
   };
 
   const onOpenFilter = () => {
@@ -223,17 +230,24 @@ export default () => {
   };
 
   const onUpdate = (id) => () => {
+    setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.get([apiRoute.employee.detail, { id }], {
-      onBeforeSend: () => {
-        setTrigger((state) => ({ ...state, form: !state.form }));
-        mutation.clearData();
-      },
       onSuccess: (resp) => {
-        mutation.setData({
-          ...resp.data,
+        const data = {
+          id: resp.data.id,
+          name: resp.data.name,
+          cardID: resp.data.cardID,
+          phoneNumber: resp.data.phoneNumber,
+          salary: resp.data.salary,
+          hourlyWages: resp.data.hourlyWages,
+          role: resp.data.role,
           email: resp.data.user?.email || "",
           type: resp.data.type || "",
-        });
+        };
+
+        console.log(data);
+        setTrigger((state) => ({ ...state, curr: btoa(JSON.stringify(data)) }));
+        mutation.setData(data);
       },
     });
   };
@@ -287,7 +301,7 @@ export default () => {
       ...(va.type === "00" ? { type: "" } : { type: va.type }),
     }));
     mutation.post(apiRoute.employee.index, {
-      except: mutation.isNewRecord ? ["id"] : ["user", "works", "updatedAt"],
+      except: mutation.isNewRecord ? ["id"] : [],
       method: mutation.isNewRecord ? "post" : "put",
       validation: true,
       serverValidation: {
@@ -307,6 +321,11 @@ export default () => {
       },
     });
   };
+
+  const isCurr = React.useMemo(
+    () => trigger.curr !== btoa(JSON.stringify(mutation.data)),
+    [trigger.curr, mutation.data]
+  );
 
   return (
     <SettingTemplate
@@ -350,6 +369,7 @@ export default () => {
       <Collapse in={trigger.filter} unmountOnExit>
         <Filter.TableFilter table={table} />
       </Collapse>
+
       <Paper elevation={0} variant="outlined">
         <DataTable
           headProps={{ sx: { backgroundColor: "#f4f4f4" } }}
@@ -361,7 +381,8 @@ export default () => {
         />
       </Paper>
 
-      <FORM.Create
+      <EmployeeCreate
+        isCurr={isCurr}
         open={trigger.form}
         mutation={mutation}
         validate={validate}
@@ -371,3 +392,5 @@ export default () => {
     </SettingTemplate>
   );
 };
+
+export default List;

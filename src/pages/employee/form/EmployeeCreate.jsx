@@ -1,11 +1,18 @@
+import React from "react";
 import _ from "lodash";
-import { Stack, TextField, Button, CircularProgress } from "@mui/material";
+import {
+  Stack,
+  TextField,
+  Button,
+  CircularProgress,
+  Collapse,
+} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
 import PhoneFormat from "@components/base/mask/PhoneFormat";
 
-export const Create = ({ open, mutation, onOpen, onSubmit, validate }) => {
+const EmployeeCreate = ({isCurr, open, mutation, onOpen, onSubmit, validate }) => {
   return (
     <BASE.DialogForm
       open={open}
@@ -162,18 +169,22 @@ export const Create = ({ open, mutation, onOpen, onSubmit, validate }) => {
             <Button variant="outlined" onClick={onOpen}>
               Keluar
             </Button>
-            <LoadingButton
-              loading={mutation.processing}
-              disabled={mutation.processing}
-              variant="contained"
-              color="primary"
-              onClick={onSubmit}
-            >
-              Simpan
-            </LoadingButton>
+            <Collapse in={isCurr} unmountOnExit sx={{ ml: 1 }} orientation="horizontal">
+              <LoadingButton
+                loading={mutation.processing}
+                disabled={mutation.processing}
+                variant="contained"
+                color="primary"
+                onClick={onSubmit}
+              >
+                Simpan
+              </LoadingButton>
+            </Collapse>
           </>
         ),
       }}
     />
   );
 };
+
+export default React.memo(EmployeeCreate);

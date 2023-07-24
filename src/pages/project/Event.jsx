@@ -12,9 +12,9 @@ import {
 import { BasicDropdown, IconButton, Select } from "@components/base";
 import { useSnackbar } from "notistack";
 import * as utils from "@utils/";
-import * as Dummy from "../../constants/dummy";
+import * as Dummy from "@constants/dummy";
 import FRHooks from "frhooks";
-import DataTable from "../../components/base/table/DataTable";
+import DataTable from "@components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
 import { useParams } from "react-router-dom";
@@ -35,162 +35,6 @@ import { useAlert } from "@contexts/AlertContext";
 import { LoadingButton } from "@mui/lab";
 import EventCreate from "./form/EventCreate";
 import apiRoute from "@services/apiRoute";
-
-/**
- * Note: Backup
-  {
-      label: "Tanggal Plan",
-      value: (value) => {
-        const date = moment(value.datePlan).format("DD-MM-Y");
-
-        return (
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <div>
-              <Typography variant="caption">Plan</Typography>
-              <Typography variant="body2">
-                {date} {value.timePlan}
-              </Typography>
-            </div>
-
-            {value.revise1 || value.reviseTime1 ? (
-              <>
-                <div>
-                  <ArrowRight />
-                </div>
-
-                <div>
-                  <Typography
-                    variant="caption"
-                    color="success.main"
-                    fontWeight={600}
-                  >
-                    Revise 1
-                  </Typography>
-                  <Typography variant="body2">
-                    {moment(value.revise1).format("DD-MM-Y")}{" "}
-                    {value.reviseTime1}
-                  </Typography>
-                </div>
-              </>
-            ) : null}
-
-            {value.revise2 || value.reviseTime2 ? (
-              <>
-                <div>
-                  <ArrowRight />
-                </div>
-
-                <div>
-                  <Typography
-                    variant="caption"
-                    color="success.main"
-                    fontWeight={600}
-                  >
-                    Revise 2
-                  </Typography>
-                  <Typography variant="body2">
-                    {moment(value.revise2).format("DD-MM-Y")}{" "}
-                    {value.reviseTime2}
-                  </Typography>
-                </div>
-              </>
-            ) : null}
-
-            {value.actualDate || value.actualTime ? (
-              <>
-                <div>
-                  <ArrowRight />
-                </div>
-
-                <div>
-                  <Typography
-                    variant="caption"
-                    color="success.main"
-                    fontWeight={600}
-                  >
-                    Aktual
-                  </Typography>
-                  <Typography variant="body2">
-                    {value.actualDate
-                      ? moment(value.actualDate).format("DD-MM-Y")
-                      : date}{" "}
-                    {value.actualTime || value.timePlan}
-                  </Typography>
-                </div>
-              </>
-            ) : null}
-          </Stack>
-        );
-      },
-      align: "left",
-      sx: {
-        whiteSpace: "noWrap",
-        width: "1%",
-        borderTop: 1,
-      },
-      head: {
-        align: "center",
-      },
-      size: "small",
-    },
-
-       {
-      label: "Aksi",
-      value: (value) => {
-        let menu = [
-          {
-            text: "Revise 1",
-            divider: true,
-            onClick: onUpdate(value.id, "revise1"),
-          },
-          {
-            text: "Ubah Data",
-            divider: true,
-            onClick: onUpdate(value.id, "full"),
-          },
-          { text: "Hapus Milestone", onClick: onDelete(value.id) },
-        ];
-
-        if (!!value.revise1 || !!value.reviseTime1) {
-          menu[0] = {
-            text: "Revise 2",
-            divider: true,
-            onClick: onUpdate(value.id, "revise2"),
-          };
-        }
-
-        if (!!value.revise2 || !!value.reviseTime2) {
-          menu[0] = {
-            text: "Aktual",
-            divider: true,
-            onClick: onUpdate(value.id, "actual"),
-          };
-        }
-
-        if (!!value.actualDate || !!value.actualTime) {
-          delete menu[0];
-        }
-
-        return (
-          <BasicDropdown
-            size="small"
-            type="icon"
-            menu={menu}
-            label={<MoreVert fontSize="inherit" />}
-          />
-        );
-      },
-      size: "small",
-      align: "center",
-      padding: "checkbox",
-      sx: {
-        borderRight: 1,
-        borderTop: 1,
-        borderLeft: 1,
-        borderColor: "divider",
-      },
-    }
-*/
 
 const columns = (onDelete, onUpdate, today) => {
   let isToday = false;
@@ -456,69 +300,78 @@ const Event = () => {
     form: false,
     type: "full",
     filter: false,
+    curr: "",
   });
 
-  const table = FRHooks.useTable(
-    [apiRoute.project.listKoms, { projectId: id }],
-    {
-      selector: (resp) => resp.data,
-      total: (resp) => resp.meta.total,
-      sort: {
-        orderBy: "date_plan",
-        order: "asc",
-      },
-    }
-  );
+  const table = FRHooks.useTable([apiRoute.project.listKoms, { id }], {
+    selector: (resp) => resp.data,
+    total: (resp) => resp.meta.total,
+    sort: {
+      orderBy: "date_plan",
+      order: "asc",
+    },
+  });
 
   const mutation = FRHooks.useMutation({
     defaultValue: { ...Dummy.kom, projectId: id },
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
+        id: y.number().optional(),
         title: y.string().required().label("Event"),
-        description: y.string().nullable(),
-        datePlan: y.string().nullable(),
-        timePlan: y.string().nullable(),
-        revise1: y.string().nullable(),
-        revise2: y.string().nullable(),
-        reviseTime1: y.string().nullable(),
-        reviseTime2: y.string().nullable(),
-        actualDate: y.string().nullable(),
-        actualTime: y.string().nullable(),
-        status: y.string().nullable(),
+        description: y.string().optional().label("Deskripsi"),
+        datePlan: y.string().optional().label("Tanggal Plan"),
+        timePlan: y.string().optional().label("Jam Plan"),
+        revise1: y.string().optional().label("Revise 1"),
+        revise2: y.string().optional().label("Revise 2"),
+        reviseTime1: y.string().optional().label("Jam Revise 1"),
+        reviseTime2: y.string().optional().label("Jams Revise 2"),
+        actualDate: y.string().optional().label("Tanggal Aktual"),
+        actualTime: y.string().optional().label("Jam Aktual"),
+        status: y.string().optional().label("Status"),
       }),
   });
 
   const onOpen = () => {
-    setTrigger((state) => ({ ...state, form: !state.form, type: "full" }));
     mutation.clearData();
     mutation.clearError();
+    setTrigger((state) => ({
+      ...state,
+      form: !state.form,
+      type: "full",
+      curr: btoa(JSON.stringify({ ...Dummy.kom, projectId: id })),
+    }));
   };
 
-  const onUpdate = (id, type) => async () => {
-    mutation.get(FRHooks.apiRoute().project("listKomDetail", { id }).link(), {
+  const onUpdate = (id, type) => () => {
+    mutation.get([apiRoute.project.listKomDetail, { id }], {
       onBeforeSend: () => {
         setTrigger((state) => ({ ...state, form: !state.form, type }));
-        mutation.clearData();
-        mutation.clearError();
       },
-      onSuccess: ({ data }) => {
-        mutation.setData(
-          {
-            ...data,
-            reviseTime1: !!!data.reviseTime1 ? data.timePlan : data.reviseTime1,
-            reviseTime2: !!!data.reviseTime2
-              ? data.reviseTime1
-              : data.reviseTime2,
-            actualTime: !!!data.actualTime ? data.reviseTime2 : data.actualTime,
-          },
-          { include: ["id"] }
-        );
+      onSuccess: (resp) => {
+        const data = {
+          id: resp.data.id,
+          title: resp.data.title,
+          projectId: resp.data.projectId,
+          description: resp.data.description || "",
+          datePlan: resp.data.datePlan,
+          timePlan: resp.data.timePlan,
+          revise1: resp.data.revise1 || "",
+          revise2: resp.data.revise2 || "",
+          reviseTime1: resp.data.reviseTime1 || "",
+          reviseTime2: resp.data.reviseTime2 || "",
+          actualDate: resp.data.actualDate || "",
+          actualTime: resp.data.actualTime || "",
+          status: resp.data.status,
+        };
+
+        setTrigger((state) => ({ ...state, curr: btoa(JSON.stringify(data)) }));
+        mutation.setData(data);
       },
     });
   };
 
-  const onDelete = (id) => async () => {
+  const onDelete = (id) => () => {
     alert.set({
       open: true,
       title: "Mohon Perhatian",
@@ -552,6 +405,13 @@ const Event = () => {
       },
     });
   };
+
+  const isCurr = React.useMemo(
+    () => trigger.curr !== btoa(JSON.stringify(mutation.data)),
+    [trigger.curr, mutation.data]
+  );
+
+  const col = React.useMemo(() => columns, [table.data])
 
   return (
     <ProjectTemplate
@@ -695,14 +555,14 @@ const Event = () => {
           }}
           data={table.data}
           loading={table.loading}
-          column={columns(onDelete, onUpdate, today)}
+          column={col(onDelete, onUpdate, today)}
         />
       </Paper>
 
       <EventCreate
+        isCurr={isCurr}
         open={trigger.form}
         mutation={mutation}
-        route={FRHooks.apiRoute}
         snackbar={enqueueSnackbar}
         table={table}
         onOpen={onOpen}

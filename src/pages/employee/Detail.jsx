@@ -1,7 +1,6 @@
 import React from "react";
 import FRHooks from "frhooks";
 import {
-  Chip,
   Grid,
   List,
   ListItem as MuiListItem,
@@ -15,17 +14,14 @@ import {
   TextField,
   CircularProgress,
 } from "@mui/material";
-import { IconButton, Button } from "@components/base";
+import { IconButton } from "@components/base";
 import { useSnackbar } from "notistack";
 import { Link, useLocation } from "react-router-dom";
 import SettingTemplate from "@components/templates/SettingTemplate";
-import PersonAdd from "@mui/icons-material/PersonAdd";
 import Edit from "@mui/icons-material/Edit";
 import * as utils from "@utils/";
-import * as Filter from "./filter";
-import * as FORM from "./form";
-import * as Dummy from "../../constants/dummy";
-import DataTable from "../../components/base/table/DataTable";
+import * as Dummy from "@constants/dummy";
+import DataTable from "@components/base/table/DataTable";
 import apiRoute from "@services/apiRoute";
 import { useParams } from "react-router-dom";
 import { TabContext, TabPanel } from "@mui/lab";
@@ -51,7 +47,7 @@ export default () => {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
-  
+
   const absents = FRHooks.useTable([apiRoute.employee.absent, { id }], {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,

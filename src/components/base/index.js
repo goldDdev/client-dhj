@@ -1,4 +1,4 @@
-export * from "./other/";
+export * from "./other";
 export * from "./table";
 export * from "./dialog";
 export * from "./alert";

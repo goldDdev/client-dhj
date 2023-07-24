@@ -7,7 +7,7 @@ import SettingTemplate from "@components/templates/SettingTemplate";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import Edit from "@mui/icons-material/Edit";
 import * as utils from "@utils/";
-import * as Dummy from "../../../constants/dummy";
+import * as Dummy from "@constants/dummy";
 import DataTable from "../../../components/base/table/DataTable";
 import { LoadingButton } from "@mui/lab";
 import { Refresh } from "@mui/icons-material";

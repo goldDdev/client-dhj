@@ -2,7 +2,7 @@ import React from "react";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import FRHooks from "frhooks";
 import * as utils from "@utils/";
-import * as Dummy from "../../constants/dummy";
+import * as Dummy from "@constants/dummy";
 import _ from "lodash";
 import moment from "moment";
 import apiRoute from "@services/apiRoute";

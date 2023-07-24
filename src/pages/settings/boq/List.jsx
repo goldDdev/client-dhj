@@ -10,7 +10,7 @@ import Delete from "@mui/icons-material/Delete";
 import * as utils from "@utils/";
 // import * as Filter from "./filter";
 import * as FORM from "./Form";
-import * as Dummy from "../../../constants/dummy";
+import * as Dummy from "@constants/dummy";
 import DataTable from "../../../components/base/table/DataTable";
 import { LoadingButton } from "@mui/lab";
 import { Refresh } from "@mui/icons-material";

@@ -1,6 +1,6 @@
 import React from "react";
 import FRHooks from "frhooks";
-import DataTable from "../../components/base/table/DataTable";
+import DataTable from"@components/base/table/DataTable";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
 import apiRoute from "@services/apiRoute";

@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, TableCell, TableSortLabel, Typography } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 
@@ -52,7 +53,7 @@ const HeadCell = ({ sortKey, label, order, orderBy, onOrder, head }) => {
   );
 };
 
-export default HeadCell;
+export default React.memo(HeadCell);
 
 HeadCell.defaultProps = {
   sort: false,

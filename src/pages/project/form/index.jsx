@@ -12,13 +12,10 @@ import {
   List,
   ListItem,
   ListItemText,
-  Skeleton,
   Table,
   TableBody,
   TableRow,
   TableCell,
-  TableContainer,
-  TableHead,
 } from "@mui/material";
 import {
   Add,
@@ -29,14 +26,11 @@ import {
   Search,
 } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { BasicDropdown, DialogForm, FieldSet, Select } from "@components/base";
+import { BasicDropdown, DialogForm, Select } from "@components/base";
 import { SimpleList } from "@components/base/list";
 import * as utils from "@utils/";
 import moment from "moment";
 import _ from "lodash";
-import * as Filter from "../filter";
-import apiRoute from "@services/apiRoute";
-import { Link } from "react-router-dom";
 
 export const ListWorker = ({
   onAdd,

@@ -147,4 +147,4 @@ const BOQImport = ({
   );
 };
 
-export default BOQImport;
+export default React.memo(BOQImport)

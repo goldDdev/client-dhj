@@ -1,17 +1,24 @@
 import React from "react";
 import { DialogForm, FieldSet } from "@components/base";
 import { LoadingButton } from "@mui/lab";
-import { Button, CircularProgress, Stack, TextField } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Collapse,
+  Stack,
+  TextField,
+} from "@mui/material";
 import * as utils from "@utils/";
 import * as Filter from "../filter";
+import apiRoute from "@services/apiRoute";
 
 const EventCreate = ({
+  isCurr,
   open,
   mutation,
   snackbar,
   table,
   onOpen,
-  route,
   type,
 }) => {
   return (
@@ -320,31 +327,39 @@ const EventCreate = ({
             <Button variant="outlined" onClick={onOpen}>
               Batal
             </Button>
-            <LoadingButton
-              loading={mutation.processing}
-              disabled={mutation.processing || mutation.loading}
-              disableElevation
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                mutation.post(route().project("kom").link(), {
-                  method: mutation.isNewRecord ? "post" : "put",
-                  except: [].concat(mutation.isNewRecord ? ["id"] : []),
-                  validation: true,
-                  onSuccess: ({ data }) => {
-                    snackbar(`Event Berhasil Ditambahkan`);
-                    onOpen();
-                    if (table && mutation.isNewRecord) {
-                      table.add(data, "start");
-                    } else {
-                      table.update((v) => v.id === mutation.data.id, data);
-                    }
-                  },
-                });
-              }}
+            <Collapse
+              in={isCurr}
+              unmountOnExit
+              orientation="horizontal"
+              sx={{ ml: 1 }}
             >
-              {mutation.isNewRecord ? "Tambah Baru" : "Simpan Perubahan"}
-            </LoadingButton>
+              <LoadingButton
+                loading={mutation.processing}
+                disabled={mutation.processing || mutation.loading}
+                disableElevation
+                variant="contained"
+                color="primary"
+                sx={{ whiteSpace: "nowrap" }}
+                onClick={() => {
+                  mutation.post(apiRoute.project.kom, {
+                    method: mutation.isNewRecord ? "post" : "put",
+                    except: [].concat(mutation.isNewRecord ? ["id"] : []),
+                    validation: true,
+                    onSuccess: ({ data }) => {
+                      snackbar(`Event Berhasil Ditambahkan`);
+                      onOpen();
+                      if (table && mutation.isNewRecord) {
+                        table.add(data, "start");
+                      } else {
+                        table.update((v) => v.id === mutation.data.id, data);
+                      }
+                    },
+                  });
+                }}
+              >
+                {mutation.isNewRecord ? "Tambah Baru" : "Simpan Perubahan"}
+              </LoadingButton>
+            </Collapse>
           </>
         ),
       }}

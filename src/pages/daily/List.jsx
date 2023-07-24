@@ -22,8 +22,7 @@ import { useSnackbar } from "notistack";
 import moment from "moment";
 import MainTemplate from "@components/templates/MainTemplate";
 import * as utils from "@utils/";
-import * as FORM from "./form";
-import * as Dummy from "../../constants/dummy";
+import * as Dummy from "@constants/dummy";
 import * as BASE from "@components/base";
 import {
   Add,
@@ -35,8 +34,9 @@ import {
 } from "@mui/icons-material";
 import apiRoute from "@services/apiRoute";
 import { useAlert } from "@contexts/AlertContext";
+import DailyCreate from "./form/DailyCreate";
 
-export default () => {
+const List = () => {
   const alert = useAlert();
   const today = moment().format("DD-MM-Y");
 
@@ -45,6 +45,7 @@ export default () => {
   const [trigger, setTrigger] = React.useState({
     form: false,
     filter: false,
+    currentData: "",
   });
 
   const [name, setName] = React.useState("");
@@ -102,9 +103,14 @@ export default () => {
   });
 
   const onOpen = () => {
-    setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
+    setTrigger((state) => ({
+      ...state,
+      form: !state.form,
+      currentData: btoa(JSON.stringify(Dummy.dailyPlan)),
+    }));
+
     projects.data = [];
     employees.data = [];
   };
@@ -125,7 +131,11 @@ export default () => {
         method: "post",
       },
       onSuccess: () => {
-        enqueueSnackbar("Plan mingguan berhasil ditambahkan");
+        enqueueSnackbar(
+          mutation.isNewRecord
+            ? "Plan harian berhasil ditambahkan"
+            : "Plan harian berhasil diperbaharui"
+        );
         table.refresh();
         mutation.clearData();
         mutation.clearError();
@@ -135,27 +145,33 @@ export default () => {
   };
 
   const onUpdate = (value) => {
-    setTrigger((state) => ({ ...state, form: true }));
-    projects.add({
-      id: value.projectId,
-      name: value.projectName,
-    });
-
-    employees.add({
-      id: value.employeeId,
-      name: value.name,
-      role: value.role,
-    });
-
-    mutation.setData({
-      employeeId: value.employeeId,
+    const data = {
+      id: value.id,
       projectId: value.projectId,
-      date: value.date,
+      employeeId: value.employeeId,
       projectName: value.projectName,
       name: value.name,
       role: value.role,
-      id: value.id,
+      date: value.date,
+    };
+
+    projects.add({
+      id: data.projectId,
+      name: data.projectName,
     });
+
+    employees.add({
+      id: data.employeeId,
+      name: data.name,
+      role: data.role,
+    });
+
+    setTrigger((state) => ({
+      ...state,
+      form: true,
+      currentData: btoa(JSON.stringify(data)),
+    }));
+    mutation.setData(data);
   };
 
   const onDelete = (id) => () => {
@@ -198,6 +214,11 @@ export default () => {
       left: document.getElementById(today).getBoundingClientRect().left,
     });
   }, []);
+
+  const isCurr = React.useMemo(
+    () => trigger.currentData !== btoa(JSON.stringify(mutation.data)),
+    [mutation.data, trigger.currentData]
+  );
 
   return (
     <MainTemplate
@@ -564,7 +585,8 @@ export default () => {
         </TableContainer>
       </Paper>
 
-      <FORM.Create
+      <DailyCreate
+        isCurr={isCurr}
         open={trigger.form}
         mutation={mutation}
         projects={projects}
@@ -576,3 +598,5 @@ export default () => {
     </MainTemplate>
   );
 };
+
+export default List;

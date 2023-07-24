@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import {
   Button,
   Stack,
@@ -15,10 +15,10 @@ import {
 } from "@mui/material";
 import { BasicDropdown, Timeline } from "@components/base";
 import { useSnackbar } from "notistack";
-import * as Dummy from "../../constants/dummy";
+import * as Dummy from "@constants/dummy";
 import * as utils from "@utils/";
 import FRHooks from "frhooks";
-import DataTable from "../../components/base/table/DataTable";
+import DataTable from "@components/base/table/DataTables";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
 import { useNavigate, useParams } from "react-router-dom";
@@ -54,6 +54,9 @@ const columns = (
       head: {
         padding: "checkbox",
         align: "center",
+        sx: {
+          minWidth: "46px",
+        },
       },
     },
 
@@ -291,6 +294,7 @@ const Boq = () => {
     currentId: 0,
     pboid: 0,
     history: false,
+    curr: "",
   });
   const [isSwitch, setSwitch] = React.useState(true);
 
@@ -299,7 +303,7 @@ const Boq = () => {
     total: (resp) => resp.meta.total,
     pagination: {
       perPage: 100,
-      perPageOptions: [50, 100, 200]
+      perPageOptions: [50, 100, 200],
     },
   });
 
@@ -318,17 +322,21 @@ const Boq = () => {
         projectId: y.number().nullable(),
         name: y.string().required().label("Nama"),
         typeUnit: y.string().required().label("Satuan"),
-        price: y.number().nullable().label("Harga"),
         unit: y.number().nullable().label("Unit"),
+        price: y.number().nullable().label("Harga"),
         totalPrice: y.number().nullable(),
         type: y.string().required().label("Tipe"),
       }),
   });
 
   const onOpen = React.useCallback(() => {
-    setTrigger((state) => ({ ...state, form: !state.form }));
     mutation.clearData();
     mutation.clearError();
+    setTrigger((state) => ({
+      ...state,
+      form: !state.form,
+      curr: btoa(JSON.stringify({ ...Dummy.projectBoq, projectId: +id })),
+    }));
   }, [mutation.data]);
 
   const onImport = () => {
@@ -381,15 +389,27 @@ const Boq = () => {
     progres.setQuery({ pboid: value.id });
   };
 
-  const onBoqUpdate = useCallback(
-    (value) => () => {
-      setTrigger((state) => ({ ...state, form: !state.form }));
-      mutation.clearData();
-      mutation.clearError();
-      mutation.setData(value);
-    },
-    [mutation.data]
-  );
+  const onBoqUpdate = (value) => () => {
+    mutation.clearData();
+    mutation.clearError();
+    const data = {
+      id: value.id,
+      projectId: +id,
+      name: value.name,
+      typeUnit: value.typeUnit,
+      unit: value.unit,
+      price: value.price,
+      totalPrice: value.totalPrice,
+      type: value.type,
+    };
+    console.log(data)
+    mutation.setData(data);
+    setTrigger((state) => ({
+      ...state,
+      form: !state.form,
+      curr: btoa(JSON.stringify(data)),
+    }));
+  };
 
   const onDelete = (id) => () => {
     alert.set({
@@ -460,6 +480,11 @@ const Boq = () => {
       onAlways: () => {},
     });
   };
+
+  const isCurr = React.useMemo(
+    () => trigger.curr !== btoa(JSON.stringify(mutation.data)),
+    [trigger.curr, mutation.data]
+  );
 
   return (
     <ProjectTemplate
@@ -648,6 +673,7 @@ const Boq = () => {
       </Paper>
 
       <BOQCreate
+        isCurr={isCurr}
         trigger={trigger}
         mutation={mutation}
         onOpen={onOpen}

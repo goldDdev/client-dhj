@@ -19,7 +19,7 @@ import MainTemplate from "@components/templates/MainTemplate";
 import * as utils from "@utils/";
 import * as BASE from "@components/base";
 import apiRoute from "@services/apiRoute";
-import DataTable from "../../components/base/table/DataTable";
+import DataTable from"@components/base/table/DataTable";
 import { FilterAlt, FilterAltOff, Refresh, Search } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 
@@ -293,6 +293,7 @@ const List = () => {
                   position: "sticky",
                   backgroundColor: "#f4f4f4",
                   left: 0,
+                  minWidth: "50px",
                 },
 
               "& > tbody > tr > td:nth-of-type(1), & > tbody > tr > td:nth-of-type(2)":
@@ -301,6 +302,7 @@ const List = () => {
                   position: "-webkit-sticky",
                   position: "sticky",
                   left: 0,
+                  minWidth: "50px",
                   zIndex: 3,
                 },
               "& > thead > tr > th:nth-of-type(2), & > tbody > tr > td:nth-of-type(2)":
