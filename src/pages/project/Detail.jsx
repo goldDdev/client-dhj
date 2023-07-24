@@ -54,18 +54,21 @@ export default () => {
     isNewRecord: (data) => data.id === 0,
     schema: (y) =>
       y.object().shape({
-        name: y.string().required(),
-        companyName: y.string().required(),
-        noSpk: y.string().required(),
-        contact: y.string().nullable(),
-        location: y.string().nullable(),
-        latitude: y.number().nullable(),
-        longitude: y.number().nullable(),
-        startAt: y.date().nullable(),
-        finishAt: y.date().nullable(),
-        targetDate: y.date().nullable(),
+        id: y.number().optional(),
+        name: y.string().required().label("Nama"),
+        noSpk: y.string().required().label("No SPK"),
+        companyName: y.string().required().label("Team"),
+        contact: y.string().optional(),
+        startAt: y.date().optional(),
+        finishAt: y.date().optional(),
+        duration: y.number().optional(),
+        price: y.number().optional(),
+        location: y.string().optional(),
+        latitude: y.number().optional(),
+        longitude: y.number().optional(),
+        targetDate: y.date().optional(),
         status: y.string().required(),
-        duration: y.number().nullable(),
+        note: y.string().optional(),
       }),
   });
 
@@ -78,6 +81,7 @@ export default () => {
     form: false,
     openWorker: false,
     addWorkerLoading: [],
+    curr: "",
   });
 
   const workers = FRHooks.useFetch([apiRoute.project.listWorkers, { id }], {
@@ -101,7 +105,10 @@ export default () => {
   });
 
   const onOpen = () => {
-    setTrigger((state) => ({ ...state, form: !state.form }));
+    setTrigger((state) => ({
+      ...state,
+      form: !state.form,
+    }));
     mutation.clearError();
   };
 
@@ -198,20 +205,67 @@ export default () => {
   };
 
   const onRefresh = () => {
-    mutation.get([apiRoute.project.detail, { id }], {
-      onSuccess: ({ data }) => {
+    mutation.get(["project.detail", { id }], {
+      onSuccess: (resp) => {
+        const data = {
+          id: resp.data.id,
+          name: resp.data.name,
+          noSpk: resp.data.noSpk,
+          companyName: resp.data.companyName,
+          contact: resp.data.contact || "",
+          startAt: resp.data.startAt,
+          finishAt: resp.data.finishAt,
+          duration: resp.data.duration,
+          price: resp.data.price,
+          location: resp.data.location || "",
+          latitude: resp.data.latitude,
+          longitude: resp.data.longitude,
+          targetDate: resp.data.targetDate,
+          status: resp.data.status,
+          note: resp.data.note || "",
+        };
+        setTrigger((state) => ({
+          ...state,
+          curr: btoa(JSON.stringify(data)),
+        }));
         mutation.setData(data);
       },
     });
   };
 
   React.useEffect(() => {
-    mutation.get([apiRoute.project.detail, { id }], {
-      onSuccess: ({ data }) => {
+    mutation.get(["project.detail", { id }], {
+      onSuccess: (resp) => {
+        const data = {
+          id: resp.data.id,
+          name: resp.data.name,
+          noSpk: resp.data.noSpk,
+          companyName: resp.data.companyName,
+          contact: resp.data.contact || "",
+          startAt: resp.data.startAt,
+          finishAt: resp.data.finishAt,
+          duration: resp.data.duration,
+          price: resp.data.price,
+          location: resp.data.location || "",
+          latitude: resp.data.latitude,
+          longitude: resp.data.longitude,
+          targetDate: resp.data.targetDate,
+          status: resp.data.status,
+          note: resp.data.note || "",
+        };
+        setTrigger((state) => ({
+          ...state,
+          curr: btoa(JSON.stringify(data)),
+        }));
         mutation.setData(data);
       },
     });
   }, [id]);
+
+  const isCurr = React.useMemo(
+    () => trigger.curr !== btoa(JSON.stringify(mutation.data)),
+    [trigger.curr, mutation.data]
+  );
 
   return (
     <ProjectTemplate
@@ -515,6 +569,7 @@ export default () => {
       </Grid>
 
       <ProjectCreate
+        isCurr={isCurr}
         open={trigger.form}
         mutation={mutation}
         onOpen={onOpen}

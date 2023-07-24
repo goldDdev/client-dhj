@@ -980,10 +980,10 @@ form-data@^4.0.0:
     combined-stream "^1.0.8"
     mime-types "^2.1.12"
 
-frhooks@^2.2.2-3:
-  version "2.2.2-3"
-  resolved "https://registry.yarnpkg.com/frhooks/-/frhooks-2.2.2-3.tgz#b37c04e1b502bfa2e899706aa20b75a1236f1c61"
-  integrity sha512-BnepCWZ138cNofXzLteZV0pk4FCu8MGa7XEqb72uW2O5q+X7A5b+LRspHyfJTaJt9KuH2yJnx6iR0VE9R5wB1g==
+frhooks@^2.2.2-6:
+  version "2.2.2-6"
+  resolved "https://registry.yarnpkg.com/frhooks/-/frhooks-2.2.2-6.tgz#8c6ef9d726e974ac4c02021f2b60ca4abd23287a"
+  integrity sha512-c704z5nPnystzH+G40+Zx5Kwmu1N+2i9IuuSsUAIT488dLfCA3Y7GeL/hhmK+NaeZ84adQ3xUXawSV95Znd3MA==
 
 fsevents@~2.3.2:
   version "2.3.2"

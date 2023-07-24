@@ -146,7 +146,7 @@ const List = () => {
     },
   });
 
-  const table = FRHooks.useTable(apiRoute.project.index, {
+  const table = FRHooks.useTable('project.index', {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
   });
@@ -185,7 +185,7 @@ const List = () => {
   };
 
   const onUpdate = (id) => () => {
-    mutation.get([apiRoute.project.detail, { id }], {
+    mutation.get(['project.detail', { id }], {
       onBeforeSend: () => {
         setTrigger((state) => ({
           ...state,
