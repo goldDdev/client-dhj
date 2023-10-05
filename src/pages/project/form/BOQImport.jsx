@@ -2,7 +2,9 @@ import React from "react";
 import { DialogForm } from "@components/base";
 import { LoadingButton } from "@mui/lab";
 import {
+  Box,
   Button,
+  Paper,
   Stack,
   Table,
   TableBody,
@@ -15,6 +17,24 @@ import {
 } from "@mui/material";
 import * as utils from "@utils/";
 import { Link } from "react-router-dom";
+
+const examples = [
+  {
+    name: "Seng Gelombang",
+    typeUnit: "lbr",
+    unit: 25,
+    price: 65000,
+    type: "CIVIL",
+  },
+  {
+    name: "Pipa Suling PVC 2",
+    typeUnit: "bh",
+    unit: 40,
+    price: 100000,
+    type: "PIPING",
+  },
+  { name: "Aki", typeUnit: "bh", unit: 2, price: 150000, type: "ELECTRICAL" },
+];
 
 const BOQImport = ({
   data,
@@ -39,7 +59,7 @@ const BOQImport = ({
 
   return (
     <DialogForm
-      open={trigger.import}
+      open={!trigger.import}
       onClose={onOpen}
       title="Import BOQ"
       maxWidth="sm"
@@ -60,6 +80,57 @@ const BOQImport = ({
                 {filename} ({data.length})
               </Typography>
             ) : null}
+
+            <Paper
+              variant="outlined"
+              sx={{
+                backgroundColor: "whitesmoke",
+                p:1
+              }}
+            >
+              <Typography>Contoh: </Typography>
+              <Typography gutterBottom>Tipe: <Typography component={"span"} fontWeight={600}>CIVIL, ELECTRICAL dan PIPING</Typography> </Typography>
+              <TableContainer></TableContainer>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Nama</TableCell>
+                      <TableCell align="center">Satuan</TableCell>
+                      <TableCell align="center">Unit</TableCell>
+                      <TableCell align="center">Tipe</TableCell>
+                      <TableCell align="center">Harga</TableCell>
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {examples.map((val, r) => {
+                      return (
+                        <TableRow key={r}>
+                          <TableCell>{val.name || "Kosong"}</TableCell>
+
+                          <TableCell align="center">
+                            {val.typeUnit || "Kosong"}
+                          </TableCell>
+
+                          <TableCell align="center">
+                            {val.unit || "Kosong"}
+                          </TableCell>
+
+                          <TableCell align="center">
+                            {val.type || "Kosong"}
+                          </TableCell>
+
+                          <TableCell align="center">
+                            {Number(val.price || 0)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
 
             {failData.length > 0 ? (
               <TableContainer>
@@ -119,13 +190,13 @@ const BOQImport = ({
         },
         children: (
           <>
-            <div style={{ marginRight: 2 }}>
+            <div style={{ marginLeft: '16px' }}>
               <Link to={"https://api.app-dhj.com/web/boqs"}>
                 Unduh Format Import
               </Link>
             </div>
 
-            <Stack direction={"row"} spacing={1}>
+            <Stack direction={"row"} spacing={1} mr={2}>
               <Button variant="outlined" onClick={onOpen}>
                 Batal
               </Button>
@@ -147,4 +218,4 @@ const BOQImport = ({
   );
 };
 
-export default React.memo(BOQImport)
+export default React.memo(BOQImport);
