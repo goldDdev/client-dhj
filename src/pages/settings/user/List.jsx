@@ -119,6 +119,9 @@ const List = () => {
           .label("No Handphone"),
         role: y.string().required().label("Role"),
       }),
+    format: {
+      phoneNumber: (value) => String(value).replaceAll(" ", ""),
+    },
   });
 
   const server = useServerValidation({

@@ -1,9 +1,9 @@
-import FRHooks from "frhooks";
 import _ from "lodash";
 import { Stack, TextField, Button, CircularProgress } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import * as BASE from "@components/base";
 import * as utils from "@utils/";
+import PhoneFormat from "@components/base/mask/PhoneFormat";
 
 const UserCreate = ({ open, mutation, server, snackbar, table, onOpen }) => {
   return (
@@ -70,6 +70,7 @@ const UserCreate = ({ open, mutation, server, snackbar, table, onOpen }) => {
                 endAdornment: mutation.loading ? (
                   <CircularProgress size={20} />
                 ) : null,
+                inputComponent: PhoneFormat,
               }}
             />
 
@@ -108,32 +109,35 @@ const UserCreate = ({ open, mutation, server, snackbar, table, onOpen }) => {
             </Button>
             <LoadingButton
               loading={mutation.processing}
-              disabled={mutation.processing}
+              disabled={mutation.processing || !mutation.isValid()}
               variant="contained"
               color="primary"
               onClick={() => {
                 const isNew = mutation.isNewRecord;
                 const editId = mutation.data.id;
-                const route = isNew
-                  ? FRHooks.apiRoute().user("index")
-                  : FRHooks.apiRoute().user("detail", { id: editId });
-                mutation.post(route.link(), {
-                  method: mutation.isNewRecord ? "post" : "put",
-                  except: mutation.isNewRecord ? ["id"] : [],
-                  validation: true,
-                  onSuccess: (resp) => {
-                    snackbar("Pengguna berhasil ditambahkan");
-                    if (isNew) {
-                      table.data.unshift(resp.data);
-                    } else {
-                      const idx = table.data.findIndex((d) => d.id === editId);
-                      table.data[idx] = resp.data;
-                    }
-                    mutation.clearData();
-                    mutation.clearError();
-                    onOpen();
-                  },
-                });
+
+                mutation.post(
+                  isNew ? "user.index" : ["user.detail", { id: editId }],
+                  {
+                    method: mutation.isNewRecord ? "post" : "put",
+                    except: mutation.isNewRecord ? ["id"] : [],
+                    validation: true,
+                    onSuccess: (resp) => {
+                      snackbar("Pengguna berhasil ditambahkan");
+                      if (isNew) {
+                        table.data.unshift(resp.data);
+                      } else {
+                        const idx = table.data.findIndex(
+                          (d) => d.id === editId
+                        );
+                        table.data[idx] = resp.data;
+                      }
+                      mutation.clearData();
+                      mutation.clearError();
+                      onOpen();
+                    },
+                  }
+                );
               }}
             >
               {mutation.isNewRecord ? "Tambah Pengguna" : "Simpan Perubahan"}

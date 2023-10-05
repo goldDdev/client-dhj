@@ -172,7 +172,7 @@ const EmployeeCreate = ({isCurr, open, mutation, onOpen, onSubmit, validate }) =
             <Collapse in={isCurr} unmountOnExit sx={{ ml: 1 }} orientation="horizontal">
               <LoadingButton
                 loading={mutation.processing}
-                disabled={mutation.processing}
+                disabled={mutation.processing || !mutation.isValid()}
                 variant="contained"
                 color="primary"
                 onClick={onSubmit}

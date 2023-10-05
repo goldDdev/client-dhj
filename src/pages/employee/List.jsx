@@ -27,6 +27,7 @@ import { Button, BasicDropdown } from "@components/base";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
 import EmployeeCreate from "./form/EmployeeCreate";
+import { AxiosError } from "axios";
 
 const columns = (table, utils, onUpdate, onDelete) => [
   {
@@ -187,7 +188,7 @@ const List = () => {
     },
   });
 
-  const { serve, validate: serverValidate } = FRHooks.useServerValidation({
+  const { validate: serverValidate } = FRHooks.useServerValidation({
     url: apiRoute.employee.validation,
     param: {
       path: "field",
@@ -300,14 +301,11 @@ const List = () => {
       ...va,
       ...(va.type === "00" ? { type: "" } : { type: va.type }),
     }));
+
     mutation.post(apiRoute.employee.index, {
       except: mutation.isNewRecord ? ["id"] : [],
       method: mutation.isNewRecord ? "post" : "put",
       validation: true,
-      serverValidation: {
-        serve,
-        method: "post",
-      },
       onSuccess: ({ data }) => {
         enqueueSnackbar("Karyawan baru berhasil disimpan");
         if (mutation.isNewRecord) {
@@ -318,6 +316,11 @@ const List = () => {
         mutation.clearData();
         mutation.clearError();
         onOpen();
+      },
+      onError: (e) => {
+        if (e instanceof AxiosError) {
+          enqueueSnackbar(e.message, { variant: "error" });
+        }
       },
     });
   };
