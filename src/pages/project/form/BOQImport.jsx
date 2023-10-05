@@ -59,7 +59,7 @@ const BOQImport = ({
 
   return (
     <DialogForm
-      open={!trigger.import}
+      open={trigger.import}
       onClose={onOpen}
       title="Import BOQ"
       maxWidth="sm"
