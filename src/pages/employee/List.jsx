@@ -160,6 +160,7 @@ const List = () => {
   const table = FRHooks.useTable(apiRoute.employee.index, {
     selector: (resp) => resp.data,
     total: (resp) => resp.meta.total,
+    replaceUrl: true,
   });
 
   const mutation = FRHooks.useMutation({

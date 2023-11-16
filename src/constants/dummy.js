@@ -70,6 +70,8 @@ export const projectBoq = {
   price: 0,
   totalPrice: 0,
   type: "",
+  description: "",
+  code: ""
 };
 
 export const inventory = {

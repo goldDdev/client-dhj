@@ -4,7 +4,14 @@ import { LoadingButton } from "@mui/lab";
 import { Button, Collapse, Stack, TextField } from "@mui/material";
 import * as utils from "@utils/";
 
-const BOQCreate = ({ isCurr, trigger, onOpen, mutation, onSubmit }) => (
+const BOQCreate = ({
+  isCurr,
+  trigger,
+  onOpen,
+  mutation,
+  onSubmit,
+  typeUnits,
+}) => (
   <DialogForm
     open={trigger.form}
     onClose={onOpen}
@@ -33,7 +40,7 @@ const BOQCreate = ({ isCurr, trigger, onOpen, mutation, onSubmit }) => (
               onChange={(e) => mutation.setData({ typeUnit: e.target.value })}
               error={mutation.error("typeUnit")}
               helperText={mutation.message("typeUnit")}
-              sx={{ minWidth: "75%" }}
+              sx={{ minWidth: "50%" }}
             />
 
             <TextField
@@ -49,6 +56,14 @@ const BOQCreate = ({ isCurr, trigger, onOpen, mutation, onSubmit }) => (
               }}
               error={mutation.error("unit")}
               helperText={mutation.message("unit")}
+            />
+
+            <TextField
+              label="Kode"
+              value={mutation.data.code || ""}
+              onChange={(e) => mutation.setData({ code: e.target.value })}
+            
+              sx={{ minWidth: "%" }}
             />
           </FieldSet>
 
@@ -80,19 +95,19 @@ const BOQCreate = ({ isCurr, trigger, onOpen, mutation, onSubmit }) => (
             name="type"
             menu={[
               { text: "Pilih Tipe", value: "00" },
-              ...utils.boqTypes.map((v) => ({
-                text: v,
-                value: v,
+              ...typeUnits.data.map((v) => ({
+                text: v.type,
+                value: v.type,
               })),
             ]}
-            value={mutation.data.type || "00"}
+            value={mutation.data.description || "00"}
             onChange={(e) => {
               mutation.setData({
-                type: e.target.value === "00" ? null : e.target.value,
+                description: e.target.value === "00" ? null : e.target.value,
               });
             }}
-            error={mutation.error("type")}
-            helperText={mutation.message("type")}
+            error={mutation.error("description")}
+            helperText={mutation.message("description")}
           />
         </Stack>
       ),

@@ -76,6 +76,7 @@ const apiRoute = {
   },
   setting: {
     index: "/setting",
+    typeUnit: "/setting/boq-types",
   },
   inventory: {
     index: "/inventory",

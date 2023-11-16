@@ -46,15 +46,7 @@ const BOQImport = ({
   filename,
 }) => {
   const failData = data.filter((v) =>
-    !v.name
-      ? true
-      : !v.typeUnit
-      ? true
-      : !v.unit
-      ? true
-      : !v.type
-      ? true
-      : false
+    !v.name ? true : !v.typeUnit ? true : !v.unit ? true : false
   );
 
   return (
@@ -85,11 +77,16 @@ const BOQImport = ({
               variant="outlined"
               sx={{
                 backgroundColor: "whitesmoke",
-                p:1
+                p: 1,
               }}
             >
               <Typography>Contoh: </Typography>
-              <Typography gutterBottom>Tipe: <Typography component={"span"} fontWeight={600}>CIVIL, ELECTRICAL dan PIPING</Typography> </Typography>
+              <Typography gutterBottom>
+                Tipe:{" "}
+                <Typography component={"span"} fontWeight={600}>
+                  CIVIL, ELECTRICAL dan PIPING
+                </Typography>{" "}
+              </Typography>
               <TableContainer></TableContainer>
               <TableContainer>
                 <Table size="small">
@@ -98,7 +95,6 @@ const BOQImport = ({
                       <TableCell>Nama</TableCell>
                       <TableCell align="center">Satuan</TableCell>
                       <TableCell align="center">Unit</TableCell>
-                      <TableCell align="center">Tipe</TableCell>
                       <TableCell align="center">Harga</TableCell>
                     </TableRow>
                   </TableHead>
@@ -115,10 +111,6 @@ const BOQImport = ({
 
                           <TableCell align="center">
                             {val.unit || "Kosong"}
-                          </TableCell>
-
-                          <TableCell align="center">
-                            {val.type || "Kosong"}
                           </TableCell>
 
                           <TableCell align="center">
@@ -147,7 +139,6 @@ const BOQImport = ({
                       <TableCell>Nama</TableCell>
                       <TableCell align="center">Satuan</TableCell>
                       <TableCell align="center">Unit</TableCell>
-                      <TableCell align="center">Tipe</TableCell>
                       <TableCell align="center">Harga</TableCell>
                     </TableRow>
                   </TableHead>
@@ -165,10 +156,6 @@ const BOQImport = ({
 
                           <TableCell align="center">
                             {val.unit || "Kosong"}
-                          </TableCell>
-
-                          <TableCell align="center">
-                            {val.type || "Kosong"}
                           </TableCell>
 
                           <TableCell align="center">
@@ -190,11 +177,11 @@ const BOQImport = ({
         },
         children: (
           <>
-            <div style={{ marginLeft: '16px' }}>
+            {/* <div style={{ marginLeft: "16px" }}>
               <Link to={"https://api.app-dhj.com/web/boqs"}>
                 Unduh Format Import
               </Link>
-            </div>
+            </div> */}
 
             <Stack direction={"row"} spacing={1} mr={2}>
               <Button variant="outlined" onClick={onOpen}>

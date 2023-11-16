@@ -17,7 +17,7 @@ import { BasicDropdown, Timeline } from "@components/base";
 import { useSnackbar } from "notistack";
 import * as Dummy from "@constants/dummy";
 import * as utils from "@utils/";
-import FRHooks from "frhooks";
+import FRHooks, { useFetch } from "frhooks";
 import DataTable from "@components/base/table/DataTables";
 import ProjectTemplate from "@components/templates/ProjectTemplate";
 import moment from "moment";
@@ -69,14 +69,19 @@ const columns = (
         ) : (
           value.name
         ),
+      sx: {},
+    },
+    {
+      label: "Satuan",
+      value: (value) => value.typeUnit || "-",
       sx: {
         whiteSpace: "nowrap",
       },
     },
     {
-      label: "Satuan",
+      label: "Kode",
+      value: (value) => value.code || "-",
       align: "center",
-      value: (value) => value.typeUnit || "-",
       sx: {
         whiteSpace: "nowrap",
       },
@@ -84,8 +89,8 @@ const columns = (
 
     {
       label: "Tipe",
-      value: (value) => value.type || "-",
-      align: "center",
+      value: (value) => value.description || "-",
+
       sx: {
         whiteSpace: "nowrap",
       },
@@ -97,7 +102,7 @@ const columns = (
     },
 
     {
-      label: "Jumlah",
+      label: "Qty",
       value: (value) => value.unit,
       align: "center",
       padding: "checkbox",
@@ -118,35 +123,35 @@ const columns = (
       },
     },
 
-    {
-      label: "Plan",
-      value: (value) =>
-        postLoading.some((v) => v === value.boqId) ? (
-          <Skeleton width="100%" />
-        ) : (
-          value.planProgres
-        ),
-      align: "center",
-      padding: "checkbox",
-      head: {
-        align: "center",
-      },
-      sx: {
-        whiteSpace: "noWrap",
-        fontWeight: 700,
-        fontSize: "16px",
-        minWidth: "80px",
-        ...borderPlan,
-      },
-    },
-    {
-      label: "Jumlah Plan",
-      value: (value) => utils.formatCurrency(value.price * value.planProgres),
-      align: "right",
-      sx: {
-        ...borderPlan,
-      },
-    },
+    // {
+    //   label: "Plan",
+    //   value: (value) =>
+    //     postLoading.some((v) => v === value.boqId) ? (
+    //       <Skeleton width="100%" />
+    //     ) : (
+    //       value.planProgres
+    //     ),
+    //   align: "center",
+    //   padding: "checkbox",
+    //   head: {
+    //     align: "center",
+    //   },
+    //   sx: {
+    //     whiteSpace: "noWrap",
+    //     fontWeight: 700,
+    //     fontSize: "16px",
+    //     minWidth: "80px",
+    //     ...borderPlan,
+    //   },
+    // },
+    // {
+    //   label: "Jumlah Plan",
+    //   value: (value) => utils.formatCurrency(value.price * value.planProgres),
+    //   align: "right",
+    //   sx: {
+    //     ...borderPlan,
+    //   },
+    // },
 
     {
       label: "Progres",
@@ -179,58 +184,58 @@ const columns = (
       },
     },
 
-    {
-      label: "Tanggal Progres",
-      sortKey: "updated_at",
-      value: (value) => (
-        <ListItemText
-          sx={{ m: 0 }}
-          primary={value.progresBy || "-"}
-          primaryTypographyProps={{ variant: "body2" }}
-          secondary={value.lastProgresAt || "-"}
-          secondaryTypographyProps={{ variant: "body2" }}
-        />
-      ),
-      align: "center",
-      padding: "checkbox",
-      head: {
-        align: "center",
-        sx: {
-          whiteSpace: "nowrap",
-        },
-      },
-      sx: {
-        ...borderPlan,
-      },
-    },
-    {
-      label: "Tanggal Plan",
-      value: (value) =>
-        postLoading.some((v) => v === value.boqId) ? (
-          <Skeleton width="100%" />
-        ) : (
-          <ListItemText
-            sx={{ m: 0 }}
-            secondary={`${value.planStart || ""} - ${value.planEnd || ""}`}
-            primaryTypographyProps={{ variant: "body2" }}
-            primary={value.planBy || "-"}
-            secondaryTypographyProps={{ variant: "body2" }}
-          />
-        ),
-      align: "center",
-      head: {
-        align: "center",
-        sx: {
-          whiteSpace: "nowrap",
-        },
-      },
-      padding: "checkbox",
-      sx: {
-        whiteSpace: "noWrap",
-        padding: 0.4,
-        ...borderPlan,
-      },
-    },
+    // {
+    //   label: "Tanggal Progres",
+    //   sortKey: "updated_at",
+    //   value: (value) => (
+    //     <ListItemText
+    //       sx={{ m: 0 }}
+    //       primary={value.progresBy || "-"}
+    //       primaryTypographyProps={{ variant: "body2" }}
+    //       secondary={value.lastProgresAt || "-"}
+    //       secondaryTypographyProps={{ variant: "body2" }}
+    //     />
+    //   ),
+    //   align: "center",
+    //   padding: "checkbox",
+    //   head: {
+    //     align: "center",
+    //     sx: {
+    //       whiteSpace: "nowrap",
+    //     },
+    //   },
+    //   sx: {
+    //     ...borderPlan,
+    //   },
+    // },
+    // {
+    //   label: "Tanggal Plan",
+    //   value: (value) =>
+    //     postLoading.some((v) => v === value.boqId) ? (
+    //       <Skeleton width="100%" />
+    //     ) : (
+    //       <ListItemText
+    //         sx={{ m: 0 }}
+    //         secondary={`${value.planStart || ""} - ${value.planEnd || ""}`}
+    //         primaryTypographyProps={{ variant: "body2" }}
+    //         primary={value.planBy || "-"}
+    //         secondaryTypographyProps={{ variant: "body2" }}
+    //       />
+    //     ),
+    //   align: "center",
+    //   head: {
+    //     align: "center",
+    //     sx: {
+    //       whiteSpace: "nowrap",
+    //     },
+    //   },
+    //   padding: "checkbox",
+    //   sx: {
+    //     whiteSpace: "noWrap",
+    //     padding: 0.4,
+    //     ...borderPlan,
+    //   },
+    // },
 
     {
       value: (value) => (
@@ -305,12 +310,20 @@ const Boq = () => {
       perPage: 100,
       perPageOptions: [50, 100, 200],
     },
+    sort: {
+      order: "asc",
+    },
   });
 
   const progres = FRHooks.useFetch([apiRoute.project.listProgress, { id }], {
     defaultValue: [],
     selector: (resp) => resp.data,
     total: (resp) => resp.data.meta.total,
+  });
+
+  const typeUnits = useFetch("setting.typeUnit", {
+    defaultValue: [],
+    selector: (resp) => resp.data,
   });
 
   const mutation = FRHooks.useMutation({
@@ -325,7 +338,8 @@ const Boq = () => {
         unit: y.number().nullable().label("Unit"),
         price: y.number().nullable().label("Harga"),
         totalPrice: y.number().nullable(),
-        type: y.string().required().label("Tipe"),
+        description: y.string().optional().label("Tipe"),
+        code: y.string().optional().label("Kode"),
       }),
   });
 
@@ -358,25 +372,50 @@ const Boq = () => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(worksheet, {
         defVal: null,
-        header: ["name", "typeUnit", "unit", "price", "type"],
+        header: ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
         blankrows: null,
       });
 
       if (!!data.length) {
         delete data[0];
+        delete data[1];
+        data.pop();
 
-        setJsonData(
-          data
-            .map((vl, i) => ({
-              name: vl.name || "",
-              typeUnit: vl.typeUnit ?? "",
-              unit: parseFloat(vl.unit || 0),
-              price: +vl.price,
-              type: vl.type || "",
-              row: vl.__rowNum__ || i,
-            }))
-            .filter((v) => v !== null)
-        );
+        let tmp = [];
+        let description = "";
+
+        data.forEach((vl, i) => {
+          const A = String(vl.A).trim();
+          const B = String(vl.B).trim();
+          const C = String(vl.C).trim();
+          const D = String(vl.D).trim();
+          const E = String(vl.E).trim();
+          const F = String(vl.F).trim();
+          const G = String(vl.G).trim();
+          const H = String(vl.H).trim();
+          const I = String(vl.I).trim();
+
+          if (!!A) {
+            description = A;
+          }
+
+          if (!!vl) {
+            if (!!B && !!C && (!!D || !!E) && !!F && !!I) {
+              tmp.push({
+                description,
+                name: B || "",
+                typeUnit: C || "",
+                unit: parseFloat(F || 0),
+                price: +(D || E || 0),
+                type: "",
+                code: I || "",
+                row: vl.__rowNum__ || i,
+              });
+            }
+          }
+        });
+
+        setJsonData(tmp);
       }
     };
 
@@ -401,8 +440,9 @@ const Boq = () => {
       price: value.price,
       totalPrice: value.totalPrice,
       type: value.type,
+      description: value.description,
+      code: value.code,
     };
-    console.log(data)
     mutation.setData(data);
     setTrigger((state) => ({
       ...state,
@@ -604,6 +644,10 @@ const Boq = () => {
                     borderColor: "divider",
                     boxShadow: "inset -2px 0 1px -2px rgba(0,0,0,0.50)",
                   },
+
+                "& > tbody > tr > td:nth-of-type(2)": {
+                  minWidth: "500px",
+                },
               },
             }}
             data={table.data}
@@ -676,6 +720,7 @@ const Boq = () => {
         isCurr={isCurr}
         trigger={trigger}
         mutation={mutation}
+        typeUnits={typeUnits}
         onOpen={onOpen}
         onSubmit={onCreate}
       />

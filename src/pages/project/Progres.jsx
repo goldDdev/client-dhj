@@ -55,9 +55,9 @@ export default () => {
   const progres = FRHooks.useTable([apiRoute.progres.all, { id }], {
     selector: (resp) => resp.data,
     total: (resp) => resp.total,
-    pagination:{
-      perPage: 100
-    }
+    pagination: {
+      perPage: 100,
+    },
   });
 
   const handleClick = (value) => (event) => {
@@ -358,7 +358,7 @@ export default () => {
                   return (
                     <React.Fragment key={i}>
                       <TableRow>
-                        <TableCell rowSpan={2} sx={{ whiteSpace: "nowrap" }}>
+                        <TableCell rowSpan={2} sx={{ minWidth: "500px" }}>
                           <ListItemText
                             primary={value.name}
                             secondary={`Tipe: ${value.type || "-"} | Satuan: ${
