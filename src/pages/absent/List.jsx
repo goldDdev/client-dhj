@@ -268,7 +268,7 @@ const List = () => {
             {Object.entries(table.queryParams).map(([k, v]) => (
               <Chip
                 key={k}
-                label={k === "month" ? utils.getMonth(v) : v}
+                label={k === "month" ? utils.getMonth(v -1) : v}
                 size="small"
                 variant="outlined"
                 color="primary"
